@@ -9,17 +9,39 @@
 namespace py
 {
 
-	bool SameLine::ParsePy(std::string& line)
+	bool ICommand::ParsePy(std::string& line)
+	{
+		std::regex statement(R"((s*)(.+)(\s*))");
+		if (!std::regex_match(line, statement))
+			return false;
+
+		std::smatch matches;
+		std::regex_search(line, matches, statement);
+
+		Indentation = matches[1];
+		CmdText = matches[2];
+		// We omit suffix spaces.
+		return ParsePy_inner(CmdText);
+	}
+
+	std::string ICommand::Translate()
+	{
+		return Translate_inner();
+	}
+	
+	//////////////////////////////////////////////////
+
+	bool SameLine::ParsePy_inner(std::string& line)
 	{
 		Line = line;
 		return true;
 	}
-	std::string SameLine::Translate() const
+	std::string SameLine::Translate_inner() const
 	{
 		return Line;
 	}
 
-	bool TwoSidesOperator::ParsePy(std::string & line)
+	bool TwoSidesOperator::ParsePy_inner(std::string & line)
 	{
 		auto parts = pyStr(line).split(PyOperator(), 2);
 		if (parts.size() > 1)
@@ -34,26 +56,26 @@ namespace py
 		return false;
 	}
 
-	std::string TwoSidesOperator::Translate() const
+	std::string TwoSidesOperator::Translate_inner() const
 	{
-		return Children[0]->Translate() + CppOperator() + Children[1]->Translate();
+		return Children[0]->Translate_inner() + CppOperator() + Children[1]->Translate_inner();
 	}
 	
 	//////////////////////////////////////////////
 
 	std::string ObjIdentity::CppOperator() const { NOT_IMPL; }
-	std::string ObjIdentity::Translate() const
+	std::string ObjIdentity::Translate_inner() const
 	{
-		return pyStr("is_same(") + Children[0]->Translate() + pyStr(",") + Children[1]->Translate() + pyStr(")");
+		return pyStr("is_same(") + Children[0]->Translate_inner() + pyStr(",") + Children[1]->Translate_inner() + pyStr(")");
 	}
 
 	std::string NgatedObjIdentity::CppOperator() const { NOT_IMPL; }
-	std::string NgatedObjIdentity::Translate() const
+	std::string NgatedObjIdentity::Translate_inner() const
 	{
-		return pyStr("is_not(") + Children[0]->Translate() + pyStr(",") + Children[1]->Translate() + pyStr(")");
+		return pyStr("is_not(") + Children[0]->Translate_inner() + pyStr(",") + Children[1]->Translate_inner() + pyStr(")");
 	}
 	   
-	bool NegationOP::ParsePy(std::string & line)
+	bool NegationOP::ParsePy_inner(std::string & line)
 	{
 		std::regex statement(R"(not (.*))");
 		if (!std::regex_match(line, statement))
@@ -66,9 +88,9 @@ namespace py
 		return true;
 	}
 
-	std::string NegationOP::Translate() const
+	std::string NegationOP::Translate_inner() const
 	{
-		return "! " + Children[0]->Translate();
+		return "! " + Children[0]->Translate_inner();
 	}
 
 	//////////// Pre and post escaping: ///////////////
@@ -90,7 +112,7 @@ namespace py
 	
 	///////////////////////////
 
-	bool InnerScopeEscaperBase::ParsePy(std::string & line)
+	bool InnerScopeEscaperBase::ParsePy_inner(std::string & line)
 	{
 		std::regex statement(OuterExpressionRegex());
 		if (!std::regex_match(line, statement))
@@ -112,10 +134,10 @@ namespace py
 		return true;
 	}
 	
-	std::string InnerScopeEscaperBase::Translate() const
+	std::string InnerScopeEscaperBase::Translate_inner() const
 	{
-		std::string outer = Children[0]->Translate();
-		std::string inner = Children[1]->Translate();
+		std::string outer = Children[0]->Translate_inner();
+		std::string inner = Children[1]->Translate_inner();
 		
 		auto uuidIndex = outer.find(_UUID, 0);
 		THROW_IF(std::string::npos == uuidIndex, "Parsing error: Where did the substring UUID go?!");
@@ -129,7 +151,7 @@ namespace py
 	
 	////////////////////////////////////////////////////////////
 
-	bool Container_ImplicitConstruction_Base::ParsePy(std::string& line)
+	bool Container_ImplicitConstruction_Base::ParsePy_inner(std::string& line)
 	{
 		std::regex statement("\\(" + ScopeOpenerRGX() + "\\)" + R"((.*))" + ScopeCloserRGX());
 		if (!std::regex_match(line, statement))
@@ -151,12 +173,12 @@ namespace py
 			elements.append(part.Clone());
 	}
 
-	std::string ListImplicitConstruction::Translate() const
+	std::string ListImplicitConstruction::Translate_inner() const
 	{
 		return pyStr("list({") + pyStr(",").join(elements) + pyStr("});");
 	}
 
-	std::string DictImplicitConstruction::Translate() const
+	std::string DictImplicitConstruction::Translate_inner() const
 	{
 		pyStr result = pyStr("dict({");
 		for (auto elemObj : elements)
@@ -170,7 +192,7 @@ namespace py
 		return result;
 	}
 
-	std::string FunctionCall::Translate() const
+	std::string FunctionCall::Translate_inner() const
 	{
 		pyStr result = pyStr("");
 
@@ -190,7 +212,7 @@ namespace py
 	}
 
 
-	bool EmptyDictImplicitConstruction::ParsePy(std::string& line)
+	bool EmptyDictImplicitConstruction::ParsePy_inner(std::string& line)
 	{
 		std::regex statement("\\{\\s*\\}");
 		if (!std::regex_match(line, statement))
@@ -202,24 +224,24 @@ namespace py
 		return true;
 	}
 
-	std::string EmptyDictImplicitConstruction::Translate() const
+	std::string EmptyDictImplicitConstruction::Translate_inner() const
 	{
 		return "dict();";
 	}
 
-	std::string SetImplicitConstruction::Translate() const
+	std::string SetImplicitConstruction::Translate_inner() const
 	{
 		return pyStr("set({") + pyStr(",").join(elements) + pyStr("});");
 	}
 
-	std::string BytesImplicitConstruction::Translate() const
+	std::string BytesImplicitConstruction::Translate_inner() const
 	{
 		return pyStr("bytes(\"") + pyStr(",").join(elements) + pyStr("\")");
 	}
 
 	//////////////////////////////////////////////////
 
-	bool VariableUsage::ParsePy(std::string& line)
+	bool VariableUsage::ParsePy_inner(std::string& line)
 	{
 		std::regex varName(R"([a-zA-Z_]+\w*)");
 		bool isVar = std::regex_match(line, varName);
@@ -234,12 +256,12 @@ namespace py
 		return isVar;
 	}
 
-	std::string VariableUsage::Translate() const
+	std::string VariableUsage::Translate_inner() const
 	{
 		return IsDefinedFirstTime ? "object " + VarName : VarName;
 	}
 
-	bool If_Statement::ParsePy(std::string& line)
+	bool If_Statement::ParsePy_inner(std::string& line)
 	{
 		std::regex statement(R"(if\s+([\w\s]+)\:)");
 		if (!std::regex_match(line, statement))
@@ -252,12 +274,12 @@ namespace py
 		return true;
 	}
 
-	std::string If_Statement::Translate() const
+	std::string If_Statement::Translate_inner() const
 	{
-		return pyStr("if ({})").format(Children[0]->Translate());
+		return pyStr("if ({})").format(Children[0]->Translate_inner());
 	}
 
-	bool For_Statement::ParsePy(std::string& line)
+	bool For_Statement::ParsePy_inner(std::string& line)
 	{
 		std::regex statement(R"(for\s+(.+)\sin\s+(.+)\:)");
 		if (!std::regex_match(line, statement))
@@ -273,12 +295,12 @@ namespace py
 
 	}
 
-	std::string For_Statement::Translate() const
+	std::string For_Statement::Translate_inner() const
 	{
-		return pyStr("for (auto {} : {})").format(Children[0]->Translate(), Children[1]->Translate());
+		return pyStr("for (auto {} : {})").format(Children[0]->Translate_inner(), Children[1]->Translate_inner());
 	}
 
-	bool While_Statement::ParsePy(std::string& line)
+	bool While_Statement::ParsePy_inner(std::string& line)
 	{
 		std::regex statement(R"(while\s+(.+)\:)");
 		if (!std::regex_match(line, statement))
@@ -292,9 +314,9 @@ namespace py
 		return true;
 	}
 
-	std::string While_Statement::Translate() const
+	std::string While_Statement::Translate_inner() const
 	{
-		return pyStr("while ({})").format(Children[0]->Translate());
+		return pyStr("while ({})").format(Children[0]->Translate_inner());
 	}
 
 	//void InnerScope_FunctionCall_Escaper::ParsePy_innerScope(std::string const& text)
@@ -309,7 +331,7 @@ namespace py
 		elements.append(pyStr(match).Clone());
 	}
 
-	std::string StringLiterals_OuterScope_EscaperBase::Translate() const
+	std::string StringLiterals_OuterScope_EscaperBase::Translate_inner() const
 	{
 		pyStr result;
 		if (IsRealString())
@@ -402,7 +424,6 @@ namespace py
 		result->ParsePy(line);
 		return result;
 	}
-
 }
 
 

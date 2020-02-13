@@ -47,13 +47,13 @@ namespace py
 		return object(get()->Clone());
 	}
 
-	bool object::operator <(object const& other) const
+
+	bool object::operator<(object const& other) const
 	{
 		pyObj* mine = this->get();
 		pyObj* his = other.get();
 		return *mine < *his;
 	}
-
 	object object::operator ++(int x) { return get()->operator++(x); };
 	object object::operator ++() { return get()->operator++(); };
 	object & object::operator += (object const& other) { get()->operator+=(*other.get()); return *this; };

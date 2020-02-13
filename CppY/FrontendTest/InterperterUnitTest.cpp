@@ -8,7 +8,7 @@ TEST(Interperter, TestName)
     // Arrange
     PyParser parser;
     // Act
-    auto command = parser.Parse("x = 5 + f(78)");
+    auto command = parser.Parse("x =  5 + f(78)");
     auto cppStr = command->Translate();
 
     // Assert
