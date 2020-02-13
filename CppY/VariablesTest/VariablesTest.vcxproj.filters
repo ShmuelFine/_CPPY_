@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="numericObjTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="objectUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>other</Filter>
+    </ClCompile>
+    <ClCompile Include="listUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="FuncUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="pyListUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="IntUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="rangeUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+<<<<<<< HEAD
+    <ClCompile Include="tupleUnitTest.cpp">
+=======
+    <ClCompile Include="pyDictUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+    <ClCompile Include="dictUnitTest.cpp">
+      <Filter>Tests</Filter>
+    </ClCompile>
+<<<<<<< HEAD
+    <ClCompile Include="setUnitTest.cpp">
+=======
+    <ClCompile Include="BytesUnitTest.cpp">
+>>>>>>> 19b648d64bef26043c7ed8d28d3776e980d67350
+>>>>>>> 5af36a52634206de82d007fea9554864fb00795a
+      <Filter>Tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{99861adb-332e-4120-8154-7410cdfc09ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="other">
+      <UniqueIdentifier>{4b5362cb-085b-497d-b16c-0d67c743e8ee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>other</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>other</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

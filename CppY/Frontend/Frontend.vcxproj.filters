@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="general functions">
+      <UniqueIdentifier>{d877310d-a7ce-406d-a30f-69952b436c98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="py built in types">
+      <UniqueIdentifier>{9bf144de-180a-4b01-9dd1-519f38a253b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="py built in types\collections">
+      <UniqueIdentifier>{d7563e3b-a922-47b9-9320-cd4cd7091a15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="py built in types\Exeptions">
+      <UniqueIdentifier>{96a65545-71df-4b6a-8e39-604a0d12330f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="py built in types\numeric">
+      <UniqueIdentifier>{0d0e69d6-9ce0-43f0-bb61-8d8ad830db59}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Base\Types\booleanOperators.h">
+      <Filter>general functions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\Built_In_Functions.h">
+      <Filter>general functions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\Comparisons.h">
+      <Filter>general functions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\ComparisonUtils.h">
+      <Filter>general functions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\WithStatement.h">
+      <Filter>general functions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\dict.h">
+      <Filter>py built in types\collections</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\list.h">
+      <Filter>py built in types\collections</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\range.h">
+      <Filter>py built in types\collections</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\set.h">
+      <Filter>py built in types\collections</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\_Exceptions.h">
+      <Filter>py built in types\Exeptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\Complex.h">
+      <Filter>py built in types\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\Int.h">
+      <Filter>py built in types\numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\binary.h">
+      <Filter>py built in types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\FunDefs.h">
+      <Filter>py built in types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\object.h">
+      <Filter>py built in types</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Base\Types\Built_In_Functions.cpp">
+      <Filter>general functions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\Comparisons.cpp">
+      <Filter>general functions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\dict.cpp">
+      <Filter>py built in types\collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\list.cpp">
+      <Filter>py built in types\collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\range.cpp">
+      <Filter>py built in types\collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\set.cpp">
+      <Filter>py built in types\collections</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\_Exceptions.cpp">
+      <Filter>py built in types\Exeptions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\Complex.cpp">
+      <Filter>py built in types\numeric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\Int.cpp">
+      <Filter>py built in types\numeric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\binary.cpp">
+      <Filter>py built in types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\FunDefs.cpp">
+      <Filter>py built in types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\object.cpp">
+      <Filter>py built in types</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Types">
+      <UniqueIdentifier>{3536c0c0-4311-4ed9-8256-c9a390fd37a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\InnerImpl">
+      <UniqueIdentifier>{a9ccc22b-069a-492a-b4fb-4d581cf49def}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\Interface">
+      <UniqueIdentifier>{e2ad3c8b-aeb5-4607-98da-167bc8064de8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\Interface\general functions">
+      <UniqueIdentifier>{e07353b8-a5f4-4197-afd1-e31a4941c614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\Interface\py built in types">
+      <UniqueIdentifier>{2edeae04-21e3-44a8-9605-be24fa8bd719}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\Interface\py built in types\collections">
+      <UniqueIdentifier>{c7af5451-53fc-4778-b365-911f795c873e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\Interface\py built in types\Exeptions">
+      <UniqueIdentifier>{48971a67-7f0e-46ac-94bb-16ff2e5367bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types\Interface\py built in types\numeric">
+      <UniqueIdentifier>{2cceaaff-cc32-4c66-bb78-fe66f5c20c74}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

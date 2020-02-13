@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\Base\Types\pyBinary.cpp" />
+    <ClCompile Include="..\Base\Types\pyDict.cpp" />
+    <ClCompile Include="..\Base\Types\pyExceptions.cpp" />
+    <ClCompile Include="..\Base\Types\pyFormat.cpp" />
+    <ClCompile Include="..\Base\Types\pyFunc.cpp" />
+    <ClCompile Include="..\Base\Types\pyList.cpp" />
+    <ClCompile Include="..\Base\Types\pyNone.cpp" />
+    <ClCompile Include="..\Base\Types\PyObj.cpp" />
+    <ClCompile Include="..\Base\Types\pySet.cpp" />
+    <ClCompile Include="..\Base\Types\pyStr.cpp" />
+    <ClCompile Include="..\Base\Types\pyTuple.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Base\Types\PyBinary.h" />
+    <ClInclude Include="..\Base\Types\pyBytes.h" />
+    <ClInclude Include="..\Base\Types\pyDict.h" />
+    <ClInclude Include="..\Base\Types\pyExceptions.h" />
+    <ClInclude Include="..\Base\Types\pyFormat.hpp" />
+    <ClInclude Include="..\Base\Types\pyFunc.h" />
+    <ClInclude Include="..\Base\Types\pyLambda.h" />
+    <ClInclude Include="..\Base\Types\pyList.h" />
+    <ClInclude Include="..\Base\Types\pyNone.h" />
+    <ClInclude Include="..\Base\Types\pyNums.h" />
+    <ClInclude Include="..\Base\Types\PyObj.h" />
+    <ClInclude Include="..\Base\Types\pyRange.h" />
+    <ClInclude Include="..\Base\Types\pySet.h" />
+    <ClInclude Include="..\Base\Types\pyStr.h" />
+    <ClInclude Include="..\Base\Types\pyTuple.h" />
+  </ItemGroup>
+</Project>
