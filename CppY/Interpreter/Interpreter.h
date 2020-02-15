@@ -56,15 +56,19 @@ namespace py
 	public:
 		ICommand(PyParser * parser) : _parser(parser) {}
 
-		virtual bool CanParse(std::string const& line) const = 0;
 		void ParsePy(std::string const & line);
 		std::string Translate();
+		std::set<std::string> GetVariables() const;
+
 	public:
+		virtual bool CanParse(std::string const& line) const = 0;
 		virtual void ParsePy_inner(std::string const & line) = 0;
 		virtual std::string Translate_inner() const = 0;
-		
 		virtual ICommandPtr Clone() const = 0;
-
+		// default impl. for almost all commands:
+		virtual std::vector<std::string> GetMyVariables() const {return std::vector<std::string>();}
+	
+	public:
 		std::string Indentation;
 		std::string CmdText;
 		std::string SuffixSpace;
@@ -99,6 +103,8 @@ namespace py
 	public:
 		virtual std::string PyOperator() const override { return "="; }
 		virtual std::string CppOperator() const override { return "="; }
+		virtual std::vector<std::string> GetMyVariables() const;
+
 	};
 
 	COMMAND_CLASS(CommandLineSplitter, TwoSidesOperator)
@@ -134,28 +140,28 @@ namespace py
 	COMMAND_CLASS(Bool_AND_Statement,TwoSidesOperator)
 	public:
 
-		virtual std::string PyOperator() const override { return "and"; }
-		virtual std::string CppOperator() const override { return "&&"; }
+		virtual std::string PyOperator() const override { return "\\sand\\s"; }
+		virtual std::string CppOperator() const override { return " && "; }
 	};
 
 	COMMAND_CLASS(Bool_OR_Statement,TwoSidesOperator)
 	public:
-		virtual std::string PyOperator() const override { return "or"; }
-		virtual std::string CppOperator() const override { return "\\|\\|"; }
+		virtual std::string PyOperator() const override { return "\\sor\\s"; }
+		virtual std::string CppOperator() const override { return " || "; }
 	};
 
 	COMMAND_CLASS(Bitwise_AND_Statement,TwoSidesOperator)
 	public:
 
 		virtual std::string PyOperator() const override { return "\\&"; }
-		virtual std::string CppOperator() const override { return "\\&"; }
+		virtual std::string CppOperator() const override { return "&"; }
 	};
 
 	COMMAND_CLASS(Bitwise_OR_Statement,TwoSidesOperator)
 	public:
 
 		virtual std::string PyOperator() const override { return "\\|"; }
-		virtual std::string CppOperator() const override { return "\\|"; }
+		virtual std::string CppOperator() const override { return "|"; }
 	};
 
 	///////// Comparisons: ////////////
@@ -191,14 +197,14 @@ namespace py
 	};
 	COMMAND_CLASS(ObjIdentity,TwoSidesOperator)
 	public:
-		virtual std::string PyOperator() const override { return "is"; }
+		virtual std::string PyOperator() const override { return "\\sis\\s"; }
 		virtual std::string CppOperator() const override;
 		virtual std::string Translate_inner() const override;
 
 	};
 	COMMAND_CLASS(NgatedObjIdentity,TwoSidesOperator)
 	public:
-		virtual std::string PyOperator() const override { return "is not"; }
+		virtual std::string PyOperator() const override { return "\\sis not\\s"; }
 		virtual std::string CppOperator() const override;
 		virtual std::string Translate_inner() const override;
 
@@ -439,15 +445,16 @@ namespace py
 
 	/////////////////////////////////
 
-	COMMAND_CLASS(VariableUsage,ICommand)
-	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const &  line) override;
-		virtual std::string Translate_inner() const override;
-		std::string getVarRegex() const;
-		std::string VarName;
-		bool IsDefinedFirstTime;
-	};
+	//COMMAND_CLASS(VariableUsage,ICommand)
+	//public:
+	//	virtual bool CanParse(std::string const& line) const override;
+	//	virtual void ParsePy_inner(std::string const &  line) override;
+	//	virtual std::string Translate_inner() const override;
+	//	std::string getVarRegex() const;
+	//	virtual std::vector<std::string> GetMyVariables() const override;
+	//	std::string VarName;
+	//	bool IsDefinedFirstTime;
+	//};
 
 	///////////////////////////////////
 	COMMAND_CLASS(If_Statement,ICommand)
@@ -462,6 +469,8 @@ namespace py
 		virtual bool CanParse(std::string const& line) const override;
 		virtual void ParsePy_inner(std::string const &  line) override;
 		virtual std::string Translate_inner() const override;
+		virtual std::vector<std::string> GetMyVariables() const;
+
 	};
 
 	COMMAND_CLASS(While_Statement,ICommand)	

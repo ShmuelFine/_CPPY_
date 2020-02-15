@@ -29,6 +29,53 @@ namespace py
 		return Indentation + Translate_inner() + SuffixSpace;
 	}
 	
+	std::set<std::string> ICommand::GetVariables() const
+	{
+		auto myVars = GetMyVariables();
+		std::set<std::string> result(myVars.begin(), myVars.end());
+		for (auto& child : Children)
+		{
+			auto toAdd = child->GetVariables();
+			if (!toAdd.empty())
+				result.insert(toAdd.begin(), toAdd.end());
+		}
+		return result;
+	}
+
+	//////////////////////////////////////////////////
+	std::string GetVarialbeRegex()
+	{
+		return R"(^([a-zA-Z_]+[a-zA-Z0-9_]*)$)";
+	}
+	bool IsVarialbe(std::string const& line)
+	{
+		std::regex varName(GetVarialbeRegex());
+		return std::regex_match(line, varName);
+	}
+	std::vector<std::string> ExtractVariables(std::string const& candidatesStr)
+	{
+		std::vector<std::string> result;
+		auto varCandidates = pyStr(candidatesStr).split(R"(\,)");
+		for (auto candidate : varCandidates)
+		{
+			if (IsVarialbe(candidate))
+				result.push_back(candidate);
+		}
+		return result;
+	}
+	//
+	//void VariableUsage::ParsePy_inner(std::string const &  line)
+	//{
+	//	VarName = line;
+	//}
+	//std::string VariableUsage::Translate_inner() const
+	//{
+	//	return VarName;
+	//}
+	//std::vector<std::string> VariableUsage::GetMyVariables() const
+	//{
+	//	return std::vector<std::string>({ VarName });
+	//}
 	//////////////////////////////////////////////////
 
 	bool SameLine::CanParse(std::string const& line) const
@@ -68,6 +115,11 @@ namespace py
 		return Children[0]->Translate() + CppOperator() + Children[1]->Translate();
 	}
 	
+	//////////////////////////////////////////////
+	std::vector<std::string> Assignment::GetMyVariables() const
+	{
+		return ExtractVariables(Children[0]->Translate_inner());
+	}
 	//////////////////////////////////////////////
 
 	std::string ObjIdentity::CppOperator() const { NOT_IMPL; }
@@ -251,27 +303,9 @@ namespace py
 		return pyStr("bytes(\"") + pyStr(",").join(elements) + pyStr("\")");
 	}
 
-	//////////////////////////////////////////////////
-	std::string VariableUsage::getVarRegex() const
-	{
-		return R"(^([a-zA-Z_]+[a-zA-Z0-9_]*)$)";
-	}
+	////////////////////////////////////////////////////
 
-	bool VariableUsage::CanParse(std::string const& line) const
-	{
-		std::regex varName(getVarRegex());
-		return std::regex_match(line, varName);
-	}
-	
-	void VariableUsage::ParsePy_inner(std::string const &  line)
-	{
-		VarName = line;
-	}
 
-	std::string VariableUsage::Translate_inner() const
-	{
-		return VarName;
-	}
 
 	bool If_Statement::CanParse(std::string const& line) const
 	{
@@ -307,11 +341,15 @@ namespace py
 		Children.push_back(_parser->Parse(matches[1]));
 		Children.push_back(_parser->Parse(matches[2]));
 	}
-
 	std::string For_Statement::Translate_inner() const
 	{
 		return pyStr("for (auto {} : {})").format(Children[0]->Translate(), Children[1]->Translate());
 	}
+	std::vector<std::string> For_Statement::GetMyVariables() const
+	{
+		return ExtractVariables(Children[0]->Translate_inner());
+	}
+
 
 	bool While_Statement::CanParse(std::string const& line) const
 	{
@@ -326,7 +364,6 @@ namespace py
 
 		Children.push_back(_parser->Parse(matches[1]));
 	}
-
 	std::string While_Statement::Translate_inner() const
 	{
 		return pyStr("while ({})").format(Children[0]->Translate());
@@ -421,7 +458,7 @@ namespace py
 		ParsingChain.push_back(std::make_shared<NgatedObjIdentity 						>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<NegationOP		  						>((PyParser *)this));
 
-		ParsingChain.push_back(std::make_shared<VariableUsage			  				>((PyParser *)this));
+		//ParsingChain.push_back(std::make_shared<VariableUsage			  				>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<If_Statement			  				>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<For_Statement			  				>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<While_Statement			  				>((PyParser*)this));

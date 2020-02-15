@@ -38,3 +38,48 @@ TEST(Interperter, list_nesting_Fixture)
     // Assert
     EXPECT_EQ(cppStr, R"(x = list({5, "asdf", "asdf", f(78, "asdf", y), 6+7}) )");
 }
+
+TEST(Interperter, GetVariables_RetrievesVariablesDefinedInLine)
+{
+    // Arrange
+    PyParser parser;
+    // Act
+    auto command = parser.Parse(R"(x = [5, 'asdf', "asdf", f(78, x, "asdf", y), 6+7, z] )");
+
+    // Assert
+    auto vars = command->GetVariables();
+    ASSERT_TRUE(vars.count("x"));
+    ASSERT_FALSE(vars.count("y"));// Used, but not defined
+    ASSERT_FALSE(vars.count("z"));// Used, but not defined
+    ASSERT_FALSE(vars.count("w"));
+}
+
+TEST(Interperter, GetVariables_Retrieves_Multiple_VariablesDefinedInLine)
+{
+    // Arrange
+    PyParser parser;
+    // Act
+    auto command = parser.Parse(R"(x,y,z = [5, 'asdf', "asdf", f(78, x0, "asdf", y0), 6+7, w] )");
+
+    // Assert
+    auto vars = command->GetVariables();
+    ASSERT_TRUE(vars.count("x"));
+    ASSERT_TRUE(vars.count("y"));// Used, but not defined
+    ASSERT_TRUE(vars.count("z"));// Used, but not defined
+    ASSERT_FALSE(vars.count("w"));
+}
+
+TEST(Interperter, GetVariables_Retrieves_Multiple_VariablesDefinedIn_ForStatement)
+{
+    // Arrange
+    PyParser parser;
+    // Act
+    auto command = parser.Parse(R"(for x,y,z in os.walk(some_folder):)");
+
+    // Assert
+    auto vars = command->GetVariables();
+    ASSERT_TRUE(vars.count("x"));
+    ASSERT_TRUE(vars.count("y"));// Used, but not defined
+    ASSERT_TRUE(vars.count("z"));// Used, but not defined
+    ASSERT_FALSE(vars.count("w"));
+}
