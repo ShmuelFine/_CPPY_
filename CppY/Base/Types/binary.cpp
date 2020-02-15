@@ -36,7 +36,7 @@ namespace py
 		PARAM(self, );
 		PARAM(iterable, );
 		auto meAsBytes = reinterpret_cast<pyStr*>(self._ptr.get());
-		meAsBytes->join(iterable);
+		//meAsBytes->join(iterable);
 		END_FUN(join);
 
 	}

@@ -9,11 +9,11 @@
 namespace py
 {
 
-	bool ICommand::ParsePy(std::string const & line)
+	void ICommand::ParsePy(std::string const & line)
 	{
 		std::regex statement(R"(^(s*)(.+?)(\s*)$)");
 		if (!std::regex_match(line, statement))
-			return false;
+			throw std::runtime_error("Can't parse this line");
 
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
@@ -21,7 +21,7 @@ namespace py
 		Indentation = matches[1];
 		CmdText = matches[2];
 		SuffixSpace = matches[3];
-		return ParsePy_inner(CmdText);
+		ParsePy_inner(CmdText);
 	}
 
 	std::string ICommand::Translate()
@@ -31,17 +31,26 @@ namespace py
 	
 	//////////////////////////////////////////////////
 
-	bool SameLine::ParsePy_inner(std::string const &  line)
+	bool SameLine::CanParse(std::string const& line) const
+	{
+		return true;
+	}
+
+	void SameLine::ParsePy_inner(std::string const &  line)
 	{
 		Line = line;
-		return true;
 	}
 	std::string SameLine::Translate_inner() const
 	{
 		return Line;
 	}
 
-	bool TwoSidesOperator::ParsePy_inner(std::string const &  line)
+	bool TwoSidesOperator::CanParse(std::string const& line) const
+	{
+		return pyStr(line).split(PyOperator(), 2).size() > 1;
+	}
+
+	void TwoSidesOperator::ParsePy_inner(std::string const &  line)
 	{
 		auto parts = pyStr(line).split(PyOperator(), 2);
 		if (parts.size() > 1)
@@ -51,9 +60,7 @@ namespace py
 
 			Children.push_back(_parser->Parse(pyStr(parts[0])));
 			Children.push_back(_parser->Parse(pyStr(parts[1])));
-			return true;
 		}
-		return false;
 	}
 
 	std::string TwoSidesOperator::Translate_inner() const
@@ -75,17 +82,18 @@ namespace py
 		return pyStr("is_not(") + Children[0]->Translate() + pyStr(",") + Children[1]->Translate() + pyStr(")");
 	}
 	   
-	bool NegationOP::ParsePy_inner(std::string const &  line)
+	bool NegationOP::CanParse(std::string const& line) const
 	{
 		std::regex statement(R"(not (.*))");
-		if (!std::regex_match(line, statement))
-			return false;
-
+		return std::regex_match(line, statement);
+	}
+	void NegationOP::ParsePy_inner(std::string const& line)
+	{
+		std::regex statement(R"(not (.*))");
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
 
 		Children.push_back(_parser->Parse(matches[1]));
-		return true;
 	}
 
 	std::string NegationOP::Translate_inner() const
@@ -106,17 +114,21 @@ namespace py
 			s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
 		}
 
-		return s;
+		return "$"+s+"$";
 	}
 
 	
 	///////////////////////////
 
-	bool InnerScopeEscaperBase::ParsePy_inner(std::string const &  line)
+	bool InnerScopeEscaperBase::CanParse(std::string const& line) const
 	{
 		std::regex statement(OuterExpressionRegex());
-		if (!std::regex_match(line, statement))
-			return false;
+		return std::regex_match(line, statement);
+	}
+	
+	void InnerScopeEscaperBase::ParsePy_inner(std::string const& line)
+	{
+		std::regex statement(OuterExpressionRegex());
 
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
@@ -130,8 +142,6 @@ namespace py
 
 		Children.push_back(_parser->Parse(modifiedLine));
 		ParsePy_innerScope(innerExpression_str);
-
-		return true;
 	}
 	
 	std::string InnerScopeEscaperBase::Translate_inner() const
@@ -151,20 +161,22 @@ namespace py
 	
 	////////////////////////////////////////////////////////////
 
-	bool Container_ImplicitConstruction_Base::ParsePy_inner(std::string const &  line)
+	bool Container_ImplicitConstruction_Base::CanParse(std::string const& line) const
 	{
-		std::regex statement("\\(" + ScopeOpenerRGX() + "\\)" + R"((.*))" + ScopeCloserRGX());
-		if (!std::regex_match(line, statement))
-			return false;
+		std::regex statement("(" + ScopeOpenerRGX() + ")" + R"((.*))" + ScopeCloserRGX());
+		return std::regex_match(line, statement);
+	}
+
+	void Container_ImplicitConstruction_Base::ParsePy_inner(std::string const& line)
+	{
+		std::regex statement("(" + ScopeOpenerRGX() + ")" + R"((.*))" + ScopeCloserRGX());
 
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
 		
 		_scopeOpener = matches[1];
-		std::string elements = matches[1];
+		std::string elements = matches[2];
 		ProcessMatch(elements);
-
-		return true;
 	}
 
 	void Container_ImplicitConstruction_Base::ProcessMatch(std::string const& match)
@@ -175,7 +187,7 @@ namespace py
 
 	std::string ListImplicitConstruction::Translate_inner() const
 	{
-		return pyStr("list({") + pyStr(",").join(elements) + pyStr("});");
+		return pyStr("list({") + pyStr(",").join(elements) + pyStr("})");
 	}
 
 	std::string DictImplicitConstruction::Translate_inner() const
@@ -212,16 +224,16 @@ namespace py
 	}
 
 
-	bool EmptyDictImplicitConstruction::ParsePy_inner(std::string const &  line)
+	bool EmptyDictImplicitConstruction::CanParse(std::string const& line) const
 	{
 		std::regex statement("\\{\\s*\\}");
-		if (!std::regex_match(line, statement))
-			return false;
-
+		return std::regex_match(line, statement);
+	}
+	void EmptyDictImplicitConstruction::ParsePy_inner(std::string const& line)
+	{
+		std::regex statement("\\{\\s*\\}");
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
-
-		return true;
 	}
 
 	std::string EmptyDictImplicitConstruction::Translate_inner() const
@@ -240,38 +252,39 @@ namespace py
 	}
 
 	//////////////////////////////////////////////////
-
-	bool VariableUsage::ParsePy_inner(std::string const &  line)
+	std::string VariableUsage::getVarRegex() const
 	{
-		std::regex varName(R"(^([a-zA-Z_]+[a-zA-Z0-9_]*)\W?)");
-		bool isVar = std::regex_match(line, varName);
+		return R"(^([a-zA-Z_]+[a-zA-Z0-9_]*)$)";
+	}
 
-		if (isVar)
-		{
-			THROW_UNLESS(_parser->ScopeMD(), "Can't process Vars without scope info!");
-			VarName = line;
-			IsDefinedFirstTime = _parser->ScopeMD()->IsDefined(VarName);
-			_parser->ScopeMD()->Add(VarName);
-		}
-		return isVar;
+	bool VariableUsage::CanParse(std::string const& line) const
+	{
+		std::regex varName(getVarRegex());
+		return std::regex_match(line, varName);
+	}
+	
+	void VariableUsage::ParsePy_inner(std::string const &  line)
+	{
+		VarName = line;
 	}
 
 	std::string VariableUsage::Translate_inner() const
 	{
-		return IsDefinedFirstTime ? "object " + VarName : VarName;
+		return VarName;
 	}
 
-	bool If_Statement::ParsePy_inner(std::string const &  line)
+	bool If_Statement::CanParse(std::string const& line) const
 	{
 		std::regex statement(R"(if\s+([\w\s]+)\:)");
-		if (!std::regex_match(line, statement))
-			return false;
-
+		return std::regex_match(line, statement);
+	}
+	void If_Statement::ParsePy_inner(std::string const &  line)
+	{
+		std::regex statement(R"(if\s+([\w\s]+)\:)");
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
 
 		Children.push_back(_parser->Parse(matches[1]));
-		return true;
 	}
 
 	std::string If_Statement::Translate_inner() const
@@ -279,20 +292,20 @@ namespace py
 		return pyStr("if ({})").format(Children[0]->Translate());
 	}
 
-	bool For_Statement::ParsePy_inner(std::string const &  line)
+	
+	bool For_Statement::CanParse(std::string const& line) const
 	{
 		std::regex statement(R"(for\s+(.+)\sin\s+(.+)\:)");
-		if (!std::regex_match(line, statement))
-			return false;
-
+		return std::regex_match(line, statement);
+	}
+	void For_Statement::ParsePy_inner(std::string const &  line)
+	{
+		std::regex statement(R"(for\s+(.+)\sin\s+(.+)\:)");
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
 
 		Children.push_back(_parser->Parse(matches[1]));
 		Children.push_back(_parser->Parse(matches[2]));
-
-		return true;
-
 	}
 
 	std::string For_Statement::Translate_inner() const
@@ -300,18 +313,18 @@ namespace py
 		return pyStr("for (auto {} : {})").format(Children[0]->Translate(), Children[1]->Translate());
 	}
 
-	bool While_Statement::ParsePy_inner(std::string const &  line)
+	bool While_Statement::CanParse(std::string const& line) const
 	{
 		std::regex statement(R"(while\s+(.+)\:)");
-		if (!std::regex_match(line, statement))
-			return false;
-
+		return std::regex_match(line, statement);
+	}
+	void While_Statement::ParsePy_inner(std::string const &  line)
+	{
+		std::regex statement(R"(while\s+(.+)\:)");
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
 
 		Children.push_back(_parser->Parse(matches[1]));
-
-		return true;
 	}
 
 	std::string While_Statement::Translate_inner() const
@@ -339,7 +352,7 @@ namespace py
 		else
 			result += pyStr(R"(")");
 
-		result += elements ? pyStr("") : (pyStr)*elements.FetchByIdx(0);
+		result += elements ? (pyStr)*elements.FetchByIdx(0) : pyStr("") ;
 
 		if (IsRealString())
 			result += pyStr(")\"");
@@ -392,6 +405,11 @@ namespace py
 		ParsingChain.push_back(std::make_shared<Bool_OR_Statement							>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<Bitwise_AND_Statement						>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<Bitwise_OR_Statement						>((PyParser *)this));
+		ParsingChain.push_back(std::make_shared<Addition									>((PyParser*)this));
+		ParsingChain.push_back(std::make_shared<Substraction								>((PyParser*)this));
+		ParsingChain.push_back(std::make_shared<Division									>((PyParser*)this));
+		ParsingChain.push_back(std::make_shared<Multiplication								>((PyParser*)this));
+
 
 		ParsingChain.push_back(std::make_shared<LT				  						>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<LTE				  						>((PyParser *)this));
@@ -406,7 +424,9 @@ namespace py
 		ParsingChain.push_back(std::make_shared<VariableUsage			  				>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<If_Statement			  				>((PyParser *)this));
 		ParsingChain.push_back(std::make_shared<For_Statement			  				>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<While_Statement			  				>((PyParser *)this));
+		ParsingChain.push_back(std::make_shared<While_Statement			  				>((PyParser*)this));
+		
+		ParsingChain.push_back(std::make_shared<SameLine				  				>((PyParser *)this));
 	}
 
 	ICommandPtr PyParser::Parse(std::string const& origLine)
@@ -414,15 +434,15 @@ namespace py
 		for (auto parserPtr : ParsingChain)
 		{
 			auto line = origLine;
-			if (parserPtr->ParsePy(line))
+			if (parserPtr->CanParse(line))
 			{
-				return parserPtr->Clone();
+				auto result = parserPtr->Clone();
+				result->ParsePy(line);
+				return result;
 			}
 		}
-		auto result = std::make_shared<SameLine>((PyParser*)this);
-		auto line = origLine;
-		result->ParsePy(line);
-		return result;
+
+		throw std::runtime_error("Shouldn't get here... What happened to the SameLine parser?");
 	}
 }
 
