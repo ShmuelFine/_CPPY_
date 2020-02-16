@@ -11,9 +11,14 @@ namespace py
 
 	void ICommand::ParsePy(std::string const & line)
 	{
-		std::regex statement(R"(^(s*)(.+?)(\s*)$)");
+		std::regex statement(R"(^(\s*)(.+?)(\s*)$)");
 		if (!std::regex_match(line, statement))
-			throw std::runtime_error("Can't parse this line");
+		{
+			Indentation = "";
+			CmdText = "";
+			SuffixSpace = "";
+			return;
+		}
 
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
@@ -21,6 +26,7 @@ namespace py
 		Indentation = matches[1];
 		CmdText = matches[2];
 		SuffixSpace = matches[3];
+
 		ParsePy_inner(CmdText);
 	}
 
@@ -63,19 +69,7 @@ namespace py
 		}
 		return result;
 	}
-	//
-	//void VariableUsage::ParsePy_inner(std::string const &  line)
-	//{
-	//	VarName = line;
-	//}
-	//std::string VariableUsage::Translate_inner() const
-	//{
-	//	return VarName;
-	//}
-	//std::vector<std::string> VariableUsage::GetMyVariables() const
-	//{
-	//	return std::vector<std::string>({ VarName });
-	//}
+	
 	//////////////////////////////////////////////////
 
 	bool SameLine::CanParse(std::string const& line) const
@@ -309,12 +303,12 @@ namespace py
 
 	bool If_Statement::CanParse(std::string const& line) const
 	{
-		std::regex statement(R"(if\s+([\w\s]+)\:)");
+		std::regex statement(R"(if\s+(.+)\:)");
 		return std::regex_match(line, statement);
 	}
 	void If_Statement::ParsePy_inner(std::string const &  line)
 	{
-		std::regex statement(R"(if\s+([\w\s]+)\:)");
+		std::regex statement(R"(if\s+(.+)\:)");
 		std::smatch matches;
 		std::regex_search(line, matches, statement);
 
@@ -400,73 +394,73 @@ namespace py
 	}
 
 	/////////////////
-	VariablesMetaDataPtr PyParser::ScopeMD()
+
+	bool Else_Statement::CanParse(std::string const& line) const { return pyStr(line).strip() == pyStr("else:"); }
+	void Else_Statement::ParsePy_inner(std::string const& line) { return ; }
+	std::string Else_Statement::Translate_inner() const { return "else"; }
+
+	/////////////////
+
+	PyLineParser::PyLineParser()
 	{
-		return ScopeMDs_Stack.front();
-	}
+		ParsingChain.push_back(std::make_shared<CommentLine_InnerScope							>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_InnerScope			>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_InnerScope		>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_InnerScope		>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_InnerScope			>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_InnerScope		>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_InnerScope			>((PyLineParser *)this));
 
-	PyParser::PyParser()
-	{
-		ScopeMDs_Stack.push_back(VariablesMetaDataPtr(new VariablesMetaData()));
-		Indintations.push_back(0);
+		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_OuterScope	 	>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<CommentLine_InnerScope							>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_InnerScope			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_InnerScope		>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_InnerScope		>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_InnerScope			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_InnerScope		>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_InnerScope			>((PyParser *)this));
+		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<InnerScope_SquareBraces_Escaper					>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<InnerScope_FunctionCall_Escaper					>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<InnerScope_RoundBraces_Escaper 					>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_OuterScope		 			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_OuterScope	 			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_OuterScope	 			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_OuterScope		 			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 			>((PyParser *)this));
+		ParsingChain.push_back(std::make_shared<ListImplicitConstruction						>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<DictImplicitConstruction						>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<EmptyDictImplicitConstruction					>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<SetImplicitConstruction							>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<BytesImplicitConstruction						>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<FunctionCall									>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<InnerScope_SquareBraces_Escaper			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<InnerScope_FunctionCall_Escaper			>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<InnerScope_RoundBraces_Escaper 			>((PyParser *)this));
-
-		ParsingChain.push_back(std::make_shared<ListImplicitConstruction					>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<DictImplicitConstruction					>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<EmptyDictImplicitConstruction				>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<SetImplicitConstruction						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<BytesImplicitConstruction					>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<FunctionCall								>((PyParser *)this));
-
-		ParsingChain.push_back(std::make_shared<Assignment									>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<Bool_AND_Statement							>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<Bool_OR_Statement							>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<Bitwise_AND_Statement						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<Bitwise_OR_Statement						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<Addition									>((PyParser*)this));
-		ParsingChain.push_back(std::make_shared<Substraction								>((PyParser*)this));
-		ParsingChain.push_back(std::make_shared<Division									>((PyParser*)this));
-		ParsingChain.push_back(std::make_shared<Multiplication								>((PyParser*)this));
+		ParsingChain.push_back(std::make_shared<If_Statement			  						>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<Else_Statement			  						>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<For_Statement			  						>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<While_Statement			  						>((PyLineParser*)this));
 
 
-		ParsingChain.push_back(std::make_shared<LT				  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<LTE				  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<GT				  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<GTE				  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<Equal			  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<NotEqual		  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<ObjIdentity		  						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<NgatedObjIdentity 						>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<NegationOP		  						>((PyParser *)this));
+		ParsingChain.push_back(std::make_shared<Assignment										>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<Bool_AND_Statement								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<Bool_OR_Statement								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<Bitwise_AND_Statement							>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<Bitwise_OR_Statement							>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<Addition										>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<Substraction									>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<Division										>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<Multiplication									>((PyLineParser*)this));
 
-		//ParsingChain.push_back(std::make_shared<VariableUsage			  				>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<If_Statement			  				>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<For_Statement			  				>((PyParser *)this));
-		ParsingChain.push_back(std::make_shared<While_Statement			  				>((PyParser*)this));
+		ParsingChain.push_back(std::make_shared<LT				  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<LTE				  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<GT				  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<GTE				  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<Equal			  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<NotEqual		  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<ObjIdentity		  								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<NgatedObjIdentity 								>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<NegationOP		  								>((PyLineParser *)this));
+
 		
-		ParsingChain.push_back(std::make_shared<SameLine				  				>((PyParser *)this));
+		ParsingChain.push_back(std::make_shared<SameLine				  						>((PyLineParser *)this));
 	}
 
-	ICommandPtr PyParser::Parse(std::string const& origLine)
+	ICommandPtr PyLineParser::Parse(std::string const& origLine)
 	{
 		for (auto parserPtr : ParsingChain)
 		{

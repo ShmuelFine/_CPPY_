@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "..\Interpreter\Interpreter.h"
+#include "..\Interpreter\PyBlockParser.h"
 
 using namespace py;
 
 TEST(Interperter, var_equal_cons_plus_func__Fixture)
 {
     // Arrange
-    PyParser parser;
+    PyLineParser parser;
     // Act
     auto command = parser.Parse("x = 5 + f(78)");
     auto cppStr = command->Translate();
@@ -18,7 +19,7 @@ TEST(Interperter, var_equal_cons_plus_func__Fixture)
 TEST(Interperter, var_plus_func_equal_cons_plus_func__Fixture)
 {
     // Arrange
-    PyParser parser;
+    PyLineParser parser;
     // Act
     auto command = parser.Parse("x + sin(x) = 5 + f(78)");
     auto cppStr = command->Translate();
@@ -30,7 +31,7 @@ TEST(Interperter, var_plus_func_equal_cons_plus_func__Fixture)
 TEST(Interperter, list_nesting_Fixture)
 {
     // Arrange
-    PyParser parser;
+    PyLineParser parser;
     // Act
     auto command = parser.Parse(R"(x = [5, 'asdf', "asdf", f(78, "asdf", y), 6+7] )");
     auto cppStr = command->Translate();
@@ -42,7 +43,7 @@ TEST(Interperter, list_nesting_Fixture)
 TEST(Interperter, GetVariables_RetrievesVariablesDefinedInLine)
 {
     // Arrange
-    PyParser parser;
+    PyLineParser parser;
     // Act
     auto command = parser.Parse(R"(x = [5, 'asdf', "asdf", f(78, x, "asdf", y), 6+7, z] )");
 
@@ -57,7 +58,7 @@ TEST(Interperter, GetVariables_RetrievesVariablesDefinedInLine)
 TEST(Interperter, GetVariables_Retrieves_Multiple_VariablesDefinedInLine)
 {
     // Arrange
-    PyParser parser;
+    PyLineParser parser;
     // Act
     auto command = parser.Parse(R"(x,y,z = [5, 'asdf', "asdf", f(78, x0, "asdf", y0), 6+7, w] )");
 
@@ -72,7 +73,7 @@ TEST(Interperter, GetVariables_Retrieves_Multiple_VariablesDefinedInLine)
 TEST(Interperter, GetVariables_Retrieves_Multiple_VariablesDefinedIn_ForStatement)
 {
     // Arrange
-    PyParser parser;
+    PyLineParser parser;
     // Act
     auto command = parser.Parse(R"(for x,y,z in os.walk(some_folder):)");
 
@@ -82,4 +83,37 @@ TEST(Interperter, GetVariables_Retrieves_Multiple_VariablesDefinedIn_ForStatemen
     ASSERT_TRUE(vars.count("y"));// Used, but not defined
     ASSERT_TRUE(vars.count("z"));// Used, but not defined
     ASSERT_FALSE(vars.count("w"));
+}
+
+TEST(BlockParser, scopes_and_variable_Defs)
+{
+    // Arrange
+    PyBlockParser blockparser("\n");
+    std::vector<std::string> lines = {
+    "x = 5",
+    "if x > 8:",
+    "   print(\"hello\")",
+    "else:",
+    "   y = 8",
+    "   print(x + y)",
+    };
+    // Act
+    auto cppBlock = blockparser.ParseBlock(lines);
+    // Assert
+    std::string expected =
+        R"(object x;
+x = 5;
+if (x > 8)
+{
+   print("hello");
+}
+else
+{
+   object y;
+   y = 8;
+   print(x + y);
+}
+)";
+    EXPECT_EQ(cppBlock, expected);
+
 }

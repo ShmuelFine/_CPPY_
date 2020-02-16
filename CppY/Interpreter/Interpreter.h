@@ -34,27 +34,27 @@ namespace py
 		std::vector<std::string> _currentScopeVars;
 	};
 	
-	class PyParser
+	class PyLineParser
 	{
 	public:
 		std::vector<ICommandPtr> ParsingChain;
-		std::vector<VariablesMetaDataPtr> ScopeMDs_Stack;
-		VariablesMetaDataPtr ScopeMD();
-		std::vector<int> Indintations;
-
-		PyParser();
+		PyLineParser();
 
 		ICommandPtr Parse(std::string const& line);
 	};
-	typedef std::shared_ptr<PyParser> PyParserPtr;
+	typedef std::shared_ptr<PyLineParser> PyParserPtr;
+
+	
+	
+
 
 	class ICommand
 	{
 	public:
-		PyParser * _parser;
+		PyLineParser * _parser;
 		
 	public:
-		ICommand(PyParser * parser) : _parser(parser) {}
+		ICommand(PyLineParser * parser) : _parser(parser) {}
 
 		void ParsePy(std::string const & line);
 		std::string Translate();
@@ -65,6 +65,9 @@ namespace py
 		virtual void ParsePy_inner(std::string const & line) = 0;
 		virtual std::string Translate_inner() const = 0;
 		virtual ICommandPtr Clone() const = 0;
+	
+		virtual bool IsToSemicolon() const { return true; }
+	protected:
 		// default impl. for almost all commands:
 		virtual std::vector<std::string> GetMyVariables() const {return std::vector<std::string>();}
 	
@@ -72,13 +75,14 @@ namespace py
 		std::string Indentation;
 		std::string CmdText;
 		std::string SuffixSpace;
+
 		std::vector<ICommandPtr> Children;
 	};
 
 #define COMMAND_INTERFACE(name, base)\
 	class name : public base {\
 	public:\
-		name(PyParser * parser) : base(parser) {}\
+		name(PyLineParser * parser) : base(parser) {}\
 
 
 #define COMMAND_CLASS(name, base)\
@@ -258,6 +262,16 @@ namespace py
 		virtual std::string ScopeCloserRGX() const override { return R"(\))"; };
 		//virtual void ParsePy_innerScope(std::string const& text);
 	};
+
+	//COMMAND_CLASS(InnerScope_FunctionCall_Escaper, InnerScopeEscaperBase)
+	//public:
+	//	virtual std::string OuterExpressionRegex() const {
+	//		// Enforce inner expression by the .+ at the beginning:
+	//		return R"(.*\W(\w+\(.*?\)).*)";
+	//	}
+	//	virtual std::string ScopeOpenerRGX() const override { return ""; };
+	//	virtual std::string ScopeCloserRGX() const override { return ""; };
+	//};
 
 	COMMAND_CLASS(InnerScope_RoundBraces_Escaper,InnerScopeEscaperBase)
 	public:
@@ -443,33 +457,31 @@ namespace py
 
 #pragma endregion
 
-	/////////////////////////////////
-
-	//COMMAND_CLASS(VariableUsage,ICommand)
-	//public:
-	//	virtual bool CanParse(std::string const& line) const override;
-	//	virtual void ParsePy_inner(std::string const &  line) override;
-	//	virtual std::string Translate_inner() const override;
-	//	std::string getVarRegex() const;
-	//	virtual std::vector<std::string> GetMyVariables() const override;
-	//	std::string VarName;
-	//	bool IsDefinedFirstTime;
-	//};
-
 	///////////////////////////////////
 	COMMAND_CLASS(If_Statement,ICommand)
 	public:
 		virtual bool CanParse(std::string const& line) const override;
 		virtual void ParsePy_inner(std::string const &  line) override;
 		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return false; }
+
 	};
 	
-	COMMAND_CLASS(For_Statement,ICommand)
+	COMMAND_CLASS(Else_Statement, ICommand)
+	public:
+		virtual bool CanParse(std::string const& line) const override;
+		virtual void ParsePy_inner(std::string const& line) override;
+		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return false; }
+	};
+
+	COMMAND_CLASS(For_Statement, ICommand)
 	public:
 		virtual bool CanParse(std::string const& line) const override;
 		virtual void ParsePy_inner(std::string const &  line) override;
 		virtual std::string Translate_inner() const override;
 		virtual std::vector<std::string> GetMyVariables() const;
+		virtual bool IsToSemicolon() const { return false; }
 
 	};
 
@@ -478,6 +490,7 @@ namespace py
 		virtual bool CanParse(std::string const& line) const override;
 		virtual void ParsePy_inner(std::string const &  line) override;
 		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return false; }
 	};
 
 
