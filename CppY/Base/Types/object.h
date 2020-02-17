@@ -23,7 +23,6 @@ namespace py
 		pyObjPtr _tmp_impl; // needed in the cases that object is not constructed from reference.
 		pyObjPtr& _ptr;
 
-		std::map<std::string, object> attributes;
 
 	public:
 		object()						: _ptr(_tmp_impl)	{ _ptr = nullptr; }
@@ -40,7 +39,7 @@ namespace py
 		object(size_t sz)				: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyInt((int)sz))	;}
 		object(uint8_t i) : _ptr(_tmp_impl) { _ptr = pyObjPtr(new pyByte(i)); }
 
-		object(object const& other)		: _ptr(_tmp_impl) { _ptr = other._ptr; attributes = other.attributes;  }
+		object(object const& other)		: _ptr(_tmp_impl) { _ptr = other._ptr; }
 
 		pyObj* get() const				{ return _ptr.get(); }
 		operator pyObjPtr() const		{ return _ptr; }
@@ -92,7 +91,6 @@ namespace py
 		virtual object& operator = (object const& other) 
 		{
 			_ptr = other._ptr;
-			attributes = other.attributes;
 			return *this;
 		}
 
@@ -119,26 +117,26 @@ namespace py
 		///////////// Generic attributes: ////////////////////////
 		void setattr(std::string const& what, object toWhat)
 		{
-			attributes[what] = toWhat;
+			_ptr.attributes[what] = toWhat;
 		}
 		
 		bool hasattr(std::string const& what)
 		{
-			return attributes.count(what) > 0;
+			return _ptr.attributes.count(what) > 0;
 		}
 
 		object getattr(std::string const& what, object defaultValue = pyNone())
 		{
-			if (attributes.count(what))
-				return attributes[what];
+			if (_ptr.attributes.count(what))
+				return _ptr.attributes[what];
 			else
 				return defaultValue;
 		}
 
 		// direct access / definition:
-		object& _attr_(std::string const& key)
+		object _attr_(std::string const& key)
 		{
-			return attributes[key];
+			return _ptr.attributes[key];
 		}
 
 	};
@@ -148,7 +146,7 @@ namespace py
 	
 	// For pretty syntax coloring, using two step definition:
 	static const py::object _False = py::object(Bool(false));
-	static const py::object _True = py::object(Bool(false));
+	static const py::object _True = py::object(Bool(true));
 	static const py::object _None = py::object(py::pyNone());
 	
 #define False _False

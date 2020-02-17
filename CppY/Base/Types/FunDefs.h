@@ -3,8 +3,11 @@
 #include <string>
 namespace py
 {
-	class ARGS : private pyDict
+	class ARGS
 	{
+	private:
+		pyObjPtr _;
+		
 	public:
 		ARGS(object const& key, object const& value);
 		ARGS(object const& value);
