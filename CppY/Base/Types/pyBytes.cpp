@@ -33,7 +33,7 @@ namespace py
 		/*auto res = std::find_end(_impl.begin(), _impl.end(), ending._impl.begin(), ending._impl.end());
 			if (res != _impl.end())
 				return true;*/
-		return std::equal(ending._impl.rbegin(), ending._impl.rend(), _impl.rbegin());
+		return std::equal(ending._impl.rbegin(), ending._impl.rend()-1, _impl.rbegin());
 		//return std::equal(ending._impl.begin(), ending._impl.end(), _impl.begin()+(_impl.size()- ending._impl.size()-1));
 	}
 
