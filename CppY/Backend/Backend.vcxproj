@@ -138,7 +138,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Base\Types\pyBinary.cpp" />
+    <ClCompile Include="..\Base\Types\bytes.cpp" />
+    <ClCompile Include="..\Base\Types\pyBytes.cpp" />
     <ClCompile Include="..\Base\Types\pyDict.cpp" />
     <ClCompile Include="..\Base\Types\pyExceptions.cpp" />
     <ClCompile Include="..\Base\Types\pyFormat.cpp" />
@@ -151,7 +152,7 @@
     <ClCompile Include="..\Base\Types\pyTuple.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Base\Types\PyBinary.h" />
+    <ClInclude Include="..\Base\Types\PyByteArray.h" />
     <ClInclude Include="..\Base\Types\pyBytes.h" />
     <ClInclude Include="..\Base\Types\pyDict.h" />
     <ClInclude Include="..\Base\Types\pyExceptions.h" />
