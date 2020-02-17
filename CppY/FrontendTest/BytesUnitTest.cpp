@@ -27,16 +27,32 @@ TEST(bytes, count)
 	ASSERT_EQ(counter, 1);
 	ASSERT_EQ(counter1, 0);
 }
+//TEST(bytes, replace)
+//{
+//	// Arrange
+//	bytes b(R"(\xb6\x01\xef\xb6)");
+//
+//	// Act
+//	bytes rep1 = MEM_FUN(b, replace).A(182).A(181));
+//	bytes expected(R"(\xb5\x01\xef\xb5)");
+//
+//	bytes rep2 = MEM_FUN(b, replace).A(bytes(R"(\xb5\x01)")).A(bytes(R"(\xb3\x51)")));
+//	bytes expected2(R"(\xb3\x51\xef\xb6)");
+//
+//	// Assert
+//	ASSERT_EQ(rep1, expected);
+//	ASSERT_EQ(rep2, expected2);
+//}
 TEST(bytes, center)
 {
 	// Arrange
 	auto b = bytes(R"(\xb1\x01\xb6)");
 
 	// Act
-	bytes s = MEM_FUN(b, center).A(5));
+	bytes expected = MEM_FUN(b, center).A(5));
 	bytes res(R"(\x20\x20\xb1\x01\xb6\x20\x20)");
 	// Assert
-	ASSERT_TRUE(s==res);
+	ASSERT_TRUE(expected ==res);
 }
 TEST(bytes, endswith)
 {
@@ -70,6 +86,20 @@ TEST(bytes, index)
 	// Assert
 	ASSERT_EQ(ind, 2);
 }
+
+//TEST(bytes, rindex)
+//{
+//	// Arrange
+//	auto b = bytes(R"(xb6\xb1\x01\xb6)");
+//
+//	// Act
+//	int ind = MEM_FUN(b, rindex).A(182));
+//	int ind2 = MEM_FUN(b, rindex).A(bytes(R"(\xb6)")));
+//
+//	// Assert
+//	ASSERT_EQ(ind, 3);
+//	ASSERT_EQ(ind2, 3);
+//}
 TEST(bytes, startswith)
 {
 	// Arrange
@@ -81,19 +111,6 @@ TEST(bytes, startswith)
 	// Assert
 	ASSERT_EQ(open1, true);
 	ASSERT_EQ(open2, false);
-}
-
-TEST(bytes, replace)
-{
-	// Arrange
-	auto b = bytes(R"(\xb1\x01\xb6)");
-	// Act
-	bytes newb = MEM_FUN(b, replace).A(R"(\xb6)").A(R"(\xb5)"));
-	bytes newb2 = MEM_FUN(b, replace).A(R"(\x01\xb6)").A(R"(\xb5)"));
-
-	// Assert
-	ASSERT_EQ(newb, bytes(R"(\xb1\x01\xb5)"));
-	ASSERT_EQ(newb2, bytes(R"(\xb1\xb5)"));
 }
 
 TEST(bytes, stringOperator)

@@ -9,6 +9,7 @@ namespace py
 		extern object count;
 		extern object index;
 		extern object find;
+		//extern object list;
 	}
 	class list : public object
 	{

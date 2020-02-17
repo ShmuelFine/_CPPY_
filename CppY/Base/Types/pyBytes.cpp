@@ -1,4 +1,6 @@
 #include "pyBytes.h"
+#include "Comparisons.h"
+#include "algorithm"
 namespace py
 {
 
@@ -28,7 +30,11 @@ namespace py
 	bool pyBytes::endswith(pyBytes const& ending)
 	{
 		if (ending._impl.size() > this->_impl.size()) return false;
-		return std::equal(ending._impl.rbegin(), ending._impl.rend()-1, _impl.rbegin());
+		/*auto res = std::find_end(_impl.begin(), _impl.end(), ending._impl.begin(), ending._impl.end());
+			if (res != _impl.end())
+				return true;*/
+		return std::equal(ending._impl.rbegin(), ending._impl.rend(), _impl.rbegin());
+		//return std::equal(ending._impl.begin(), ending._impl.end(), _impl.begin()+(_impl.size()- ending._impl.size()-1));
 	}
 
 	bool pyBytes::startswith(pyBytes const& open)
@@ -38,11 +44,17 @@ namespace py
 
 	}
 
-	pyList pyBytes::replace(pyBytes const& what, pyBytes const& withWhat)
+	pyBytes pyBytes::replace(pyBytes const& what, pyBytes const& withWhat)
 	{
-		auto b = _impl;
-		//std::replace(b.begin(), b.end(), what, withWhat);
-		return b;
+		//auto newObj = _impl.begin();
+		//auto itPos = _impl.begin();
+		//while (itPos != _impl.end()){
+		//itPos = std::search(itPos,_impl.end(),what.begin(),what.end());
+		//newObj = std::copy(withWhat.begin(), withWhat.end(), itPos);
+		//}
+		//auto asBytes = reinterpret_cast<pyBytes*>(newObj._Ptr->get());
+		//return asBytes->_impl;
+		throw;
 	}
 
 	pyBytes pyBytes::center(int width, pyByte fillByte)
@@ -69,6 +81,30 @@ namespace py
 		vec.push_back(delimitor);
 		std::vector<unsigned char> after(it + sepInd+1, meAsList->end());
 		vec.push_back(after);*/
+		throw;
+	}
+
+	int pyBytes::rindex(pyBytes o, pyInt i, pyInt j, bool throwEx)
+	{
+		//if (is_ofType(i, None))
+		//	i = 0;
+		//if (is_ofType(j, None))
+		//	j = this->_impl.size();
+		//auto it = std::find_end(
+		//	_impl.begin() + i,
+		//	_impl.end() - (_impl.size() - j), o.begin(),o.end());
+		//if (it != _impl.end() - (_impl.size() - j))
+		//	if (throwEx)
+		//		THROW("Not found element");
+		//	else
+		//		return -1;
+		//return (int)std::distance(_impl.begin() + i, it);
+		//
+		///*std::reverse(_impl.begin(), _impl.end());
+		//auto iObjPtr = reinterpret_cast<pyObj*>(&i);
+		//auto jObjPtr = reinterpret_cast<pyObj*>(&j);
+		//int pos = this->index(o, iObjPtr, jObjPtr, throwEx);
+		//return _impl.size() - pos;*/
 		throw;
 	}
 

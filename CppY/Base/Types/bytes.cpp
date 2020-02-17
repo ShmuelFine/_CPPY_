@@ -6,12 +6,12 @@
 namespace py
 {
 
-	namespace py_bytes{
-	FUN_DEF(hex);
-	PARAM(self, );
-	auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-	return meAsBytes->hex();
-	END_FUN(hex);
+	namespace py_bytes {
+		FUN_DEF(hex);
+		PARAM(self, );
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
+		return meAsBytes->hex();
+		END_FUN(hex);
 
 		/*FUN_DEF(decode);
 		PARAM(self, );
@@ -66,14 +66,33 @@ namespace py
 		END_FUN(partition);
 
 		FUN_DEF(center);
-		PARAM(self,);
-		PARAM(width,);
-		PARAM(fillByte,32);
+		PARAM(self, );
+		PARAM(width, );
+		PARAM(fillByte, 32);
 		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
 		auto filling = reinterpret_cast<pyByte*>(fillByte._ptr.get());
-		return meAsBytes->center(width,*filling);
+		return meAsBytes->center(width, *filling);
 		END_FUN(center);
 
+		FUN_DEF(rindex);
+		PARAM(self, );
+		PARAM(what, );
+		PARAM(i, None);
+		PARAM(j, None);
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
+		auto x = reinterpret_cast<pyBytes*>(what._ptr.get());
+		return meAsBytes->rindex(*x, i, j, true);
+		END_FUN(rindex);
+
+		FUN_DEF(rfind);
+		PARAM(self, );
+		PARAM(what, );
+		PARAM(i, None);
+		PARAM(j, None);
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
+		auto x = reinterpret_cast<pyBytes*>(what._ptr.get());
+		return meAsBytes->rindex(*x, i, j, false);
+		END_FUN(rfind);
 	}
 
 }
@@ -92,25 +111,24 @@ namespace py
 
 		//does weird thing in python
 		(*this).attr(join) = py_bytes::join;
-		
+
 		attr(find) = py_list::find;
 
 		attr(index) = py_list::index;
 
 		//static method
 		//(*this).attr(maketrans) = py_bytes::maketrans;
-		
+
 		//to do
 		(*this).attr(partition) = py_bytes::partition;
 
 		//(*this).attr(translate) = py_bytes::translate;
 
 		(*this).attr(center) = py_bytes::center;
-		
+
 		(*this).attr(replace) = py_bytes::replace;
-		//(*this).attr(rfind) = py_bytes::rfind;
-		//(*this).attr(rindex) = py_bytes::rindex;
-		//(*this).attr(rindex) = py_bytes::rindex;
+		(*this).attr(rfind) = py_bytes::rfind;
+		(*this).attr(rindex) = py_bytes::rindex;
 		//(*this).attr(rpartition) = py_bytes::rpartition;
 
 	}
@@ -125,7 +143,7 @@ namespace py
 	{
 		AddAttributes();
 	}
-	bytes::bytes(std::string const& v) : 
+	bytes::bytes(std::string const& v) :
 		object(pyBytes(v))
 		//object(pyBytes(std::string(v.begin(), v.end())))
 	{

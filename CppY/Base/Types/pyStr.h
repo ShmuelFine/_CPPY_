@@ -57,7 +57,7 @@ namespace py
 			{
 				retStr = retStr + (std::string)(*part) + (std::string)(*this);
 			}*/
-			retStr = std::string(retStr.begin(), retStr.end() - this->_impl.size());
+			//retStr = std::string(retStr.begin(), retStr.end() - this->_impl.size());
 
 			return retStr;
 		}

@@ -13,6 +13,8 @@
 
 namespace py
 {
+	class pyBytes;
+	typedef std::shared_ptr<pyBytes> pyBytesPtr;
 	class pyBytes : public pyList
 	{
 	public:
@@ -54,9 +56,11 @@ namespace py
 		std::string decode(std::string encoding, std::string errors);
 		bool endswith(pyBytes const& ending);
 		bool startswith(pyBytes const& open);
-		pyList replace(pyBytes const& what, pyBytes const& withWhat);
+		pyBytes replace(pyBytes const& what, pyBytes const& withWhat);
 		pyBytes center(int width, pyByte fillByte);
 		pyTuple partition(pyByte const& delimitor);
+		int rindex(pyBytes o, pyInt i, pyInt j, bool throwEx);
+
 
 	public:
 		// Shouldn't be used. if the other is a list, use As<list>
