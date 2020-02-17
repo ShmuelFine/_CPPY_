@@ -8,7 +8,7 @@
 #include "pyList.h"
 #include "pyFunc.h"
 #include "pyDict.h"
-#include "PyBinary.h"
+#include "PyBytes.h"
 #include <memory>
 #include <map>
 #include "booleanOperators.h"
@@ -38,6 +38,7 @@ namespace py
 
 		object(const char * i)			: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyStr(i))	;}
 		object(size_t sz)				: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyInt((int)sz))	;}
+		object(uint8_t i) : _ptr(_tmp_impl) { _ptr = pyObjPtr(new pyByte(i)); }
 
 		object(object const& other)		: _ptr(_tmp_impl) { _ptr = other._ptr; attributes = other.attributes;  }
 
@@ -50,7 +51,7 @@ namespace py
 		operator float() const			 { CHECK_PTR; return get()->operator float(); };
 		operator int() const 			 { CHECK_PTR; return get()->operator int(); };
 		operator bool() const			 { CHECK_PTR; return get()->operator bool(); };
-		//operator int8_t() const			 { CHECK_PTR; return get()->operator int8_t(); };//?
+		//operator int8_t() const			 { CHECK_PTR; return get()->operator int8_t(); };
 	
 	public:
 
@@ -102,6 +103,7 @@ namespace py
 		operator Bool() const	{ CHECK_PTR;  return get() != nullptr && get()->operator bool(); }
 		operator pyStr() const	{ CHECK_PTR;  return get()->operator std::string(); }
 		operator size_t() const { CHECK_PTR;  return get()->operator int(); }
+		operator pyByte() const { CHECK_PTR;  return get()->operator uint8_t(); }
 
 		// Using templates for supporting all POD types: ////////////////////////
 		template <typename T> bool operator == (T const& other) const { return operator ==(object(other)); }

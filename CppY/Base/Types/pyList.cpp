@@ -139,7 +139,7 @@ namespace py
 
 		int count = 0;
 		for (auto it = _impl.begin() + startdx; it < _impl.end() - (_impl.size() - enddx); it++)
-			if (*it == whatToCount)
+			if (**it == *whatToCount)
 				count++;
 		return count;
 	}
@@ -151,14 +151,11 @@ namespace py
 			_impl.begin() + idx,
 			_impl.end() - (_impl.size() - jdx),
 			[&o](pyObjPtr const& a) {return (*a) == (*o); });
-
-
-		if (it == _impl.end() - (_impl.size() - jdx) - 1)
+		if (it != _impl.end() - (_impl.size() - jdx) - 1)
 			if (throwEx)
 				THROW("Not found element");
 			else
 				return -1;
-
 		return (int)std::distance(_impl.begin() + idx, it);
 	}
 
