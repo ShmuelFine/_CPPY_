@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <regex>
 #include "..\Base\Types\pyList.h"
 
 namespace py
@@ -45,9 +46,6 @@ namespace py
 	typedef std::shared_ptr<PyLineParser> PyParserPtr;
 
 	
-	
-
-
 	class ICommand
 	{
 	public:
@@ -79,6 +77,8 @@ namespace py
 		std::vector<ICommandPtr> Children;
 	};
 
+
+
 #define COMMAND_INTERFACE(name, base)\
 	class name : public base {\
 	public:\
@@ -90,6 +90,14 @@ namespace py
 		virtual ICommandPtr Clone() const { \
 	auto result = std::make_shared<name>(_parser); *result = *this; return result; }\
 
+	
+	COMMAND_INTERFACE(RegexBasedCommand, ICommand)
+	public:
+		virtual std::string GetRegexString() const = 0;
+		virtual bool CanParse(std::string const& line) const override;
+		virtual void ParsePy_inner(std::string const& line);
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch & matches) = 0;
+	};
 
 	/////////////////////////////////
 #pragma region two sides operators
@@ -214,10 +222,10 @@ namespace py
 
 	};
 
-	COMMAND_CLASS(NegationOP,ICommand)
+	COMMAND_CLASS(NegationOP,RegexBasedCommand)
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const &  line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 
 	};
@@ -225,14 +233,13 @@ namespace py
 
 #pragma region containers : outer and inner
 	//////////////////////////////////
-	COMMAND_INTERFACE(InnerScopeEscaperBase,ICommand)
+	COMMAND_INTERFACE(InnerScopeEscaperBase,RegexBasedCommand)
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const &  line) override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		
 		virtual void ParsePy_innerScope(std::string const& text);
-		virtual std::string OuterExpressionRegex() const {
+		virtual std::string GetRegexString() const override {
 			// Enforce inner expression by the .+ at the beginning:
 			return ".+(" + ScopeOpenerRGX() + ".*?" + ScopeCloserRGX() + ").*";
 		}
@@ -265,7 +272,7 @@ namespace py
 
 	//COMMAND_CLASS(InnerScope_FunctionCall_Escaper, InnerScopeEscaperBase)
 	//public:
-	//	virtual std::string OuterExpressionRegex() const {
+	//	virtual std::string GetRegexString() const {
 	//		// Enforce inner expression by the .+ at the beginning:
 	//		return R"(.*\W(\w+\(.*?\)).*)";
 	//	}
@@ -281,16 +288,17 @@ namespace py
 
 	/////////////////////////////////
 
-	COMMAND_INTERFACE(Container_ImplicitConstruction_Base,ICommand)
+	COMMAND_INTERFACE(Container_ImplicitConstruction_Base,RegexBasedCommand)
 	public:
 		virtual std::string ScopeOpenerRGX() const = 0;
 		virtual std::string ScopeCloserRGX() const = 0;
 		// Inherited via ICommand
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const & line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual void ProcessMatch(std::string const& match);
 		pyList elements;
 		std::string _scopeOpener;
+		std::string _scopeCloser;
 	};
 
 	COMMAND_CLASS(ListImplicitConstruction,Container_ImplicitConstruction_Base)
@@ -310,17 +318,17 @@ namespace py
 		virtual std::string Translate_inner() const override;
 	};
 
-	COMMAND_CLASS(EmptyDictImplicitConstruction,ICommand)
+	COMMAND_CLASS(EmptyDictImplicitConstruction,RegexBasedCommand)
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const & line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 	};
 
 
 	COMMAND_CLASS(FunctionCall, Container_ImplicitConstruction_Base)
 	public:
-		virtual std::string ScopeOpenerRGX() const override { return R"(w+\()"; };
+		virtual std::string ScopeOpenerRGX() const override { return R"(\w+\()"; };
 		virtual std::string ScopeCloserRGX() const override { return R"(\))"; };
 
 		virtual std::string Translate_inner() const override;
@@ -355,7 +363,7 @@ namespace py
 
 	COMMAND_CLASS(CommentLine_InnerScope,InnerScopeEscaperBase)
 	public:
-		virtual std::string OuterExpressionRegex() const override {
+		virtual std::string GetRegexString() const override {
 			// Enforce inner expression by the .+ at the beginning:
 			return R"(.*?(\#.*))";
 		}
@@ -458,37 +466,37 @@ namespace py
 #pragma endregion
 
 	///////////////////////////////////
-	COMMAND_CLASS(If_Statement,ICommand)
+	COMMAND_CLASS(If_Statement,RegexBasedCommand)
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const &  line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
 
 	};
 	
-	COMMAND_CLASS(Else_Statement, ICommand)
+	COMMAND_CLASS(Else_Statement, RegexBasedCommand)
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const& line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
 	};
 
-	COMMAND_CLASS(For_Statement, ICommand)
+	COMMAND_CLASS(For_Statement, RegexBasedCommand)
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const &  line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual std::vector<std::string> GetMyVariables() const;
 		virtual bool IsToSemicolon() const { return false; }
 
 	};
 
-	COMMAND_CLASS(While_Statement,ICommand)	
+	COMMAND_CLASS(While_Statement,RegexBasedCommand)	
 	public:
-		virtual bool CanParse(std::string const& line) const override;
-		virtual void ParsePy_inner(std::string const &  line) override;
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
 	};

@@ -2,7 +2,6 @@
 #include "object.h"
 #include "list.h"
 #include "Comparisons.h"
-#include <regex>
 #include <string>
 #include "_Exceptions.h"
 
@@ -48,6 +47,21 @@ namespace py
 		return result;
 	}
 
+	//////////////////////////////////////////////////
+
+	bool RegexBasedCommand::CanParse(std::string const& line) const
+	{
+		std::regex statement(GetRegexString());
+		std::string justText = pyStr(line).strip();
+		return std::regex_match(justText, statement);
+	}
+	void RegexBasedCommand::ParsePy_inner(std::string const& line)
+	{
+		std::regex statement(GetRegexString());
+		std::smatch matches;
+		std::regex_search(line, matches, statement);
+		ParsePy_inner_byRegex(line, matches);
+	}
 	//////////////////////////////////////////////////
 	std::string GetVarialbeRegex()
 	{
@@ -128,17 +142,12 @@ namespace py
 		return pyStr("is_not(") + Children[0]->Translate() + pyStr(",") + Children[1]->Translate() + pyStr(")");
 	}
 	   
-	bool NegationOP::CanParse(std::string const& line) const
+	std::string NegationOP::GetRegexString() const
 	{
-		std::regex statement(R"(not (.*))");
-		return std::regex_match(line, statement);
+		return R"(not (.*))";
 	}
-	void NegationOP::ParsePy_inner(std::string const& line)
+	void NegationOP::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
 	{
-		std::regex statement(R"(not (.*))");
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
-
 		Children.push_back(_parser->Parse(matches[1]));
 	}
 
@@ -165,19 +174,9 @@ namespace py
 
 	
 	///////////////////////////
-
-	bool InnerScopeEscaperBase::CanParse(std::string const& line) const
-	{
-		std::regex statement(OuterExpressionRegex());
-		return std::regex_match(line, statement);
-	}
 	
-	void InnerScopeEscaperBase::ParsePy_inner(std::string const& line)
+	void InnerScopeEscaperBase::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
 	{
-		std::regex statement(OuterExpressionRegex());
-
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
 		std::string innerExpression_str = matches[1];
 
 		_UUID = UUID();
@@ -207,21 +206,16 @@ namespace py
 	
 	////////////////////////////////////////////////////////////
 
-	bool Container_ImplicitConstruction_Base::CanParse(std::string const& line) const
+	std::string Container_ImplicitConstruction_Base::GetRegexString() const
 	{
-		std::regex statement("(" + ScopeOpenerRGX() + ")" + R"((.*))" + ScopeCloserRGX());
-		return std::regex_match(line, statement);
+		return "^(" + ScopeOpenerRGX() + ")" + R"((.*))" + "(" + ScopeCloserRGX() + ")" + "$";
 	}
 
-	void Container_ImplicitConstruction_Base::ParsePy_inner(std::string const& line)
+	void Container_ImplicitConstruction_Base::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
 	{
-		std::regex statement("(" + ScopeOpenerRGX() + ")" + R"((.*))" + ScopeCloserRGX());
-
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
-		
 		_scopeOpener = matches[1];
 		std::string elements = matches[2];
+		_scopeCloser = matches[3];
 		ProcessMatch(elements);
 	}
 
@@ -246,7 +240,7 @@ namespace py
 			THROW_UNLESS(parts.size() == 2, "Can't construct dict value from " + std::to_string(parts.size()) + " parts");
 			result += pyStr("{ {} , {} } , ").format(parts[0], parts[1]);
 		}
-		result += pyStr("});");
+		result += pyStr("})");
 		return result;
 	}
 
@@ -258,6 +252,9 @@ namespace py
 		{
 			pyStr elem = (std::string) * elemObj;
 			auto parts = elem.split("=");
+			for (auto& p : parts)
+				p = pyStr(p).strip();
+
 			THROW_UNLESS(parts.size() <= 2, "Can't construct dict value from " + std::to_string(parts.size()) + " parts");
 			result += result ? pyStr(".A") : pyStr("ARGS");
 			if (parts.size() == 2)
@@ -266,30 +263,26 @@ namespace py
 				result += pyStr("({})").format(parts[0]);
 		}
 		
-		return pyStr(_scopeOpener) + pyStr("(") + result  + pyStr(");");
+		return pyStr(_scopeOpener) + result  + pyStr(_scopeCloser);
 	}
 
 
-	bool EmptyDictImplicitConstruction::CanParse(std::string const& line) const
+	std::string EmptyDictImplicitConstruction::GetRegexString() const
 	{
-		std::regex statement("\\{\\s*\\}");
-		return std::regex_match(line, statement);
+		return "\\{\\s*\\}";
 	}
-	void EmptyDictImplicitConstruction::ParsePy_inner(std::string const& line)
-	{
-		std::regex statement("\\{\\s*\\}");
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
-	}
+
+	void EmptyDictImplicitConstruction::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) 
+	{}
 
 	std::string EmptyDictImplicitConstruction::Translate_inner() const
 	{
-		return "dict();";
+		return "dict()";
 	}
 
 	std::string SetImplicitConstruction::Translate_inner() const
 	{
-		return pyStr("set({") + pyStr(",").join(elements) + pyStr("});");
+		return pyStr("set({") + pyStr(",").join(elements) + pyStr("})");
 	}
 
 	std::string BytesImplicitConstruction::Translate_inner() const
@@ -301,17 +294,12 @@ namespace py
 
 
 
-	bool If_Statement::CanParse(std::string const& line) const
+	std::string If_Statement::GetRegexString() const
 	{
-		std::regex statement(R"(if\s+(.+)\:)");
-		return std::regex_match(line, statement);
+		return R"(if\s+(.+)\:)";
 	}
-	void If_Statement::ParsePy_inner(std::string const &  line)
+	void If_Statement::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
 	{
-		std::regex statement(R"(if\s+(.+)\:)");
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
-
 		Children.push_back(_parser->Parse(matches[1]));
 	}
 
@@ -321,17 +309,13 @@ namespace py
 	}
 
 	
-	bool For_Statement::CanParse(std::string const& line) const
+	std::string For_Statement::GetRegexString() const
 	{
-		std::regex statement(R"(for\s+(.+)\sin\s+(.+)\:)");
-		return std::regex_match(line, statement);
+		return R"(for\s+(.+)\sin\s+(.+)\:)";
 	}
-	void For_Statement::ParsePy_inner(std::string const &  line)
+	
+	void For_Statement::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
 	{
-		std::regex statement(R"(for\s+(.+)\sin\s+(.+)\:)");
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
-
 		Children.push_back(_parser->Parse(matches[1]));
 		Children.push_back(_parser->Parse(matches[2]));
 	}
@@ -345,17 +329,13 @@ namespace py
 	}
 
 
-	bool While_Statement::CanParse(std::string const& line) const
+	std::string While_Statement::GetRegexString() const
 	{
-		std::regex statement(R"(while\s+(.+)\:)");
-		return std::regex_match(line, statement);
+		return R"(while\s+(.+)\:)";
 	}
-	void While_Statement::ParsePy_inner(std::string const &  line)
-	{
-		std::regex statement(R"(while\s+(.+)\:)");
-		std::smatch matches;
-		std::regex_search(line, matches, statement);
 
+	void While_Statement::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
+	{
 		Children.push_back(_parser->Parse(matches[1]));
 	}
 	std::string While_Statement::Translate_inner() const
@@ -395,8 +375,8 @@ namespace py
 
 	/////////////////
 
-	bool Else_Statement::CanParse(std::string const& line) const { return pyStr(line).strip() == pyStr("else:"); }
-	void Else_Statement::ParsePy_inner(std::string const& line) { return ; }
+	std::string Else_Statement::GetRegexString() const { return "else\\:"; }
+	void Else_Statement::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) {}
 	std::string Else_Statement::Translate_inner() const { return "else"; }
 
 	/////////////////
@@ -421,6 +401,7 @@ namespace py
 		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<InnerScope_SquareBraces_Escaper					>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<InnerScope_FunctionCall_Escaper					>((PyLineParser *)this));
+		ParsingChain.push_back(std::make_shared<FunctionCall									>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<InnerScope_RoundBraces_Escaper 					>((PyLineParser *)this));
 
 		ParsingChain.push_back(std::make_shared<ListImplicitConstruction						>((PyLineParser *)this));
@@ -428,7 +409,6 @@ namespace py
 		ParsingChain.push_back(std::make_shared<EmptyDictImplicitConstruction					>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<SetImplicitConstruction							>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<BytesImplicitConstruction						>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<FunctionCall									>((PyLineParser *)this));
 
 		ParsingChain.push_back(std::make_shared<If_Statement			  						>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<Else_Statement			  						>((PyLineParser*)this));

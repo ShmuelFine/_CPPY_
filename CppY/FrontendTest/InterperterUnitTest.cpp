@@ -4,6 +4,18 @@
 
 using namespace py;
 
+TEST(Interperter, funcParsing_WrapsArgsWithMacro)
+{
+    // Arrange
+    PyLineParser parser;
+    // Act
+    auto command = parser.Parse(R"(print(a,b,c))");
+    auto cppStr = command->Translate();
+
+    // Assert
+    EXPECT_EQ(cppStr, "print(ARGS(a).A(b).A(c))");
+}
+
 TEST(Interperter, var_equal_cons_plus_func__Fixture)
 {
     // Arrange
@@ -13,7 +25,7 @@ TEST(Interperter, var_equal_cons_plus_func__Fixture)
     auto cppStr = command->Translate();
 
     // Assert
-    EXPECT_EQ(cppStr, "x = 5 + f(78)");
+    EXPECT_EQ(cppStr, "x = 5 + f(ARGS(78))");
 }
 
 TEST(Interperter, var_plus_func_equal_cons_plus_func__Fixture)
@@ -25,7 +37,7 @@ TEST(Interperter, var_plus_func_equal_cons_plus_func__Fixture)
     auto cppStr = command->Translate();
 
     // Assert
-    EXPECT_EQ(cppStr, "x + sin(x) = 5 + f(78)");
+    EXPECT_EQ(cppStr, "x + sin(ARGS(x)) = 5 + f(ARGS(78))");
 }
 
 TEST(Interperter, list_nesting_Fixture)
@@ -37,7 +49,7 @@ TEST(Interperter, list_nesting_Fixture)
     auto cppStr = command->Translate();
 
     // Assert
-    EXPECT_EQ(cppStr, R"(x = list({5, "asdf", "asdf", f(78, "asdf", y), 6+7}) )");
+    EXPECT_EQ(cppStr, R"(x = list({5, "asdf", "asdf", f(ARGS(78).A("asdf").A(y)), 6+7}) )");
 }
 
 TEST(Interperter, GetVariables_RetrievesVariablesDefinedInLine)
@@ -105,13 +117,13 @@ TEST(BlockParser, scopes_and_variable_Defs)
 x = 5;
 if (x > 8)
 {
-   print("hello");
+   print(ARGS("hello"));
 }
 else
 {
    object y;
    y = 8;
-   print(x + y);
+   print(ARGS(x + y));
 }
 )";
     EXPECT_EQ(cppBlock, expected);

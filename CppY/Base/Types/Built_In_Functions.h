@@ -4,5 +4,10 @@
 
 namespace py
 {
-	object len(object iterable);
+	extern object abs ;
+	extern object all ;
+	extern object any ;
+	extern object len ;
+	extern object repr;
+	extern object print;
 }
