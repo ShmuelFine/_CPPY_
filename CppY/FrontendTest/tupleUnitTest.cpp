@@ -86,7 +86,7 @@ TEST(tuple, count_returns_proper_count_when_value_is_not_present)
 TEST(tuple, index_returns_properly_when_value_is_indeed_present)
 {
 	// Arrange
-	auto t = tuple({ 1, "hello", "hello", 3.5 });
+	auto t = tuple({ 1, "hello", "hello", 3.5, 16 });
 	int expected = 0;
 	int expected2 = 1;
 
@@ -109,4 +109,26 @@ TEST(tuple, index_throws_if_value_not_present)
 
 	// Act, Assert
 	ASSERT_THROW(t.attr(index)(ARGS(t).A(9)), PyBaseException);
+}
+
+TEST(tuple, index_throws_if_value_is_not_in_range)
+{
+	// Arrange
+	auto t = tuple({ 1, "hello", "hello", 3.5, 16 });
+
+
+
+	// Act, Assert
+	ASSERT_THROW(t.attr(index)(ARGS(t).A(16).A(0).A(4)), PyBaseException);
+}
+
+TEST(tuple, index_throws_if_value_is_not_in_range_tst2)
+{
+	// Arrange
+	auto t = tuple({ 1, "hello", "hello", 3.5, 16 });
+
+
+
+	// Act, Assert
+	ASSERT_THROW(t.attr(index)(ARGS(t).A(16).A(1).A(4)), PyBaseException);
 }

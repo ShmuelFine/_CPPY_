@@ -1,11 +1,13 @@
 #pragma once
-#pragma once
 
 #include "PyObj.h"
 #include "pyExceptions.h"
 #include "ComparisonUtils.h"
 #include <sstream>
 #include <iomanip>
+namespace secretPy {
+	const std::string secretKeyword = "NUMERIC_";
+}
 namespace py
 {
 
@@ -31,12 +33,20 @@ namespace py
 		virtual pyObjIterator begin() const { NOT_SUPPORTED; }
 		virtual pyObjIterator end() const { NOT_SUPPORTED; }
 		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
-
-		virtual std::string Type() const override { return typeid(T).name(); }
+		
+		virtual std::string Type() const override { return  secretPy::secretKeyword + typeid(T).name(); }
 		virtual pyObjPtr Clone() const override { return std::make_shared<pyNumType<T>>(val); }
 		virtual bool operator <(pyObj const& other) const override {
-			EXPLICIT_COMPARE(Type(), other.Type());
-			return val < (reinterpret_cast<pyNumType<T> const*>(&other))->val;
+			std::string othersType = other.Type();
+			if (othersType.compare(0, secretPy::secretKeyword.length(), secretPy::secretKeyword) == 0)
+			{
+				T othersVal = (T)other;
+				return val < othersVal;
+			}
+			else
+				EXPLICIT_COMPARE(Type(), othersType);
+			
+			return false;
 		}
 
 		virtual pyObjPtr operator ++(int) override { auto result = *this; val++; return result.Clone(); }
@@ -73,6 +83,7 @@ namespace py
 		virtual operator float() const	override { return (float)val; }
 		virtual operator int() const 	override { return (int)val; }
 		virtual operator bool() const	override { return (bool)val; }
+		virtual operator uint8_t() const	override { return (uint8_t)val; }
 
 		virtual pyObjPtr& operator [](pyObjPtr const& key) { NOT_SUPPORTED; }
 		virtual pyObjPtr FetchByIdx(int idx) const { NOT_SUPPORTED; }
@@ -101,13 +112,9 @@ namespace py
 		// e.g. pyByte(250).GetHexDigit(0) -> F
 		// e.g. pyByte(250).GetHexDigit(1) -> A
 		char GetHexDigit(int pos) {
-			//std::istringstream is(this[pos]);
-			//char hexDigit;
-			//is >> std::hex >> hexDigit;
-			//return hexDigit;
 			std::stringstream ss;
-			ss << std::hex << val;
-			return ss.str()[0];
+			ss << std::setfill('0')<< std::hex << int(val);
+			return ss.str()[pos];
 		};
 
 		//virtual operator std::string() const

@@ -28,7 +28,6 @@ namespace py
 		virtual operator float() const override { NOT_IMPL; }
 		virtual operator int() const override { NOT_IMPL; }
 		virtual operator bool() const override { return not _impl.empty(); }
-
 		virtual pyObjPtr& operator [](pyObjPtr const& key);
 
 		virtual pyObjPtr FetchByIdx(int idx) const;
@@ -53,7 +52,7 @@ namespace py
 		operator bool() { return !_impl.empty(); }
 
 		int count(pyObjPtr whatToCount, pyObjPtr start, pyObjPtr end);
-		int index(pyObjPtr o, pyObjPtr i, pyObjPtr j,bool throwEx) const;
+		int index(pyObjPtr whoToSearch, pyObjPtr startIdx, pyObjPtr endIdx, bool isToThrow) const;
 
 		pyList SUB(int start, int end);
 		int CorrectIdx(int idx) const;

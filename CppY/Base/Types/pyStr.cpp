@@ -207,8 +207,10 @@ namespace py
 
 		while (regex_search(s, m, r))  
 		{
-			int split_on = (int) m.position();
-			splits.push_back(s.substr(0, split_on));
+			int split_on = (int)m.position();
+			auto first = s.substr(0, split_on);
+			if (!first.empty())
+				splits.push_back(first);
 			s = s.substr(split_on + m.length());
 			if (splits.size() == maxsplit)
 				break;

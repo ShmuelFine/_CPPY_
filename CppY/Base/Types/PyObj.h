@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <map>
 #include "ComparisonUtils.h"
 #include "booleanOperators.h"
 
@@ -20,6 +21,8 @@ namespace py
 	public:
 		bool IsAssignable;
 
+		std::map<std::string, pyObjPtr> attributes;
+
 	public:
 		pyObjPtr() : std::shared_ptr<pyObj>() { IsAssignable = true; }
 		pyObjPtr(pyObj* px) : std::shared_ptr<pyObj>(px) { IsAssignable = true; }
@@ -27,6 +30,7 @@ namespace py
 		pyObjPtr(std::shared_ptr<T> const& other) : std::shared_ptr<pyObj>(other) { IsAssignable = true; }
 
 		pyObjPtr& operator =(pyObjPtr const& other);
+
 	};
 };
 

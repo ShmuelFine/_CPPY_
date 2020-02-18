@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "..\Base\Types\object.h"
 #include "..\Base\Types\FunDefs.h"
+#include "..\Base\Types\_Exceptions.h"
 using namespace py;
 
 
@@ -58,7 +59,7 @@ TEST(pyFunctions, When_UnnamedArgs_PlacedAfter_NamedArgs_ThenThrows)
 	// Act
 	// Assert
 	ASSERT_THROW(
-	object c = multTwoNums(ARGS("a", a).A(b)), std::exception);
+	object c = multTwoNums(ARGS("a", a).A(b)), py::PyBaseException);
 }
 
 TEST(pyFunctions, When_UNNamedArgs_AreMissing_ThenThrows)
@@ -70,9 +71,9 @@ TEST(pyFunctions, When_UNNamedArgs_AreMissing_ThenThrows)
 	// Act
 	// Assert
 	ASSERT_THROW(
-		object c = multTwoNums(ARGS(a)), std::exception);
+		object c = multTwoNums(ARGS(a)), py::PyBaseException);
 
 	// wrong named arg name:
 	ASSERT_THROW(
-		object c = multTwoNums(ARGS(a).A("c", b)), std::exception);
+		object c = multTwoNums(ARGS(a).A("c", b)), py::PyBaseException);
 }

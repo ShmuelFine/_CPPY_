@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\Base\Types\pyBinary.cpp" />
     <ClCompile Include="..\Base\Types\pyDict.cpp" />
     <ClCompile Include="..\Base\Types\pyExceptions.cpp" />
     <ClCompile Include="..\Base\Types\pyFormat.cpp" />
     <ClCompile Include="..\Base\Types\pyFunc.cpp" />
-    <ClCompile Include="..\Base\Types\pyList.cpp" />
     <ClCompile Include="..\Base\Types\pyNone.cpp" />
     <ClCompile Include="..\Base\Types\PyObj.cpp" />
     <ClCompile Include="..\Base\Types\pySet.cpp" />
     <ClCompile Include="..\Base\Types\pyStr.cpp" />
     <ClCompile Include="..\Base\Types\pyTuple.cpp" />
+    <ClCompile Include="..\Base\Types\bytes.cpp" />
+    <ClCompile Include="..\Base\Types\pyBytes.cpp" />
+    <ClCompile Include="..\Base\Types\pyList.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Base\Types\PyBinary.h" />
     <ClInclude Include="..\Base\Types\pyBytes.h" />
     <ClInclude Include="..\Base\Types\pyDict.h" />
     <ClInclude Include="..\Base\Types\pyExceptions.h" />
@@ -29,5 +29,6 @@
     <ClInclude Include="..\Base\Types\pySet.h" />
     <ClInclude Include="..\Base\Types\pyStr.h" />
     <ClInclude Include="..\Base\Types\pyTuple.h" />
+    <ClInclude Include="..\Base\Types\PyByteArray.h" />
   </ItemGroup>
 </Project>

@@ -11,13 +11,14 @@ namespace py
 	// TODO. Look in CPython.
 	END_FUN(with_traceback)
 
+	// TODO: Where is this used? Where is the translation happens?
 	BaseException::BaseException(PyBaseException const& backendType)
 	{
 		attr(args) = object(pyList());
 		attr(with_traceback) = with_traceback;
 
-		attributes.insert(backendType.Props.begin(), backendType.Props.end());
-
+		for (auto& prop : backendType.Props)
+			_ptr.attributes[object(prop.first)] = object(prop.second);
 	}
 
 	/**/SIMPLE_IMPL(SystemExit			, BaseException);
