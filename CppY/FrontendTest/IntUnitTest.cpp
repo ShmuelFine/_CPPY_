@@ -20,14 +20,14 @@ TEST(Int, bit_length_Sanity)
 	for (int i = 0; i < x.size(); i++)
 		ASSERT_TRUE(bin_lengths[i] == expected[i]);
 }
-
-TEST(Int, to_bytes_CreatesNonModifyableCollection)
-{
-	// Arrange
-	Int x = -37;
-
-	auto bytes = MEM_FUN(x, to_bytes).A(5));
-
-	// Act, Assert
-	EXPECT_THROW(bytes[0] = 23, std::exception);
-}
+//
+//TEST(Int, to_bytes_CreatesNonModifyableCollection)
+//{
+//	// Arrange
+//	Int x = -37;
+//
+//	auto bytes = MEM_FUN(x, to_bytes).A(5));
+//
+//	// Act, Assert
+//	EXPECT_THROW(bytes[0] = 23, std::exception);
+//}
