@@ -44,7 +44,7 @@ namespace py
 		return *this;
 	}
 
-	bool pyObjPtr::operator==(pyObjPtr const& other)
+	bool pyObjPtr::operator==(pyObjPtr const& other) const
 	{
 		if (!*this && !other)
 			return true;

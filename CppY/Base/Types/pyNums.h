@@ -108,22 +108,8 @@ namespace py
 	{
 	public:
 		pyByte(unsigned char in) : pyNumType<uint8_t>(in) {};
-		// @pos can be 0 or 1.
-		// e.g. pyByte(250).GetHexDigit(0) -> F
-		// e.g. pyByte(250).GetHexDigit(1) -> A
-		char GetHexDigit(int pos) {
-			std::stringstream ss;
-			ss << std::setfill('0')<< std::hex << int(val);
-			return ss.str()[pos];
-		};
-
-		//virtual operator std::string() const
-		//{
-		//	// TODO: Return "\xFA" = "\x" + GetHexDigit(0) + GetHexDigit(1);
-		//	//val;
-		//	//return std::to_string(val); 
-		//	//throw;
-		//}
+		
+		virtual operator std::string() const override;
 
 	};
 }

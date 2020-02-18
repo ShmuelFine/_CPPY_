@@ -15,44 +15,23 @@ namespace py
 {
 	class pyBytes;
 	typedef std::shared_ptr<pyBytes> pyBytesPtr;
+
 	class pyBytes : public pyList
 	{
 	public:
 		pyBytes() : pyList() {};
-		pyBytes(std::initializer_list<unsigned char> const& v)
-		{
-			for (auto elem : v) _impl.push_back(new pyByte(elem));
-			for (pyObjPtr& i : _impl) i.IsAssignable = false;
-
-		}
-
-		pyBytes(std::vector<unsigned char> const& v)
-		{
-			for (auto elem : v) _impl.push_back(new pyByte(elem));
-			for (pyObjPtr& i : _impl) i.IsAssignable = false;
-		}
-
-		pyBytes(std::string const& v) {
-			auto numStrs = pyStr(v).split(R"(\\x)");
-			//std::vector<unsigned char> res;
-			for (auto singleNumStr : numStrs)
-			{
-				std::stringstream ss;
-				ss << std::hex << singleNumStr;
-				int tst;
-				ss >> tst;
-				//res.push_back(tst);
-				_impl.push_back(new pyByte(tst));
-			}
-			for (pyObjPtr& i : _impl) i.IsAssignable = false;
-			//*this=pyBytes(res);
-		}
-
-		// copy ctors
+		pyBytes(std::initializer_list<unsigned char> const& v);
+		pyBytes(std::vector<unsigned char> const& v);
+		pyBytes(std::string const& v);
 		pyBytes(pyBytes const& other) : pyList(other) {};
 
+		// Overrides:
 		virtual std::string Type() const override;
-		std::string hex();
+		virtual operator std::string() const override;
+		virtual pyObjPtr Clone() const override;
+
+	public:
+		std::string hex() const;
 		std::string decode(std::string encoding, std::string errors);
 		bool endswith(pyBytes const& ending);
 		bool startswith(pyBytes const& open);

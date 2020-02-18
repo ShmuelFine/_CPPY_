@@ -143,6 +143,12 @@ namespace py
 	{
 		AddAttributes();
 	}
+
+	bytes::bytes(uint8_t singleton)
+		: object(pyBytes(std::vector<unsigned char>({ singleton })))
+	{
+		AddAttributes();
+	}
 	
 	bytes::bytes(object const& other)
 		: object(other)

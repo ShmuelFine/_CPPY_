@@ -13,6 +13,7 @@ namespace py
 		bytes(std::vector<unsigned char> const& v);
 		bytes(std::string const& v);
 		bytes(const char * v_str);
+		bytes(uint8_t singleton);
 
 	protected:
 		void AddAttributes();

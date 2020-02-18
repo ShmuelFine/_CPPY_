@@ -97,7 +97,7 @@ namespace py
 		if (is_ofType(i, None))
 			i = 0;
 		if (is_ofType(j, None))
-			j = meAsList->_impl.size() - 1;
+			j = meAsList->_impl.size();
 		return meAsList->index(x, i, j,true);
 		END_FUN(index);
 

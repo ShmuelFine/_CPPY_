@@ -3,22 +3,65 @@
 #include "algorithm"
 namespace py
 {
+	pyBytes::pyBytes(std::initializer_list<unsigned char> const& v)
+	{
+		for (auto elem : v) _impl.push_back(new pyByte(elem));
+		for (pyObjPtr& i : _impl) i.IsAssignable = false;
+
+	}
+	pyBytes::pyBytes(std::vector<unsigned char> const& v)
+	{
+		for (auto elem : v) _impl.push_back(new pyByte(elem));
+		for (pyObjPtr& i : _impl) i.IsAssignable = false;
+	}
+
+	pyBytes::pyBytes(std::string const& v) {
+		auto numStrs = pyStr(v).split(R"(\\x)");
+		//std::vector<unsigned char> res;
+		for (auto singleNumStr : numStrs)
+		{
+			std::stringstream ss;
+			ss << std::hex << singleNumStr;
+			int tst;
+			ss >> tst;
+			//res.push_back(tst);
+			_impl.push_back(new pyByte(tst));
+		}
+		for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		//*this=pyBytes(res);
+	}
+
+	pyObjPtr pyBytes::Clone() const
+	{
+		std::shared_ptr<pyBytes> result(new pyBytes());
+		for (pyObjPtr oPtr : this->_impl)
+			result->append(oPtr);
+		return result;
+	}
 
 	std::string pyBytes::Type() const
 	{
 		return "bytes";
 	}
 
-	std::string pyBytes::hex()
+	pyBytes::operator std::string() const
 	{
-		std::string hex1, hex2;
-		for (auto elem : *this)
+		std::string result = "";
+		for (auto elem : _impl)
 		{
-			auto myByte = reinterpret_cast<pyByte*>(elem.get());
-			hex1 = myByte->GetHexDigit(0);
-			hex2 = myByte->GetHexDigit(1);
+			result += "\\x" + (std::string)*elem;
 		}
-		return hex1 + hex2;
+		return result;
+	}
+
+	std::string pyBytes::hex() const
+	{
+		std::string result = "";
+		for (auto elem : _impl)
+		{
+			result += (std::string) * elem;
+		}
+		return result;
 	}
 
 
@@ -33,14 +76,16 @@ namespace py
 			return false;
 		
 		auto res = std::search(_impl.begin(), _impl.end(), ending._impl.begin(), ending._impl.end());
-		return res != _impl.end();
+		return (res == _impl.end() - ending._impl.size());
 	}
 
 	bool pyBytes::startswith(pyBytes const& open)
 	{
-		if (open._impl.size() > this->_impl.size()) return false;
-		return std::equal(open._impl.begin(), open._impl.end(), _impl.begin());
+		if (open._impl.size() > this->_impl.size())
+			return false;
 
+		auto res = std::search(_impl.begin(), _impl.end(), open._impl.begin(), open._impl.end());
+		return (res == _impl.begin());
 	}
 
 	pyBytes pyBytes::replace(pyBytes const& what, pyBytes const& withWhat)

@@ -13,6 +13,7 @@
     <ClCompile Include="..\Base\Types\bytes.cpp" />
     <ClCompile Include="..\Base\Types\pyBytes.cpp" />
     <ClCompile Include="..\Base\Types\pyList.cpp" />
+    <ClCompile Include="..\Base\Types\pyNums.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Base\Types\pyBytes.h" />
