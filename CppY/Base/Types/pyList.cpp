@@ -144,19 +144,19 @@ namespace py
 		return count;
 	}
 
-	int pyList::index(pyObjPtr o, pyObjPtr i, pyObjPtr j,bool throwEx) const
+	int pyList::index(pyObjPtr whoToSearch, pyObjPtr startIdx, pyObjPtr endIdx, bool isToThrow) const
 	{
-		int idx = *i, jdx = *j;
+		int startIdx_int = *startIdx, endIdx_int = *endIdx;
 		auto it = std::find_if(
-			_impl.begin() + idx,
-			_impl.end() - (_impl.size() - jdx),
-			[&o](pyObjPtr const& a) {return (*a) == (*o); });
-		if (it != _impl.end() - (_impl.size() - jdx)-1)
-			if (throwEx)
+			_impl.begin() + startIdx_int,
+			_impl.begin() + endIdx_int + 1,
+			[&whoToSearch](pyObjPtr const& a) {return (*a) == (*whoToSearch); });
+		if (it == _impl.begin() + endIdx_int + 1)
+			if (isToThrow)
 				THROW("Not found element");
 			else
 				return -1;
-		return (int)std::distance(_impl.begin() + idx, it);
+		return (int)std::distance(_impl.begin() + startIdx_int, it);
 	}
 
 	pyList pyList::SUB(int start, int end)

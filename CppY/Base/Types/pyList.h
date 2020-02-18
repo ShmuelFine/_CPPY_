@@ -52,7 +52,7 @@ namespace py
 		operator bool() { return !_impl.empty(); }
 
 		int count(pyObjPtr whatToCount, pyObjPtr start, pyObjPtr end);
-		int index(pyObjPtr o, pyObjPtr i, pyObjPtr j,bool throwEx) const;
+		int index(pyObjPtr whoToSearch, pyObjPtr startIdx, pyObjPtr endIdx, bool isToThrow) const;
 
 		pyList SUB(int start, int end);
 		int CorrectIdx(int idx) const;
