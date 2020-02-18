@@ -155,6 +155,7 @@
     <ClInclude Include="..\Base\Types\object.h" />
     <ClInclude Include="..\Base\Types\range.h" />
     <ClInclude Include="..\Base\Types\set.h" />
+    <ClInclude Include="..\Base\Types\tuple.h" />
     <ClInclude Include="..\Base\Types\WithStatement.h" />
     <ClInclude Include="..\Base\Types\_Exceptions.h" />
   </ItemGroup>
@@ -170,6 +171,7 @@
     <ClCompile Include="..\Base\Types\object.cpp" />
     <ClCompile Include="..\Base\Types\range.cpp" />
     <ClCompile Include="..\Base\Types\set.cpp" />
+    <ClCompile Include="..\Base\Types\tuple.cpp" />
     <ClCompile Include="..\Base\Types\_Exceptions.cpp" />
   </ItemGroup>
   <ItemGroup>

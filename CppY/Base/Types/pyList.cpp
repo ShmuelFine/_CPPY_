@@ -153,7 +153,7 @@ namespace py
 			[&o](pyObjPtr const& a) {return (*a) == (*o); });
 
 
-		if (it == _impl.end() - (_impl.size() - jdx) - 1)
+		if (it == _impl.end() - (_impl.size() - jdx))
 			if (throwEx)
 				THROW("Not found element");
 			else

@@ -63,6 +63,9 @@
     <ClInclude Include="..\Base\Types\object.h">
       <Filter>py built in types</Filter>
     </ClInclude>
+    <ClInclude Include="..\Base\Types\tuple.h">
+      <Filter>py built in types\collections</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Base\Types\Built_In_Functions.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="..\Base\Types\object.cpp">
       <Filter>py built in types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\tuple.cpp">
+      <Filter>py built in types\collections</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,7 +6,7 @@
 
 namespace py
 {
-	
+
 	namespace py_range
 	{
 		FUN_DEF(count);
@@ -16,7 +16,7 @@ namespace py
 		int start = meAsRange->_start;
 		int step = meAsRange->_step;
 		int stop = meAsRange->_stop;
-		
+
 		if (not is_ofType(whatToCount, Int(1)))
 			return 0;
 
@@ -28,10 +28,10 @@ namespace py
 		bool isInRange = 0 <= ratio and ratio <= 1;
 		isOK = isOK and isInRange;
 		return isOK ? 1 : 0;
-		
+
 		END_FUN(count);
 
-		
+
 		FUN_DEF(index);
 		PARAM(self, );
 		PARAM(value, );
@@ -41,7 +41,7 @@ namespace py
 		if (count(ARGS(self).A(value)) == 0)
 			THROW("ValueError: value is not in range");
 		else
-			return ((value - start)/step);
+			return ((value - start) / step);
 		END_FUN(index);
 
 	}
@@ -65,13 +65,13 @@ namespace py
 	}
 
 	//TODO: If step is zero, ValueError is raised.
-	range::range() : object(pyRange(0,0,1)) 
+	range::range() : object(pyRange(0, 0, 1))
 	{
 		AddAttributes();
 	}
 
 	range::range(int start, int stop, int step)
-		:object(pyRange(start, stop, step))
+		: object(pyRange(start, stop, step))
 	{
 		AddAttributes();
 	}

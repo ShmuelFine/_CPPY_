@@ -28,7 +28,7 @@ namespace py
 			start = 0;
 		if (is_ofType(stop, None))
 			stop = meAsTuple->_impl.size();
-		return meAsTuple->index(value, start, stop);
+		return meAsTuple->index(value, start, stop, true);
 		END_FUN(index);
 	}
 }
@@ -37,7 +37,7 @@ namespace py
 {
 	void tuple::AddAttributes()
 	{
-	
+
 		//doesn't really belong here but trying to DRY the code
 		auto myTuple = reinterpret_cast<pyTuple*>(get());
 
@@ -59,6 +59,6 @@ namespace py
 		AddAttributes();
 	}
 
-	
+
 
 }
