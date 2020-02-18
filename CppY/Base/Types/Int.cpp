@@ -1,7 +1,7 @@
 #include "Int.h"
 #include "pyNums.h"
 #include "FunDefs.h"
-#include "pyBinary.h"
+#include "pyBytes.h"
 
 namespace py
 {
@@ -44,7 +44,7 @@ namespace py
 		//for (size_t i = 0; i < (size_t)outputSize; i++)
 		//	outArray[outputSize - i].reset(new pyInt(param >> (i * 8)));
 
-		//return pyBinary(outArray);
+		//return pyBytes(outArray);
 
 		//END_FUN(to_bytes);
 

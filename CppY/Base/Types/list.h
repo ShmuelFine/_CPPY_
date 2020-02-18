@@ -4,6 +4,12 @@
 
 namespace py
 {
+	namespace py_list
+	{
+		extern object count;
+		extern object index;
+		extern object find;
+	}
 	class list : public object
 	{
 	public:

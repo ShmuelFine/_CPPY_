@@ -1,11 +1,11 @@
 #pragma once
 
 
-#include "PyBinary.h"
+#include "pyBytes.h"
 
 namespace py
 {
-	class pyByteArray : public pyBinary
+	class pyByteArray : public pyBytes
 	{
 	public:
 		pyByteArray(std::initializer_list<unsigned char> const& v)

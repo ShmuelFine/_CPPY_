@@ -142,9 +142,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Base\Types\binary.h" />
     <ClInclude Include="..\Base\Types\booleanOperators.h" />
     <ClInclude Include="..\Base\Types\Built_In_Functions.h" />
+    <ClInclude Include="..\Base\Types\bytes.h" />
     <ClInclude Include="..\Base\Types\Comparisons.h" />
     <ClInclude Include="..\Base\Types\ComparisonUtils.h" />
     <ClInclude Include="..\Base\Types\Complex.h" />
@@ -159,8 +159,8 @@
     <ClInclude Include="..\Base\Types\_Exceptions.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Base\Types\binary.cpp" />
     <ClCompile Include="..\Base\Types\Built_In_Functions.cpp" />
+    <ClCompile Include="..\Base\Types\bytes.cpp" />
     <ClCompile Include="..\Base\Types\Comparisons.cpp" />
     <ClCompile Include="..\Base\Types\Complex.cpp" />
     <ClCompile Include="..\Base\Types\dict.cpp" />

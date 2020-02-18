@@ -28,7 +28,6 @@ namespace py
 		virtual operator float() const override { NOT_IMPL; }
 		virtual operator int() const override { NOT_IMPL; }
 		virtual operator bool() const override { return not _impl.empty(); }
-
 		virtual pyObjPtr& operator [](pyObjPtr const& key);
 
 		virtual pyObjPtr FetchByIdx(int idx) const;

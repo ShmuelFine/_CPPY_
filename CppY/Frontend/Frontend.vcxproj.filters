@@ -54,13 +54,13 @@
     <ClInclude Include="..\Base\Types\Int.h">
       <Filter>py built in types\numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\Base\Types\binary.h">
-      <Filter>py built in types</Filter>
-    </ClInclude>
     <ClInclude Include="..\Base\Types\FunDefs.h">
       <Filter>py built in types</Filter>
     </ClInclude>
     <ClInclude Include="..\Base\Types\object.h">
+      <Filter>py built in types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Base\Types\bytes.h">
       <Filter>py built in types</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,13 +92,13 @@
     <ClCompile Include="..\Base\Types\Int.cpp">
       <Filter>py built in types\numeric</Filter>
     </ClCompile>
-    <ClCompile Include="..\Base\Types\binary.cpp">
-      <Filter>py built in types</Filter>
-    </ClCompile>
     <ClCompile Include="..\Base\Types\FunDefs.cpp">
       <Filter>py built in types</Filter>
     </ClCompile>
     <ClCompile Include="..\Base\Types\object.cpp">
+      <Filter>py built in types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Base\Types\bytes.cpp">
       <Filter>py built in types</Filter>
     </ClCompile>
   </ItemGroup>
