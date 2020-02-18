@@ -29,12 +29,11 @@ namespace py
 
 	bool pyBytes::endswith(pyBytes const& ending)
 	{
-		if (ending._impl.size() > this->_impl.size()) return false;
-		/*auto res = std::find_end(_impl.begin(), _impl.end(), ending._impl.begin(), ending._impl.end());
-			if (res != _impl.end())
-				return true;*/
-		return std::equal(ending._impl.rbegin(), ending._impl.rend()-1, _impl.rbegin());
-		//return std::equal(ending._impl.begin(), ending._impl.end(), _impl.begin()+(_impl.size()- ending._impl.size()-1));
+		if (ending._impl.size() > this->_impl.size()) 
+			return false;
+		
+		auto res = std::search(_impl.begin(), _impl.end(), ending._impl.begin(), ending._impl.end());
+		return res != _impl.end();
 	}
 
 	bool pyBytes::startswith(pyBytes const& open)
@@ -59,13 +58,13 @@ namespace py
 
 	pyBytes pyBytes::center(int width, pyByte fillByte)
 	{
-		std::vector<unsigned char> newB((width / 2), fillByte);
-		for (auto elem : *this) {
-			auto myByte = reinterpret_cast<pyByte*>(elem.get());
-			newB.push_back(*myByte);
-		}
-		newB.insert(newB.end(), (width / 2), fillByte);
-		return newB;
+		// width must be even:
+		width = width - width % 2;
+		std::vector<unsigned char> result_vec(width + _impl.size(), fillByte);
+		for (int i = 0; i < _impl.size(); i++)
+			result_vec[width / 2 + i] = *_impl[i];
+		
+		return pyBytes(result_vec);
 	}
 
 	pyTuple pyBytes::partition(pyByte const& delimitor)

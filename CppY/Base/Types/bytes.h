@@ -9,9 +9,10 @@ namespace py
 	{
 	public:
 		bytes();
-		//bytes(unsigned char const& o);
+		bytes(object const & other);
 		bytes(std::vector<unsigned char> const& v);
 		bytes(std::string const& v);
+		bytes(const char * v_str);
 
 	protected:
 		void AddAttributes();

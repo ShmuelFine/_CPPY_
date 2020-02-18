@@ -30,7 +30,7 @@ namespace py
 		pyObjPtr(std::shared_ptr<T> const& other) : std::shared_ptr<pyObj>(other) { IsAssignable = true; }
 
 		pyObjPtr& operator =(pyObjPtr const& other);
-
+		bool operator == (pyObjPtr const& other);
 	};
 };
 

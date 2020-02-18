@@ -49,10 +49,10 @@ TEST(bytes, center)
 	auto b = bytes(R"(\xb1\x01\xb6)");
 
 	// Act
-	bytes expected = MEM_FUN(b, center).A(5));
-	bytes res(R"(\x20\x20\xb1\x01\xb6\x20\x20)");
+	bytes actual = MEM_FUN(b, center).A(5));
+	bytes expected(R"(\x20\x20\xb1\x01\xb6\x20\x20)");
 	// Assert
-	ASSERT_TRUE(expected ==res);
+	ASSERT_TRUE(expected == actual);
 }
 TEST(bytes, endswith)
 {
