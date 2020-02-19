@@ -146,6 +146,7 @@
     <ClCompile Include="..\Base\Types\pyFunc.cpp" />
     <ClCompile Include="..\Base\Types\pyList.cpp" />
     <ClCompile Include="..\Base\Types\pyNone.cpp" />
+    <ClCompile Include="..\Base\Types\pyNums.cpp" />
     <ClCompile Include="..\Base\Types\PyObj.cpp" />
     <ClCompile Include="..\Base\Types\pySet.cpp" />
     <ClCompile Include="..\Base\Types\pyStr.cpp" />

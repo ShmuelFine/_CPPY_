@@ -44,6 +44,17 @@ namespace py
 		return *this;
 	}
 
+	bool pyObjPtr::operator==(pyObjPtr const& other) const
+	{
+		if (!*this && !other)
+			return true;
+		else if (!*this || !other)
+			return false;
+
+		return (**this) == (*other);
+	}
+
+
 	pyObjPtr  pyObj::operator +(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
 	pyObjPtr  pyObj::operator -(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
 	pyObjPtr  pyObj::operator *(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }

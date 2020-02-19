@@ -350,7 +350,7 @@ namespace py
 	//	Children.push_back(_parser->Parse("$" + text + "$"));
 	//}
 
-	inline void StringLiterals_OuterScope_EscaperBase::ProcessMatch(std::string const& match)
+	void StringLiterals_OuterScope_EscaperBase::ProcessMatch(std::string const& match)
 	{
 		elements.append(pyStr(match).Clone());
 	}

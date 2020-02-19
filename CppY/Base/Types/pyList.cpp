@@ -147,10 +147,9 @@ namespace py
 	int pyList::index(pyObjPtr whoToSearch, pyObjPtr startIdx, pyObjPtr endIdx, bool isToThrow) const
 	{
 		int startIdx_int = *startIdx, endIdx_int = *endIdx;
-		auto it = std::find_if(
+		auto it = std::find(
 			_impl.begin() + startIdx_int,
-			_impl.begin() + endIdx_int,
-			[&whoToSearch](pyObjPtr const& a) {return (*a) == (*whoToSearch); });
+			_impl.begin() + endIdx_int, whoToSearch);
 		if (it == _impl.begin() + endIdx_int)
 			if (isToThrow)
 				THROW("Not found element");

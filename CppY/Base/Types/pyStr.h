@@ -53,11 +53,11 @@ namespace py
 				return "";
 
 			std::string retStr = "";
-			/*for (auto part : parts)
+			for (auto part : parts)
 			{
-				retStr = retStr + (std::string)(*part) + (std::string)(*this);
-			}*/
-			//retStr = std::string(retStr.begin(), retStr.end() - this->_impl.size());
+				retStr = retStr + (std::string)(*((pyObjPtr)part)) + (std::string)(*this);
+			}
+			retStr = std::string(retStr.begin(), retStr.end() - this->_impl.size());
 
 			return retStr;
 		}

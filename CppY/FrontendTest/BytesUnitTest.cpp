@@ -7,12 +7,12 @@ using namespace py;
 TEST(bytes, hex)
 {
 	// Arrange
-	std::vector<unsigned char> vec = { 124 };
+	std::vector<unsigned char> vec = { 124 , 124};
 	auto b = bytes(vec);
 	// Act
 	std::string hexstr = MEM_FUN(b, hex));
 	// Assert
-	ASSERT_TRUE(hexstr.compare("7c") == 0);
+	ASSERT_EQ(hexstr, "7c7c");
 }
 TEST(bytes, count)
 {
@@ -49,10 +49,10 @@ TEST(bytes, center)
 	auto b = bytes(R"(\xb1\x01\xb6)");
 
 	// Act
-	bytes expected = MEM_FUN(b, center).A(5));
-	bytes res(R"(\x20\x20\xb1\x01\xb6\x20\x20)");
+	bytes actual = MEM_FUN(b, center).A(5));
+	bytes expected(R"(\x20\x20\xb1\x01\xb6\x20\x20)");
 	// Assert
-	ASSERT_TRUE(expected ==res);
+	ASSERT_TRUE(expected == actual);
 }
 TEST(bytes, endswith)
 {
@@ -106,8 +106,8 @@ TEST(bytes, startswith)
 	auto b = bytes(R"(\xb1\x01\xb6)");
 	// Act
 
-	bool open1 = MEM_FUN(b, startswith).A(117));
-	bool open2 = MEM_FUN(b, startswith).A(182));
+	bool open1 = MEM_FUN(b, startswith).A(bytes(177)));
+	bool open2 = MEM_FUN(b, startswith).A(bytes(182)));
 	// Assert
 	ASSERT_EQ(open1, true);
 	ASSERT_EQ(open2, false);
