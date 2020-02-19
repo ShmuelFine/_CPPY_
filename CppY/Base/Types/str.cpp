@@ -39,7 +39,7 @@ namespace py
 		PARAM(fillchar, " ");
 		//if (not is_ofType(width, Int(1)))
 		//	THROW("integer value expected");
-		
+
 		//TODO:test if fillchar is unicode character
 		//if (not is_ofType(fillchar, str("s")))
 		//	THROW("The fill character must be  a unicode character");
@@ -52,9 +52,9 @@ namespace py
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 
-		int fillspaces;  
+		int fillspaces;
 
-		for(fillspaces = wid - data.length(); fillspaces > 1; fillspaces -= 2)
+		for (fillspaces = wid - data.length(); fillspaces > 1; fillspaces -= 2)
 			data = fllChr + data + fllChr;
 
 		return (fillspaces == 1) ? (data += fillchar) : data;
@@ -94,7 +94,7 @@ namespace py
 		PARAM(errors, "strict");
 		END_FUN(encode);
 
-		//TODO: add if ending is a tuple of strings to try
+		
 		FUN_DEF(endswith);
 		PARAM(self, );
 		PARAM(ending, );
@@ -102,18 +102,36 @@ namespace py
 		PARAM(end, None);
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		int strLen = data.length();
+
 		if (is_ofType(end, None))
-			end = strLen - 1;
+			end = data.length() - 1;
+		if (!is_ofType(ending, tuple()))
+			tuple ending = tuple({ ending });
+			
+			
 		//if ((not is_ofType(ending, str("s"))) && not is_ofType(ending, tuple({})))
 		//	THROW("TypeError: endswith first arg must be str or a tuple of str");
 		int endPos = (int)end;
 		int startPos = (int)start;
+		auto endingAsTuple = reinterpret_cast<pyTuple*>(ending._ptr.get());
+
 		std::string dataSub = data.substr(startPos, (endPos - startPos) + 1);
-		//return dataSub[dataSub.length() -1] == (std::string)ending;
+		//_imple.size() = 1095?
+		for (int i = 0; i < endingAsTuple->_impl.size(); i++)
+		{
+			//this throws
+			//std::string endingStr = (std::string)ending[i];
+			std::string endingStr = (std::string)endingAsTuple[i];
+			std::size_t foundPos= dataSub.rfind(endingStr);
+			
+			//if (dataSub.rfind(endingStr) == (dataSub.length() - endingStr.length()))
+			if (foundPos == (dataSub.length() - endingStr.length()))
+				return true;
+		}
+		return false;
 		END_FUN(endswith);
 
-	    //https://www.programiz.com/python-programming/methods/string/expandtabs
+		//https://www.programiz.com/python-programming/methods/string/expandtabs
 		//redo based on above understanding
 		FUN_DEF(expandtabs);
 		PARAM(self, );
@@ -140,7 +158,7 @@ namespace py
 		return data;
 		END_FUN(expandtabs);
 
-		
+
 		FUN_DEF(find);
 		PARAM(self, );
 		END_FUN(find);
@@ -156,7 +174,7 @@ namespace py
 		FUN_DEF(index);
 		PARAM(self, );
 		END_FUN(index);
-		
+
 		//tested
 		FUN_DEF(isalnum);
 		PARAM(self, );
@@ -173,20 +191,19 @@ namespace py
 		return find_if(data.begin(), data.end(), [](char c) { return !(std::isalpha(c)); }) == data.end() && data.length() > 0;
 		END_FUN(isalpha);
 
-
-		//correct?
-		// ASCII characters have code points in the range U+0000-U+007F.
-		//FUN_DEF(isascii);
-		//PARAM(self, );
-		//auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
-		//std::string data = meAsStr->_impl;
-		//for (int i = 0; i < data.length(); i++)
-		//{
-		//	if (data[i] < 0 || data[i] >= 128)
-		//		return false;
-		//}
-		//return true;
-		//END_FUN(isascii);
+		//tested
+		//TODO: test with a non-ascii string
+		FUN_DEF(Isascii);
+		PARAM(self, );
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+		for (int i = 0; i < data.length(); i++)
+		{
+			if (data[i] < 0 || data[i] >= 128)
+				return false;
+		}
+		return true;
+		END_FUN(Isascii);
 
 		//tested
 		FUN_DEF(isdecimal);
@@ -207,7 +224,7 @@ namespace py
 		return find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
 		END_FUN(isdigit);
 
-	    //tested
+		//tested
 		FUN_DEF(isidentifier);
 		PARAM(self, );
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
@@ -277,7 +294,7 @@ namespace py
 			std::any_of(data.begin(), data.end(), [](char c) { return (std::isalpha(c)); });
 		END_FUN(isupper);
 
-
+		//how to convert from iterable wrapped in object to regular iterable
 		FUN_DEF(join);
 		PARAM(self, );
 		PARAM(iterable, );
@@ -285,42 +302,46 @@ namespace py
 		return meAsStr->join(iterable);
 		END_FUN(join);
 
+		//tested
 		FUN_DEF(ljust);
 		PARAM(self, );
 		PARAM(width, );
-		PARAM(fillchar, ' ');
+		PARAM(fillchar, " ");
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		std::string addStr = "";
-		if (not is_ofType(width, Int(1)))
-			THROW("integer value expected");
-		int wid = width;
-		for (int i = 0; i < wid; i++)
-			addStr += fillchar;
+		//if (not is_ofType(width, Int(1)))
+		//	THROW("integer value expected");
+		int wid = (int)width;
+		std::string fllChr = (std::string)fillchar;
+		int fillWid = wid - data.length();
+		for (int i = 0; i < fillWid; i++)
+			addStr += fllChr;
 		return data + addStr;
 		END_FUN(ljust);
 
+		//tested
 		FUN_DEF(lower);
 		PARAM(self, );
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		return meAsStr->lower();
 		END_FUN(lower);
 
+		//tested
 		FUN_DEF(lstrip);
 		PARAM(self, );
 		PARAM(chars, None)
 			auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
-			THROW("TypeError: lstrip arg must be None or str");
+		//if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
+		//	THROW("TypeError: lstrip arg must be None or str");
 		if (chars == None)
-			return data;
-		else
-			return(data.substr(data.find_first_not_of(chars)));
+			chars = " ";
+		std::string charsStr = (std::string)chars;
+		return(data.substr(data.find_first_not_of(chars)));
 		END_FUN(lstrip);
 
-		//Will macro handle this properly?
-		//in process
+		//in process-uses some encoding
 		FUN_DEF(maketrans);
 		PARAM(self, );
 		PARAM(x, );
@@ -347,46 +368,54 @@ namespace py
 		return retDict;
 		END_FUN(maketrans);
 
+		
 		FUN_DEF(partition);
 		PARAM(self, );
 		PARAM(sep, );
-		if (not is_ofType(sep, str("sss")))
-			THROW("TypeError: must be str");
+		//if (not is_ofType(sep, str("sss")))
+		//	THROW("TypeError: must be str");
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		int sepPos = data.find(sep);
-		return sepPos == 0 ? tuple({ data, " ", " " }) :
-			tuple({ data.substr(0, sepPos), sep, data.substr(sepPos + 1) });
+		std::string sepstr = (std::string)sep;
+		int sepPos = data.find(sepstr);
+
+		std::vector<std::string> v = { data, "", "" };
+		return sepPos == std::string::npos ? tuple({ data, "", "" }) :
+			tuple({ data.substr(0, sepPos), sepstr, data.substr(sepPos + 1) });
 		END_FUN(partition);
 
+		//tested
 		FUN_DEF(replace);
 		PARAM(self, );
 		PARAM(old, );
 		PARAM(New, );
 		PARAM(count, None);
 		//check parameters
-		if (not is_ofType(old, str("sss")) || not is_ofType(New, str("sss")))
+		/*if (not is_ofType(old, str("sss")) || not is_ofType(New, str("sss")))
 			THROW("TypeError: argument must be str");
 		if (not is_ofType(count, Int(1)))
-			THROW("third argument must be an integer");
+			THROW("third argument must be an integer");*/
 
-		int cnt = count;
-		std::string what = old;
-		std::string withWhat = New;
+		int cnt = (int)count;
+		std::string what = (std::string)old;
+		std::string withWhat = (std::string)New;
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 
 		int occurencesToReplace = ((is_ofType(count, None)) ? data.length(): cnt);
+		int oldPos;
 		int pos = data.find(what);
 		for (int i = 0; i < occurencesToReplace && pos != std::string::npos; i++)
 		{
-			data.replace(pos, withWhat.length(), withWhat);
-			pos = data.find(what) + withWhat.length();
+			data.replace(pos, what.length(), withWhat);
+			oldPos = pos;
+			pos = data.find(what, oldPos);
 		}
 		return data;
 		END_FUN(replace);
 
 
+		//tested
 		FUN_DEF(rfind);
 		PARAM(self, );
 		PARAM(sub, );
@@ -395,16 +424,20 @@ namespace py
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 
-		if (not is_ofType(sub, str("s")))
-			THROW("TypeError: sub must be of type string");
+		//if (not is_ofType(sub, str("s")))
+		//	THROW("TypeError: sub must be of type string");
 
 		if (is_ofType(end, None))
 			end = data.length();
 
-		size_t rfindRes = data.substr(start, end - start).find_last_of(sub, end);
+		int endPos = (int)end;
+		int startPos = (int)start;
+		std::string subStr = (std::string)sub;
+		size_t rfindRes = data.substr(startPos, endPos - startPos).rfind(subStr, endPos);
 		return rfindRes == std::string::npos ? -1 : rfindRes;
 		END_FUN(rfind);
 
+		//tested
 		FUN_DEF(rindex);
 		PARAM(self, );
 		PARAM(sub, );
@@ -413,43 +446,50 @@ namespace py
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 
-		if (not is_ofType(sub, str("s")))
-			THROW("TypeError: sub must be of type string");
+		//if (not is_ofType(sub, str("s")))
+		//	THROW("TypeError: sub must be of type string");
 
 		if (is_ofType(end, None))
 			end = data.length();
 
-		size_t rindexRes = data.substr(start, end - start).find_last_of(sub, end);
+		int endPos = (int)end;
+		int startPos = (int)start;
+		std::string subStr = (std::string)sub;
+		size_t rindexRes = data.substr(startPos, endPos - startPos).rfind(subStr, endPos);
 		if (rindexRes == std::string::npos)
 			THROW("ValueError: substring not found");
 		return rindexRes;
 		END_FUN(rindex);
 
-
+		//tested
 		FUN_DEF(rjust);
 		PARAM(self, );
 		PARAM(width, );
-		PARAM(fillchar, ' ');
+		PARAM(fillchar, " ");
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		std::string addStr = "";
-		if (not is_ofType(width, Int(1)))
-			THROW("integer value expected");
-		int wid = width;
-		for (int i = 0; i < wid; i++)
-			addStr += fillchar;
+		//if (not is_ofType(width, Int(1)))
+		//	THROW("integer value expected");
+		int wid = (int)width;
+		std::string fllChr = (std::string)fillchar;
+		int fillWid = wid - data.length();
+		for (int i = 0; i < fillWid; i++)
+			addStr += fllChr;
 		return addStr + data;
 		END_FUN(rjust);
 
+		
 		FUN_DEF(rpartition);
 		PARAM(self, );
 		PARAM(sep, );
-		if (not is_ofType(sep, str("sss")))
-			THROW("TypeError: must be str");
+		//if (not is_ofType(sep, str("sss")))
+		//	THROW("TypeError: must be str");
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		int sepPos = data.find_last_of(sep);
-		return sepPos == 0 ? tuple({ data, " ", " " }) :
+		std::string sepStr = (std::string)sep;
+		int sepPos = data.find_last_of(sepStr);
+		return sepPos == std::string::npos ? tuple({ data, "", "" }) :
 			tuple({ data.substr(0, sepPos), sep, data.substr(sepPos + 1) });
 		END_FUN(rpartition);
 
@@ -457,6 +497,7 @@ namespace py
 		PARAM(self, );
 		END_FUN(rsplit);
 
+		//tested
 		FUN_DEF(rstrip);
 		PARAM(self, );
 		PARAM(chars, None)
@@ -465,9 +506,9 @@ namespace py
 		if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
 		    THROW("TypeError: rstrip arg must be None or str");
 		if (chars == None)
-			return data;
-		else
-			return(data.substr(0, data.find_last_not_of(chars) + 1));
+			chars = " ";
+		std::string charsStr = (std::string)chars;
+		return(data.substr(0, data.find_last_not_of(chars) + 1));
 		END_FUN(rstrip);
 
 		FUN_DEF(split);
@@ -498,20 +539,23 @@ namespace py
 		PARAM(self, );
 		END_FUN(translate);
 
+		//tested
 		FUN_DEF(upper);
 		PARAM(self, );
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		std::transform(data.begin(), data.end(), data.begin(),
 			[](unsigned char c) { return std::toupper(c); });
+		return data;
 		END_FUN(upper);
 
+		//tested
 		FUN_DEF(zfill);
 		PARAM(self, );
 		PARAM(width, 0);
-		if (not is_ofType(width, Int(3)))
-			THROW("TypeError: must be an integer");
-		int finalWidth = width;
+		//if (not is_ofType(width, Int(3)))
+		//	THROW("TypeError: must be an integer");
+		int finalWidth = (int)width;
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		if (finalWidth > data.length())
@@ -565,7 +609,7 @@ namespace py
 		(*this).attr(index) = py_str::index;
 		(*this).attr(isalnum) = py_str::isalnum;
 		(*this).attr(isalpha) = py_str::isalpha;
-		//(*this).attr(isascii) = py_str::isascii;
+		(*this).attr(Isascii) = py_str::Isascii;
 		(*this).attr(isdecimal) = py_str::isdecimal;
 		(*this).attr(isdigit) = py_str::isdigit;
 		(*this).attr(isidentifier) = py_str::isidentifier;

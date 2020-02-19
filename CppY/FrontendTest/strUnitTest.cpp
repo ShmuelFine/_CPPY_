@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "../Base/Types/str.h"
+#include "../Base/Types/tuple.h"
 #include "../Base/Types/FunDefs.h"
 using namespace py;
 
@@ -164,6 +165,23 @@ TEST(str, isalpha_sanity)
 	ASSERT_TRUE(b4);
 }
 
+TEST(str, Isascii_sanity)
+{
+	//Arrange
+	auto s1 = str(" ");
+	auto s2 = str("HellO45&*");
+	auto s3 = str("");
+	//act
+	bool b1 = MEM_FUN(s1, Isascii));
+	bool b2 = MEM_FUN(s2, Isascii));
+	bool b3 = MEM_FUN(s3, Isascii));
+
+	//assert
+	ASSERT_TRUE(b1);
+	ASSERT_TRUE(b2);
+	ASSERT_TRUE(b3);
+}
+
 TEST(str, isdecimal_sanity)
 {
 	//Arrange
@@ -286,3 +304,236 @@ TEST(str, isupper_sanity)
 
 }
 
+TEST(str, ljust_sanity)
+{
+	//Arrange
+	auto s = str("dsds");
+	auto expected1 = str("dsds     ");
+	auto expected2 = str("dsdswwwww");
+
+	//Act
+	auto actual1 = MEM_FUN(s, ljust).A(9));
+	auto actual2 = MEM_FUN(s, ljust).A(9).A("w"));
+	auto actual3 = MEM_FUN(s, ljust).A(3).A("w"));
+
+	//Assert
+	ASSERT_EQ(expected1, actual1);
+	ASSERT_EQ(expected2, actual2);
+	ASSERT_EQ(s, actual3);
+}
+
+TEST(str, rjust_sanity)
+{
+	//Arrange
+	auto s = str("dsds");
+	auto expected1 = str("     dsds");
+	auto expected2 = str("wwwwwdsds");
+
+	//Act
+	auto actual1 = MEM_FUN(s, rjust).A(9));
+	auto actual2 = MEM_FUN(s, rjust).A(9).A("w"));
+	auto actual3 = MEM_FUN(s, rjust).A(3).A("w"));
+
+	//Assert
+	ASSERT_EQ(expected1, actual1);
+	ASSERT_EQ(expected2, actual2);
+	ASSERT_EQ(s, actual3);
+}
+
+TEST(str, lower_sanity)
+{
+	//Arrange
+	auto s = str("dDDs");
+	auto s2 = str("dD3Ds");
+	auto expected2 = str("dd3ds");
+	auto expected1 = str("ddds");
+
+	//Act
+	auto actual1 = MEM_FUN(s, lower));
+	auto actual2 = MEM_FUN(s2, lower));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+}
+
+TEST(str, lstrip_sanity)
+{
+	//Arrange
+	auto s = str("   FD");
+	auto s2 = str("xxFD");
+	auto expected = str("FD");
+	
+
+	//Act
+	auto actual1 = MEM_FUN(s, lstrip));
+	auto actual2 = MEM_FUN(s2, lstrip).A("x"));
+	auto actual3 = MEM_FUN(s2, lstrip).A("w"));
+
+	//Assert
+	ASSERT_EQ(expected, actual1);
+	ASSERT_EQ(expected, actual2);
+	ASSERT_EQ(s2, actual3);
+}
+
+TEST(str, rstrip_sanity)
+{
+	//Arrange
+	auto s = str("FD   ");
+	auto s2 = str("xxFDxx");
+	auto expected = str("FD");
+	auto expected2 = str("xxFD");
+
+
+	//Act
+	auto actual1 = MEM_FUN(s, rstrip));
+	auto actual2 = MEM_FUN(s2, rstrip).A("x"));
+	auto actual3 = MEM_FUN(s2, rstrip).A("w"));
+
+	//Assert
+	ASSERT_EQ(expected, actual1);
+	ASSERT_EQ(expected2, actual2);
+	ASSERT_EQ(s2, actual3);
+}
+
+/*
+//throws strange error
+TEST(str, partition_sanity)
+{
+	//Arrange
+	auto s = str("helloeworld");
+	auto expected1 = tuple({ "h", "e", "lloeworld" });
+	auto expected2 = tuple({ "helloeworld", "", "" });
+
+	//Act
+	auto actual1 = MEM_FUN(s, partition).A("e"));
+	auto actual2 = MEM_FUN(s, partition).A("t"));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+}
+
+//throws strange error
+TEST(str, rpartition_sanity)
+{
+	//Arrange
+	auto s = str("helloeworld");
+	auto expected1 = tuple({ "hello", "e", "world" });
+	auto expected2 = tuple({ "helloeworld", "", "" });
+
+	//Act
+	auto actual1 = MEM_FUN(s, rpartition).A("e"));
+	auto actual2 = MEM_FUN(s, rpartition).A("t"));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+}*/
+
+TEST(str, replace_sanity)
+{
+	//Arrange
+	auto s = str("askask");
+	auto expected1 = str("ddkddk");
+	auto expected2 = str("dskdsk");
+	auto expected3 = str("ddkask");
+	auto expected4 = str("dydkask");
+
+	//Act
+	auto actual1 = MEM_FUN(s, replace).A("as").A("dd"));
+	auto actual2 = MEM_FUN(s, replace).A("a").A("d"));
+	auto actual3 = MEM_FUN(s, replace).A("as").A("dd").A(1));
+	auto actual4 = MEM_FUN(s, replace).A("as").A("dyd").A(1));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+	ASSERT_EQ(actual3, expected3);
+	ASSERT_EQ(actual4, expected4);
+}
+
+TEST(str, rfind_sanity)
+{
+	//Arrange
+	auto s = str("dsdsdsfgrthf");
+	auto s1 = str("olivertwist");
+	auto s2 = str("acacac");
+	int expected1 = 11;
+	int expected2 = -1;
+	int expected3 = 8;
+	int expected4 = 2;
+	int expected5 = 4;
+
+	//Act
+	auto actual1 = MEM_FUN(s, rfind).A("f"));
+	auto actual2 = MEM_FUN(s, rfind).A("v"));
+	auto actual3 = MEM_FUN(s1, rfind).A("i"));
+	auto actual4 = MEM_FUN(s1, rfind).A("i").A("0").A(4));
+	auto actual5 = MEM_FUN(s2, rfind).A("ac"));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+	ASSERT_EQ(actual3, expected3);
+	ASSERT_EQ(actual4, expected4);
+	ASSERT_EQ(actual5, expected5);
+}
+
+TEST(str, rindex_sanity)
+{
+	//Arrange
+	auto s = str("dsdsdsfgrthf");
+	auto s1 = str("olivertwist");
+	auto s2 = str("acacac");
+	int expected1 = 11;
+	int expected2 = -1;
+	int expected3 = 8;
+	int expected4 = 2;
+	int expected5 = 4;
+
+	//Act
+	auto actual1 = MEM_FUN(s, rindex).A("f"));
+	auto actual3 = MEM_FUN(s1, rindex).A("i"));
+	auto actual4 = MEM_FUN(s1, rindex).A("i").A("0").A(4));
+	auto actual5 = MEM_FUN(s2, rindex).A("ac"));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_THROW(s.attr(rindex)(ARGS("v")), PyBaseException);
+	ASSERT_EQ(actual3, expected3);
+	ASSERT_EQ(actual4, expected4);
+	ASSERT_EQ(actual5, expected5);
+}
+
+TEST(str, upper_sanity)
+{
+	//Arrange
+	auto s = str("hEllo");
+	auto s1 = str("4gf5");
+	auto expected1 = str("HELLO");
+	auto expected2 = str("4GF5");
+
+	//Act
+	auto actual1 = MEM_FUN(s, upper));
+	auto actual2 = MEM_FUN(s1, upper));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+}
+
+TEST(str, zfill_sanity)
+{
+	//Arrange
+	auto s = str("hello");
+	auto expected1 = str("00000hello");
+
+	//Act
+	auto actual1 = MEM_FUN(s, zfill).A(3));
+	auto actual2 = MEM_FUN(s, zfill).A(10));
+
+	//Assert
+	ASSERT_EQ(actual1, s);
+	ASSERT_EQ(actual2, expected1);
+}
