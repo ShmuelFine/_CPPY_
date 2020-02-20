@@ -25,13 +25,11 @@ namespace py
 		return pyObjPtr(new pyTuple(_impl));
 	}
 
-	bool pyTuple::operator<(pyObj const& other) const
+	bool pyTuple::operator < (pyObj const& other) const
 	{
 		EXPLICIT_COMPARE(Type(), other.Type());
 		pyTuple const* otherPtr = reinterpret_cast<pyTuple const*>(&other);
-		pyList const* thisAsList = this;
-		pyList const* otherAsList = otherPtr;
-		return thisAsList->operator < (*otherAsList);
+		pyList::operator <(other);
 	}
 
 }

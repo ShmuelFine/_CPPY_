@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "../Base/Types/str.h"
 #include "../Base/Types/tuple.h"
+#include "../Base/Types/list.h"
 #include "../Base/Types/FunDefs.h"
 using namespace py;
 
@@ -87,22 +88,22 @@ TEST(str, count_sanity)
 	ASSERT_TRUE(actual5 == 1);
 }
 
-//TEST(str, endswith_sanity)
-//{
-//	//Arrange
-//	auto s1 = str("asdasd");
-//
-//	//Act
-//	bool actual = MEM_FUN(s1, endswith).A("s"));
-//	bool actual2 = MEM_FUN(s1, endswith).A("d"));
-//	bool actual3 = MEM_FUN(s1, endswith).A("s").A(0).A(4));
-//	bool actual4 = MEM_FUN(s1, endswith).A("s").A(0).A(5));
-//
-//	ASSERT_FALSE(actual);
-//	ASSERT_TRUE(actual2);
-//	ASSERT_FALSE(actual3);
-//	ASSERT_TRUE(actual4);
-//}
+TEST(str, endswith_sanity)
+{
+	//Arrange
+	auto s1 = str("asdasd");
+
+	//Act
+	//bool actual = MEM_FUN(s1, endswith).A("s"));
+	//bool actual2 = MEM_FUN(s1, endswith).A("d"));
+	bool actual3 = MEM_FUN(s1, endswith).A("s").A(0).A(4));
+	//bool actual4 = MEM_FUN(s1, endswith).A("s").A(0).A(5));
+
+	//ASSERT_FALSE(actual);
+	//ASSERT_TRUE(actual2);
+	ASSERT_FALSE(actual3);
+	//ASSERT_TRUE(actual4);
+}
 
 //TEST(str, expandtabs_sanity)
 //{
@@ -381,22 +382,26 @@ TEST(str, rstrip_sanity)
 	//Arrange
 	auto s = str("FD   ");
 	auto s2 = str("xxFDxx");
+	auto s3 = str("asFDasas");
 	auto expected = str("FD");
 	auto expected2 = str("xxFD");
+	auto expected3 = str("asFD");
 
 
 	//Act
 	auto actual1 = MEM_FUN(s, rstrip));
 	auto actual2 = MEM_FUN(s2, rstrip).A("x"));
 	auto actual3 = MEM_FUN(s2, rstrip).A("w"));
+	auto actual4 = MEM_FUN(s3, rstrip).A("as"));
 
 	//Assert
 	ASSERT_EQ(expected, actual1);
 	ASSERT_EQ(expected2, actual2);
 	ASSERT_EQ(s2, actual3);
+	ASSERT_EQ(expected3, actual4);
 }
 
-/*
+
 //throws strange error
 TEST(str, partition_sanity)
 {
@@ -429,7 +434,7 @@ TEST(str, rpartition_sanity)
 	//Assert
 	ASSERT_EQ(actual1, expected1);
 	ASSERT_EQ(actual2, expected2);
-}*/
+}
 
 TEST(str, replace_sanity)
 {
@@ -536,4 +541,48 @@ TEST(str, zfill_sanity)
 	//Assert
 	ASSERT_EQ(actual1, s);
 	ASSERT_EQ(actual2, expected1);
+}
+
+TEST(str, split_sanity)
+{
+	//Arrange
+	auto s = str("helloworld");
+	auto s2 = str("hhiohh");
+	auto expected1 = list({ "hell", "w", "rld" });
+	auto expected2 = list({ "hell", "world"});
+	auto expected3 = list({ "hh", "hh" });
+
+	//act
+	auto actual1 = MEM_FUN(s, split).A("o"));
+	auto actual2 = MEM_FUN(s, split).A("o").A(1));
+	auto actual3 = MEM_FUN(s2, split).A("io"));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+	ASSERT_EQ(actual3, expected3);
+}
+
+TEST(str, splitlines_sanity)
+{
+	//Arrange
+	auto s = str("helloworld");
+	auto s2 = str("hello\nworld");
+	auto s3 = str("hello\nworld\fhello\vworld");
+	auto s4 = str("hello\u2028world");
+	auto expected1 = list({ "helloworld" });
+	auto expected2 = list({ "hello", "world" });
+	auto expected3 = list({ "hello", "world", "hello", "world" });
+
+	//act
+	auto actual1 = MEM_FUN(s, splitlines));
+	auto actual2 = MEM_FUN(s2, splitlines));
+	auto actual3 = MEM_FUN(s3, splitlines));
+	auto actual4 = MEM_FUN(s4, splitlines));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, expected2);
+	ASSERT_EQ(actual3, expected3);
+	ASSERT_EQ(actual4, expected2);
 }

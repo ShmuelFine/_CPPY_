@@ -1,12 +1,15 @@
 #include "str.h"
 #include "tuple.h"
 #include "dict.h"
+#include "list.h"
 #include "FunDefs.h"
 #include "Comparisons.h"
 #include "Int.h"
 #include <locale>
 #include <codecvt>
 #include <algorithm>
+#include <regex>
+#include <string>
 namespace py
 {
 
@@ -95,6 +98,8 @@ namespace py
 		END_FUN(encode);
 
 		
+
+
 		FUN_DEF(endswith);
 		PARAM(self, );
 		PARAM(ending, );
@@ -103,31 +108,27 @@ namespace py
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 
+
 		if (is_ofType(end, None))
-			end = data.length() - 1;
+			end = data.length();
 		if (!is_ofType(ending, tuple()))
-			tuple ending = tuple({ ending });
-			
-			
-		//if ((not is_ofType(ending, str("s"))) && not is_ofType(ending, tuple({})))
-		//	THROW("TypeError: endswith first arg must be str or a tuple of str");
+			ending = tuple({ ending });
+		
 		int endPos = (int)end;
 		int startPos = (int)start;
-		auto endingAsTuple = reinterpret_cast<pyTuple*>(ending._ptr.get());
+		pyStr dataSub = data.substr(startPos, (endPos - startPos));
 
-		std::string dataSub = data.substr(startPos, (endPos - startPos) + 1);
-		//_imple.size() = 1095?
-		for (int i = 0; i < endingAsTuple->_impl.size(); i++)
+		//if ((not is_ofType(ending, str("s"))) && not is_ofType(ending, tuple({})))
+		//	THROW("TypeError: endswith first arg must be str or a tuple of str");
+
+
+		for (auto elem : ending)
 		{
-			//this throws
-			//std::string endingStr = (std::string)ending[i];
-			std::string endingStr = (std::string)endingAsTuple[i];
-			std::size_t foundPos= dataSub.rfind(endingStr);
-			
-			//if (dataSub.rfind(endingStr) == (dataSub.length() - endingStr.length()))
-			if (foundPos == (dataSub.length() - endingStr.length()))
-				return true;
+			std::string elem_str = (std::string)elem;
+			if (dataSub.endswith(elem_str))
+				return True;
 		}
+
 		return false;
 		END_FUN(endswith);
 
@@ -368,7 +369,7 @@ namespace py
 		return retDict;
 		END_FUN(maketrans);
 
-		
+		//tested
 		FUN_DEF(partition);
 		PARAM(self, );
 		PARAM(sep, );
@@ -479,7 +480,7 @@ namespace py
 		return addStr + data;
 		END_FUN(rjust);
 
-		
+		//tested
 		FUN_DEF(rpartition);
 		PARAM(self, );
 		PARAM(sep, );
@@ -488,7 +489,7 @@ namespace py
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		std::string sepStr = (std::string)sep;
-		int sepPos = data.find_last_of(sepStr);
+		int sepPos = data.rfind(sepStr);
 		return sepPos == std::string::npos ? tuple({ data, "", "" }) :
 			tuple({ data.substr(0, sepPos), sep, data.substr(sepPos + 1) });
 		END_FUN(rpartition);
@@ -500,23 +501,84 @@ namespace py
 		//tested
 		FUN_DEF(rstrip);
 		PARAM(self, );
-		PARAM(chars, None)
-			auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		PARAM(chars, None);
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
-		    THROW("TypeError: rstrip arg must be None or str");
+		//if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
+		//    THROW("TypeError: rstrip arg must be None or str");
 		if (chars == None)
 			chars = " ";
 		std::string charsStr = (std::string)chars;
-		return(data.substr(0, data.find_last_not_of(chars) + 1));
+		std::string retStr = data;
+		int pos = retStr.rfind(charsStr);
+		int diff = retStr.length() - charsStr.length();
+		while (pos == (diff) && pos != std::string::npos)
+		{
+			retStr = retStr.substr(0, retStr.rfind(charsStr));
+			pos = retStr.rfind(charsStr);
+			diff = retStr.length() - charsStr.length();
+		}
+		     
+		return retStr;
 		END_FUN(rstrip);
 
+		//tested
 		FUN_DEF(split);
 		PARAM(self, );
+		PARAM(sep, " ");
+		PARAM(maxsplit, -1);
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+		std::string sepStr = (std::string)sep;
+		int max = (int)maxsplit;
+		if (max == -1)
+			max = data.length();
+		return list(meAsStr->split(sepStr, max));
 		END_FUN(split);
 
 		FUN_DEF(splitlines);
 		PARAM(self, );
+		PARAM(keepends, False);
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+		bool keependsBool = (bool)keepends;
+		//std::string whatToSearchFor = "\n\r\v\x0b\f\x0c\x1c\x1d\x1e\x85\u2028\u2029";
+		////std::string whatToSearchFor = "\n";
+		//int prevPos = 0;
+		//int pos = data.find(whatToSearchFor);
+		//auto retList = list({});
+		//while (pos != std::string::npos)
+		//{
+		//	MEM_FUN(retList, append).A(data.substr(prevPos, pos - prevPos))); 
+		//	prevPos = pos;
+		//	pos = data.find(whatToSearchFor, prevPos + 1);
+		//}
+
+		//if (!retList)
+		//{
+		//	MEM_FUN(retList, append).A(data));
+		//}
+		//else
+		//	MEM_FUN(retList, append).A(data.substr(prevPos + 1)));
+		//return retList;
+		std::vector<std::string> splits;
+		std::smatch m;
+		const std::regex r("(\n)| (\r) (\v) (.\x0b)(\f) (.\x0c) (.\x1c) (.\x1d) (.\x1e) (\x85) (\u2028)(\u2029)");
+
+		while (regex_search(data, m, r))
+		{
+			int split_on = (int)m.position();
+			auto first = data.substr(0, split_on);
+			if (!first.empty())
+				splits.push_back(first);
+			data = data.substr(split_on + m.length());
+		}
+
+		if (!data.empty()) {
+			splits.push_back(data);
+		}
+
+		return list(splits);
 		END_FUN(splitlines);
 
 		FUN_DEF(startswith);

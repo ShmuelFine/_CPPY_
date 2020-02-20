@@ -168,4 +168,26 @@ namespace py
 		AddAttributes();
 	}
 
+
+	list::list(std::initializer_list<std::string> const& v)
+		: object(pyList())
+	{
+		pyList* impl = reinterpret_cast<pyList*>(get());
+		for (std::string const& elem : v)
+			impl->append(object(elem));
+
+		AddAttributes();
+	}
+
+	list::list(std::vector<std::string> const& v)
+		: object(pyList())
+	{
+		pyList* impl = reinterpret_cast<pyList*>(get());
+		for (std::string const & elem : v)
+			impl->append(object(elem));
+
+		AddAttributes();
+
+	}
+
 }

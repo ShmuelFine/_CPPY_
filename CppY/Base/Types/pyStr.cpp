@@ -12,6 +12,7 @@
 #include <regex>
 
 #include "pyExceptions.h"
+#include "pyList.h"
 
 namespace py
 {
