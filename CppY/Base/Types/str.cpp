@@ -97,9 +97,7 @@ namespace py
 		PARAM(errors, "strict");
 		END_FUN(encode);
 
-		
-
-
+		//tested
 		FUN_DEF(endswith);
 		PARAM(self, );
 		PARAM(ending, );
@@ -159,21 +157,115 @@ namespace py
 		return data;
 		END_FUN(expandtabs);
 
-
+		//tested
 		FUN_DEF(find);
 		PARAM(self, );
+		PARAM(sub, );
+		PARAM(start, 0);
+		PARAM(end, None);
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+
+		//if (not is_ofType(sub, str("s")))
+		//	THROW("TypeError: sub must be of type string");
+
+		if (is_ofType(end, None))
+			end = data.length();
+
+		int endPos = (int)end;
+		int startPos = (int)start;
+		std::string subStr = (std::string)sub;
+		size_t findRes = data.substr(startPos, endPos - startPos).rfind(subStr, 0);
+		return findRes == std::string::npos ? -1 : findRes;
 		END_FUN(find);
 
+		/*
+		std::string pyFormat(std::string const & s, T value, Args... args)
+	{
+		using namespace std;
+		int placeHolders = MatchesAmount(s, "\\{.*?\\}");
+		if (placeHolders > 0)
+		{
+			smatch currMatch;
+			if (!regex_search(s, currMatch, regex("\\{(.*?)\\}")))
+				throw "BUG";
+
+			std::string nextToken = currMatch[1];
+			std::string newS;
+			std::string valueStr = toString(value);
+			if (!nextToken.empty())
+				newS = regex_replace(s, regex("\\{" + nextToken + "\\}"), valueStr);
+			else
+				newS = regex_replace(s, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
+
+			return pyFormat(newS, args...);
+		}
+		else
+			return s;
+	}
+		*/
 		FUN_DEF(format);
 		PARAM(self, );
+		
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+
+		int counter = 0;
+
+		//while (HAS_MORE_POS_PARAMS())
+		//{
+		//	PARAM(next, );
+		//	std::cout << (std::string)sep << (std::string)next;
+		//}
+
+		while (HAS_MORE_POS_PARAMS())
+		{
+			PARAM(next, );
+			using namespace std;
+			int placeHolders = MatchesAmount(data, "\\{.*?\\}");
+			if (placeHolders > 0)
+			{
+				smatch currMatch;
+				if (!regex_search(data, currMatch, regex("\\{(.*?)\\}")))
+					throw "BUG";
+
+				std::string nextToken = currMatch[1];
+				std::string newS;
+				//std::string valueStr = toString(object(next));
+				std::string valueStr = (std::string)next;
+				if (!nextToken.empty())
+					newS = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr);
+				else
+					newS = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
+			}
+			else
+				return data;
+		}
+		
 		END_FUN(format);
 
-		FUN_DEF(format_map);
-		PARAM(self, );
-		END_FUN(format_map);
-
+		//tested
 		FUN_DEF(index);
 		PARAM(self, );
+		PARAM(sub, );
+		PARAM(start, 0);
+		PARAM(end, None);
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+
+		//if (not is_ofType(sub, str("s")))
+		//	THROW("TypeError: sub must be of type string");
+
+		if (is_ofType(end, None))
+			end = data.length();
+
+		int endPos = (int)end;
+		int startPos = (int)start;
+		std::string subStr = (std::string)sub;
+		size_t indexRes = data.substr(startPos, endPos - startPos).rfind(subStr, 0);
+		if(indexRes == std::string::npos)
+			THROW("ValueError: substring not found");
+		return indexRes;
 		END_FUN(index);
 
 		//tested
@@ -295,7 +387,7 @@ namespace py
 			std::any_of(data.begin(), data.end(), [](char c) { return (std::isalpha(c)); });
 		END_FUN(isupper);
 
-		//how to convert from iterable wrapped in object to regular iterable
+		//tested
 		FUN_DEF(join);
 		PARAM(self, );
 		PARAM(iterable, );
@@ -339,7 +431,7 @@ namespace py
 		if (chars == None)
 			chars = " ";
 		std::string charsStr = (std::string)chars;
-		return(data.substr(data.find_first_not_of(chars)));
+		return(data.substr(data.find_first_not_of(charsStr)));
 		END_FUN(lstrip);
 
 		//in process-uses some encoding
@@ -542,59 +634,114 @@ namespace py
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		bool keependsBool = (bool)keepends;
-		//std::string whatToSearchFor = "\n\r\v\x0b\f\x0c\x1c\x1d\x1e\x85\u2028\u2029";
-		////std::string whatToSearchFor = "\n";
-		//int prevPos = 0;
-		//int pos = data.find(whatToSearchFor);
-		//auto retList = list({});
-		//while (pos != std::string::npos)
-		//{
-		//	MEM_FUN(retList, append).A(data.substr(prevPos, pos - prevPos))); 
-		//	prevPos = pos;
-		//	pos = data.find(whatToSearchFor, prevPos + 1);
-		//}
-
-		//if (!retList)
-		//{
-		//	MEM_FUN(retList, append).A(data));
-		//}
-		//else
-		//	MEM_FUN(retList, append).A(data.substr(prevPos + 1)));
-		//return retList;
-		std::vector<std::string> splits;
-		std::smatch m;
-		const std::regex r("(\n)| (\r) (\v) (.\x0b)(\f) (.\x0c) (.\x1c) (.\x1d) (.\x1e) (\x85) (\u2028)(\u2029)");
-
-		while (regex_search(data, m, r))
+		std::string whatToSearchFor = "\r\n";
+		//std::string whatToSearchFor = "\n";
+		int prevPos = 0;
+		int pos = data.find(whatToSearchFor);
+		auto retList = list({});
+		while (pos != std::string::npos)
 		{
-			int split_on = (int)m.position();
-			auto first = data.substr(0, split_on);
-			if (!first.empty())
-				splits.push_back(first);
-			data = data.substr(split_on + m.length());
+			if(data[pos + 1] == 'n' || data[pos + 1] == 'r')
+			   MEM_FUN(retList, append).A(data.substr(prevPos, pos - prevPos))); 
+			prevPos = pos;
+			pos = data.find(whatToSearchFor, prevPos + 1);
 		}
 
-		if (!data.empty()) {
-			splits.push_back(data);
+		if (!retList)
+		{
+			MEM_FUN(retList, append).A(data));
 		}
-
-		return list(splits);
+		else
+			MEM_FUN(retList, append).A(data.substr(prevPos + 1)));
+		return retList;
 		END_FUN(splitlines);
 
+		//tested
 		FUN_DEF(startswith);
 		PARAM(self, );
+		PARAM(ending, );
+		PARAM(start, 0);
+		PARAM(end, None);
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+
+
+		if (is_ofType(end, None))
+			end = data.length();
+		if (!is_ofType(ending, tuple()))
+			ending = tuple({ ending });
+
+		int endPos = (int)end;
+		int startPos = (int)start;
+		std::string dataSub = data.substr(startPos, (endPos - startPos));
+
+		//if ((not is_ofType(ending, str("s"))) && not is_ofType(ending, tuple({})))
+		//	THROW("TypeError: endswith first arg must be str or a tuple of str");
+
+
+		for (auto elem : ending)
+		{
+			std::string elem_str = (std::string)elem;
+			if (dataSub.rfind(elem_str, 0) == 0)
+				return True;
+		}
+
+		return false;
 		END_FUN(startswith);
 
+		//tested
 		FUN_DEF(strip);
 		PARAM(self, );
+		PARAM(chars, None);
+		if (is_ofType(chars, None))
+			chars = " ";
+		std::string charStr = (std::string)chars;
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+		std::string retStr = MEM_FUN(self, lstrip).A(chars));
+		return MEM_FUN(str(retStr), rstrip).A(chars));
 		END_FUN(strip);
 
+		//tested
 		FUN_DEF(swapcase);
 		PARAM(self, );
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+		std::string retStr = "";
+		int len = data.length();
+
+		for (int i = 0; i < len; i++)
+		{
+			if (std::isupper(data[i]))
+				retStr += std::tolower(data[i]);
+			else if (std::islower(data[i]))
+				retStr += std::toupper(data[i]);
+			else
+				retStr += data[i];
+		}
+		return retStr;
 		END_FUN(swapcase);
 
+		//tested
 		FUN_DEF(title);
 		PARAM(self, );
+		std::string retStr = "";
+		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		std::string data = meAsStr->_impl;
+		auto splitList = MEM_FUN(str(data), split));
+		for (auto elem : splitList)
+		{
+			std::string elemStr = (std::string)elem;
+			std::string innerStr;
+			innerStr += std::toupper(elemStr[0]);
+			for (int i = 1; i < elemStr.length(); i++)
+			{
+				innerStr += std::tolower(elemStr[i]);
+			}
+			retStr += innerStr + " ";
+		}
+ 		std::string ret = retStr.substr(0, retStr.size() - 1);
+		return ret;
 		END_FUN(title);
 
 		FUN_DEF(translate);
@@ -624,33 +771,6 @@ namespace py
 			data.insert(0, finalWidth - data.length(), '0');
 		return data;
 		END_FUN(zfill);
-
-
-
-		//	FUN_DEF(format);
-		//	PARAM(self, );
-		//	END_FUN(format);
-
-		//	FUN_DEF(strip);
-		//	PARAM(self, );
-
-		//	END_FUN(strip);
-
-		//	FUN_DEF(split);
-		//	PARAM(self, );
-
-		//	END_FUN(split);
-
-		//	FUN_DEF(replace);
-		//	PARAM(self, );
-
-		//	END_FUN(replace);
-		//	
-
-		//	FUN_DEF();
-		//	PARAM(self, );
-
-		//	END_FUN();
 	}
 }
 
@@ -667,7 +787,6 @@ namespace py
 		(*this).attr(expandtabs) = py_str::expandtabs;
 		(*this).attr(find) = py_str::find;
 		(*this).attr(format) = py_str::format;
-		(*this).attr(format_map) = py_str::format_map;
 		(*this).attr(index) = py_str::index;
 		(*this).attr(isalnum) = py_str::isalnum;
 		(*this).attr(isalpha) = py_str::isalpha;
