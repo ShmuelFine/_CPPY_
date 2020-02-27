@@ -50,6 +50,12 @@ namespace py
 
 		//////////////////////
 
+		FUN_DEF(bin);
+		PARAM(self, );
+		auto meAsInt = reinterpret_cast<pyInt*>(self._ptr.get());
+		return meAsInt->bin();
+		END_FUN(bin);
+
 
 	}
 }
@@ -59,6 +65,7 @@ namespace py
 	void Int::AddAttributes()
 	{
 		(*this).attr(bit_length) = py_int::bit_length;
+		(*this).attr(bin) = py_int::bin;
 		//(*this).attr(to_bytes) = py_int::to_bytes;
 
 	}
