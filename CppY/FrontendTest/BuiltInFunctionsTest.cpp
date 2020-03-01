@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "..\Base\Types\Built_In_Functions.h"
 #include "..\Base\Types\list.h"
+#include "..\Base\Types\Int.h"
 #include "..\Base\Types\_Exceptions.h"
 #include "..\Base\Types\FunDefs.h"
 using namespace py;
@@ -18,4 +19,11 @@ TEST(len, SanityTest)
 	ASSERT_THROW(len(ARGS(x)), py::PyBaseException);
 
 
+}
+
+TEST(bin, SanityTest)
+{
+	Int x1 = Int(68);
+	std::string res = bin(ARGS(x1));
+	ASSERT_EQ(res, "0b0111");
 }

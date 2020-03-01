@@ -31,6 +31,7 @@ namespace py
 		virtual pyObjIterator begin() const;
 		virtual pyObjIterator end() const;
 
+
 		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
 
 		virtual pyObjPtr Clone() const override;
@@ -45,6 +46,7 @@ namespace py
 
 		pyStr lower();
 		bool endswith(pyStr const& ending);
+		bool startswith(pyStr const& starts);
 
 		template<typename Iterable>
 		pyStr join(Iterable const& parts)
