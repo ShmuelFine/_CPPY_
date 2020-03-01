@@ -15,6 +15,7 @@ namespace py
 
 	namespace py_str
 	{
+		//not implemented- format-map, maketrans, encode, translate
 		//tested
 		FUN_DEF(capitalize);
 		PARAM(self, );
@@ -35,7 +36,6 @@ namespace py
 		END_FUN(casefold);
 
 		//tested
-		//TODO: make it work if the fill character is a char (currently only works if it is a string)
 		FUN_DEF(center);
 		PARAM(self, );
 		PARAM(width, );
@@ -91,12 +91,6 @@ namespace py
 		return counter;
 		END_FUN(count);
 
-		FUN_DEF(encode);
-		PARAM(self, );
-		PARAM(encoding, "utf-8");
-		PARAM(errors, "strict");
-		END_FUN(encode);
-
 		//tested
 		FUN_DEF(endswith);
 		PARAM(self, );
@@ -130,8 +124,7 @@ namespace py
 		return false;
 		END_FUN(endswith);
 
-		//https://www.programiz.com/python-programming/methods/string/expandtabs
-		//redo based on above understanding
+		//tested
 		FUN_DEF(expandtabs);
 		PARAM(self, );
 		PARAM(tabSize, 8);
@@ -140,20 +133,32 @@ namespace py
 		int tabNum = (int)tabSize;
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		std::string tabStr = "";
-		for (int i = 0; i < tabNum; i++)
-			tabStr += " ";
+		std::string spaceStr = "";
 
 		int pos = data.find('\t');
-
-		// Repeat until end is reached
+		int prevPos = 0;
+		int lastLineBreak = 0;
+		int countFromPrevTab = 0;
+		int nextTabPos = 0;
+		int spaces = 0;
 		while (pos != std::string::npos)
 		{
-			// Replace this occurrence of Sub String
-			data.replace(pos, 1, tabStr);
-			// Get the next occurrence from the current position
-			pos = data.find(('\t'), pos + tabStr.size());
+			lastLineBreak = data.find_first_of('\n\r', prevPos);
+			if (lastLineBreak < pos && lastLineBreak > -1)
+				countFromPrevTab = 0;
+			else
+			    countFromPrevTab = (pos % tabNum);
+			nextTabPos = (pos - countFromPrevTab) + tabNum;
+			spaces = nextTabPos - pos;
+			spaceStr = "";
+			for (int i = 0; i < spaces; i++)
+				spaceStr += " ";
+
+			data.replace(pos, 1, spaceStr);
+			prevPos = pos;
+			pos = data.find('\t', prevPos);
 		}
+
 		return data;
 		END_FUN(expandtabs);
 
@@ -179,44 +184,10 @@ namespace py
 		return findRes == std::string::npos ? -1 : findRes;
 		END_FUN(find);
 
-		/*
-		std::string pyFormat(std::string const & s, T value, Args... args)
-	{
-		using namespace std;
-		int placeHolders = MatchesAmount(s, "\\{.*?\\}");
-		if (placeHolders > 0)
-		{
-			smatch currMatch;
-			if (!regex_search(s, currMatch, regex("\\{(.*?)\\}")))
-				throw "BUG";
-
-			std::string nextToken = currMatch[1];
-			std::string newS;
-			std::string valueStr = toString(value);
-			if (!nextToken.empty())
-				newS = regex_replace(s, regex("\\{" + nextToken + "\\}"), valueStr);
-			else
-				newS = regex_replace(s, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
-
-			return pyFormat(newS, args...);
-		}
-		else
-			return s;
-	}
-		*/
 		FUN_DEF(format);
 		PARAM(self, );
-		
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-
-		int counter = 0;
-
-		//while (HAS_MORE_POS_PARAMS())
-		//{
-		//	PARAM(next, );
-		//	std::cout << (std::string)sep << (std::string)next;
-		//}
 
 		while (HAS_MORE_POS_PARAMS())
 		{
@@ -234,9 +205,11 @@ namespace py
 				//std::string valueStr = toString(object(next));
 				std::string valueStr = (std::string)next;
 				if (!nextToken.empty())
-					newS = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr);
+					//newS = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr);
+					data = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr);
 				else
-					newS = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
+					//newS = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
+					data = regex_replace(data, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
 			}
 			else
 				return data;
@@ -307,14 +280,14 @@ namespace py
 		return retVal;
 		END_FUN(isdecimal);
 
-		//TODO
-		//allows exponents- just has to be a digit, not necessarily decimal
+		//TODO: for now just acts like isdecimal
 		//https://www.includehelp.com/python/difference-between-string-isdecimal-isdigit-isnumeric-and-methods.aspx
 		FUN_DEF(isdigit);
 		PARAM(self, );
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		return find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
+		bool retVal = find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
+		return retVal;
 		END_FUN(isdigit);
 
 		//tested
@@ -345,14 +318,13 @@ namespace py
 			std::any_of(data.begin(), data.end(), [](char c) { return (std::isalpha(c)); });
 		END_FUN(islower);
 
-		//TODO
-		//allows fractions, etc.- just has to be numeric, not necessarily decimal
-		//https://www.includehelp.com/python/difference-between-string-isdecimal-isdigit-isnumeric-and-methods.aspx
+		//TODO: for now just acts like isdecimal
 		FUN_DEF(isnumeric);
 		PARAM(self, );
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
-		return find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
+		bool retVal = find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
+		return retVal;
 		END_FUN(isnumeric);
 
 		//tested
@@ -434,32 +406,37 @@ namespace py
 		return(data.substr(data.find_first_not_of(charsStr)));
 		END_FUN(lstrip);
 
-		//in process-uses some encoding
-		FUN_DEF(maketrans);
-		PARAM(self, );
-		PARAM(x, );
-		PARAM(y, None);
-		PARAM(z, None);
-		dict retDict;
-		if (is_ofType(z, None))
-		{
-			std::string xstr = x;
-			int xLen = xstr.length();
-			std::string ystr = y;
-			int yLen = ystr.length();
-			if (xLen != yLen)
-				THROW("ValueError: the first two maketrans arguments must have equal length");
+		
+		//FUN_DEF(maketrans);
+		//PARAM(self, );
+		//PARAM(x, );
+		//PARAM(y, None);
+		//PARAM(z, None);
+		//dict retDict = dict();
+		////1 argument
 
-			for (int i = 0; i < xLen; i++)
-			{
-				char x = xstr[i];
-				char y = ystr[i];
+		////2 arguments
+		//if (is_ofType(z, None))
+		//{
+		//	std::string xstr = x;
+		//	int xLen = xstr.length();
+		//	std::string ystr = y;
+		//	int yLen = ystr.length();
+		//	if (xLen != yLen)
+		//		THROW("ValueError: the first two maketrans arguments must have equal length");
 
-			}
+		//	for (int i = 0; i < xLen; i++)
+		//	{
+		//		char x = xstr[i];
+		//		char y = ystr[i];
 
-		}
-		return retDict;
-		END_FUN(maketrans);
+		//	}
+
+		//}
+
+		////3 arguments
+		//return retDict;
+		//END_FUN(maketrans);
 
 		//tested
 		FUN_DEF(partition);
@@ -628,23 +605,30 @@ namespace py
 		return list(meAsStr->split(sepStr, max));
 		END_FUN(split);
 
+		//tested
 		FUN_DEF(splitlines);
 		PARAM(self, );
 		PARAM(keepends, False);
 		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
 		std::string data = meAsStr->_impl;
 		bool keependsBool = (bool)keepends;
-		std::string whatToSearchFor = "\r\n";
-		//std::string whatToSearchFor = "\n";
-		int prevPos = 0;
-		int pos = data.find(whatToSearchFor);
+		std::string whatToSearchFor = "\n\r";
+		int prevPos = -1;
+		int pos = data.find_first_of(whatToSearchFor);
 		auto retList = list({});
 		while (pos != std::string::npos)
 		{
-			if(data[pos + 1] == 'n' || data[pos + 1] == 'r')
-			   MEM_FUN(retList, append).A(data.substr(prevPos, pos - prevPos))); 
+				if(keependsBool)
+					MEM_FUN(retList, append).A(data.substr(prevPos + 1, pos - prevPos)));
+				else
+				{
+					std::string str = data.substr(prevPos + 1, (pos - prevPos) - 1);
+					MEM_FUN(retList, append).A(str));
+				}
+			 
+			
 			prevPos = pos;
-			pos = data.find(whatToSearchFor, prevPos + 1);
+			pos = data.find_first_of(whatToSearchFor, prevPos + 1);
 		}
 
 		if (!retList)
@@ -744,10 +728,6 @@ namespace py
 		return ret;
 		END_FUN(title);
 
-		FUN_DEF(translate);
-		PARAM(self, );
-		END_FUN(translate);
-
 		//tested
 		FUN_DEF(upper);
 		PARAM(self, );
@@ -782,7 +762,6 @@ namespace py
 		(*this).attr(casefold) = py_str::casefold;
 		(*this).attr(center) = py_str::center;
 		(*this).attr(count) = py_str::count;
-		//(*this).attr(encode) = py_str::encode;
 		(*this).attr(endswith) = py_str::endswith;
 		(*this).attr(expandtabs) = py_str::expandtabs;
 		(*this).attr(find) = py_str::find;
@@ -804,7 +783,6 @@ namespace py
 		(*this).attr(ljust) = py_str::ljust;
 		(*this).attr(lower) = py_str::lower;
 		(*this).attr(lstrip) = py_str::lstrip;
-		(*this).attr(maketrans) = py_str::maketrans;
 		(*this).attr(partition) = py_str::partition;
 		(*this).attr(replace) = py_str::replace;
 		(*this).attr(rfind) = py_str::rfind;
@@ -819,7 +797,6 @@ namespace py
 		(*this).attr(strip) = py_str::strip;
 		(*this).attr(swapcase) = py_str::swapcase;
 		(*this).attr(title) = py_str::title;
-		(*this).attr(translate) = py_str::translate;
 		(*this).attr(upper) = py_str::upper;
 		(*this).attr(zfill) = py_str::zfill;
 
