@@ -65,7 +65,7 @@ namespace py
 
 	};
 
-	typedef pyNumType<int> pyInt;
+	//typedef pyNumType<int> pyInt;  //has an implementation at line 116
 	typedef pyNumType<float> Float;
 	typedef pyNumType<double> Double;
 
@@ -111,5 +111,14 @@ namespace py
 		
 		virtual operator std::string() const override;
 
+	};
+
+	class pyInt : public pyNumType<int>
+	{
+	public:
+		pyInt(int const& i) :pyNumType<int>(i) {};
+		pyInt() :pyNumType<int>() {};
+
+		std::string bin();
 	};
 }

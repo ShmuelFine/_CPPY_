@@ -12,6 +12,7 @@
 #include <regex>
 
 #include "pyExceptions.h"
+#include "pyList.h"
 
 namespace py
 {
@@ -149,6 +150,14 @@ namespace py
 		if (ending._impl.size() > this->_impl.size()) return false;
 		return std::equal(ending._impl.rbegin(), ending._impl.rend(), _impl.rbegin());
 	}
+
+	/*bool pyStr::startswith(pyStr const& starts)
+	{
+		if (_impl.rfind("", 0) == 0) {
+			std::cout << "starts with!\n";
+		}
+	}
+	*/
 
 	//pyStr pyStr::join(pyList const& parts)
 	//{
