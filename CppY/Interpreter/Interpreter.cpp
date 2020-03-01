@@ -380,6 +380,41 @@ namespace py
 	std::string Else_Statement::Translate_inner() const { return "else"; }
 
 	/////////////////
+	std::string ClassDef::GetRegexString() const
+	{
+		return R"(class\s+(\w+)(\(\w+\))?\:)";
+	}
+
+	void ClassDef::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) 
+	{
+		ClassName = matches[1];
+		ParentName = matches.size() > 2 ? matches[2].str() : "";
+		return;
+	}
+
+	std::string ClassDef::Translate_inner() const 
+	{ 
+		auto result = "class" + ClassName;
+		if (ParentName.empty())
+		{
+			result += " : public object";
+		}
+		else
+		{
+			result += " : public " + ParentName;
+		}
+		result += R"(
+		{
+		public:
+			)" + ClassName + R"(();
+		protected:
+			void AddAttributes();
+		};)";
+		return result;
+	}
+
+	/////////////////
+
 
 	PyLineParser::PyLineParser()
 	{

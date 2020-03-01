@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "..\Interpreter\Interpreter.h"
 #include "..\Interpreter\PyBlockParser.h"
+#include "..\Base\Types\pyStr.h"
 
 using namespace py;
 
@@ -109,6 +110,40 @@ TEST(BlockParser, scopes_and_variable_Defs)
     "   y = 8",
     "   print(x + y)",
     };
+    // Act
+    auto cppBlock = blockparser.ParseBlock(lines);
+    // Assert
+    std::string expected =
+        R"(object x;
+x = 5;
+if (x > 8)
+{
+   print(ARGS("hello"));
+}
+else
+{
+   object y;
+   y = 8;
+   print(ARGS(x + y));
+}
+)";
+    EXPECT_EQ(cppBlock, expected);
+
+}
+
+TEST(BlockParser, class_Defs)
+{
+    // Arrange
+    PyBlockParser blockparser("\n");
+    auto classDef =
+        R"(class ComplexFormat(ComplexFloatingFormat):
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "ComplexFormat has been replaced by ComplexFloatingFormat",
+            DeprecationWarning, stacklevel=2)
+        super(ComplexFormat, self).__init__(*args, **kwargs))";
+
+	std::vector<std::string> lines = pyStr(classDef).split();
     // Act
     auto cppBlock = blockparser.ParseBlock(lines);
     // Assert
