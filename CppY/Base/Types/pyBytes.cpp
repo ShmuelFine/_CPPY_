@@ -1,5 +1,5 @@
 #include "pyBytes.h"
-#include "Comparisons.h"
+//#include "Comparisons.h"
 #include "algorithm"
 namespace py
 {
@@ -88,27 +88,45 @@ namespace py
 		return (res == _impl.begin());
 	}
 
-	pyBytes pyBytes::replace(pyBytes const& what, pyBytes const& withWhat)
+	pyBytes pyBytes::replace(pyBytes const& what, pyBytes const& withWhat,int howMany)
 	{
-		//auto newObj = _impl.begin();
-		//auto itPos = _impl.begin();
-		//while (itPos != _impl.end()){
-		//itPos = std::search(itPos,_impl.end(),what.begin(),what.end());
-		//newObj = std::copy(withWhat.begin(), withWhat.end(), itPos);
-		//}
-		//auto asBytes = reinterpret_cast<pyBytes*>(newObj._Ptr->get());
-		//return asBytes->_impl;
+		//auto res = std::replace(_impl.begin(), _impl.end(), what._impl, withWhat._impl);
+
+		/*auto newObj = _impl.begin();
+		auto itPos = _impl.begin();
+		while (itPos != _impl.end()){
+		itPos = std::search(itPos,_impl.end(),what.begin(),what.end());
+		newObj = std::copy(withWhat.begin(), withWhat.end(), itPos);
+		}
+		auto asBytes = reinterpret_cast<pyBytes*>(newObj._Ptr->get());
+		return asBytes->_impl;*/
 		throw;
 	}
+	//pyBytes pyBytes::center(int width, pyByte fillByte)
+	//{
+	//	// width must be even:
+	//	width = width - width % 2;
+	//	std::vector<unsigned char> result_vec(width + _impl.size(), fillByte);
+	//	for (int i = 0; i < _impl.size(); i++)
+	//		result_vec[width / 2 + i] = *_impl[i];
+	//	
+	//	return pyBytes(result_vec);
+	//}
 
-	pyBytes pyBytes::center(int width, pyByte fillByte)
+	pyBytes pyBytes::addPading(int width, pyByte fillByte,std::string pos)
 	{
-		// width must be even:
-		width = width - width % 2;
+		width = width-_impl.size();
+		if (width <= 0)
+			return *this;//convert _impl back to pybytes
 		std::vector<unsigned char> result_vec(width + _impl.size(), fillByte);
-		for (int i = 0; i < _impl.size(); i++)
-			result_vec[width / 2 + i] = *_impl[i];
-		
+		for (int i = 0; i < _impl.size(); i++) {
+			if (pos == "ljust")
+				result_vec[i] = *_impl[i];
+			else if (pos == "rjust")
+				result_vec[width + i] = *_impl[i];
+			else  //"center"
+				result_vec[width / 2 + i] = *_impl[i];
+		}
 		return pyBytes(result_vec);
 	}
 
@@ -128,27 +146,22 @@ namespace py
 		throw;
 	}
 
-	int pyBytes::rindex(pyBytes o, pyInt i, pyInt j, bool throwEx)
+	int pyBytes::rindex(pyBytes whoToSearch, int startIdx, int endIdx, bool throwEx)
 	{
-		//if (is_ofType(i, None))
-		//	i = 0;
-		//if (is_ofType(j, None))
-		//	j = this->_impl.size();
-		//auto it = std::find_end(
-		//	_impl.begin() + i,
-		//	_impl.end() - (_impl.size() - j), o.begin(),o.end());
-		//if (it != _impl.end() - (_impl.size() - j))
-		//	if (throwEx)
-		//		THROW("Not found element");
-		//	else
-		//		return -1;
-		//return (int)std::distance(_impl.begin() + i, it);
-		//
-		///*std::reverse(_impl.begin(), _impl.end());
-		//auto iObjPtr = reinterpret_cast<pyObj*>(&i);
-		//auto jObjPtr = reinterpret_cast<pyObj*>(&j);
-		//int pos = this->index(o, iObjPtr, jObjPtr, throwEx);
-		//return _impl.size() - pos;*/
+		auto it = std::find_end(
+			_impl.begin() + startIdx,
+			_impl.begin()+ endIdx, whoToSearch._impl.begin(), whoToSearch._impl.end());
+		if (it == _impl.begin() + endIdx)
+			if (throwEx)
+				THROW("Not found element");
+			else
+				return -1;
+		return (int)std::distance(_impl.begin() + startIdx, it);
+	}
+
+	pyBytes pyBytes::strip(pyByte chars, std::string pos)
+	{
+		/*auto it = (pos=="lstrip") ? (_impl.begin()) : (_impl.rbegin());*/
 		throw;
 	}
 
