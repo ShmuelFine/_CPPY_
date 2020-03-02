@@ -100,6 +100,13 @@ namespace py
 		return Line;
 	}
 
+	ICommandPtr GetEmptyCommand()
+	{
+		auto dummy = std::make_shared<SameLine>();
+		dummy->ParsePy("");
+		return dummy;
+	}
+
 	bool TwoSidesOperator::CanParse(std::string const& line) const
 	{
 		return pyStr(line).split(PyOperator(), 2).size() > 1;
@@ -379,21 +386,53 @@ namespace py
 	void Else_Statement::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) {}
 	std::string Else_Statement::Translate_inner() const { return "else"; }
 
-	/////////////////
+	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
+
+	FunDef_Scope_PostProcessor::FunDef_Scope_PostProcessor() : docString_ptr(nullptr) {}
+
+	ICommandPtr FunDef_Scope_PostProcessor::Process(ICommandPtr in)
+	{
+		if (docString_ptr)
+			return in;
+
+		bool isJustSpacesWithNoContent = pyStr(in->Translate()).strip();
+		if (isJustSpacesWithNoContent)
+			return in;
+
+		// here it is. The first line which isn't empty.
+		// Either it's a doc string or we don't have a doc string;
+
+		auto StringLiteral_cmd_Ptr = std::reinterpret_pointer_cast<StringLiterals_OuterScope_EscaperBase>(in);
+		if (StringLiteral_cmd_Ptr)
+		{
+			docString_ptr = in;
+			return GetEmptyCommand();
+		}
+		else
+		{
+			docString_ptr = std::make_shared<SameLine>();
+			docString_ptr->ParsePy("");
+			return in;
+		}
+	}
+
+	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
 	std::string FunDef::GetRegexString() const
 	{
-		return R"(def\s+(\w+)\s*\((.*?)\)\:\s+("{3}|'{3})([\w\s\W]*?)("{3}|'{3}))";
+		return R"(def\s+(\w+)\s*\((.*?)\)\:)";
 	}
 
 	void FunDef::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
 	{
 		Name = matches[1];
 		pyStr allParams_str = matches[2].str();
-		DocString = matches[4].str();
 		auto params = allParams_str.split(",");
 		for (pyStr param : params)
 		{
 			auto parts = param.split("=");
+			for (auto& p : parts)
+				p = pyStr(p).strip();
+
 			if (parts.size() == 1)
 				parts.push_back("");
 
@@ -403,7 +442,7 @@ namespace py
 
 	std::string FunDef::Translate_inner() const
 	{
-		auto result = "FUN_DEF(" + Name + ");";
+		auto result = "FUN_DEF_WITH_DOC(" + Name + ", " + "DocString" + ");";
 		for (auto paramPair : Params)
 		{
 			result += R"(\nPARAM()" + paramPair.first + "," + paramPair.second + ");";
@@ -411,15 +450,35 @@ namespace py
 		return result;
 	}
 
-	std::string FunDef::ScopeEndHook() const
+	ICommandPostProcessorPtr FunDef::ScopeInnerHook()
 	{
-		throw "";
-		//std::map<std::string, pyObjPtr> m = { {"__doc__", "hello"}  };
-		//return "END_FUN_WITH_ATTR(" + Name + ");";
+		InnerScopeProcessor.reset(new FunDef_Scope_PostProcessor());
+		return InnerScopeProcessor;
 	}
 
 
-	////////////////////
+	std::string FunDef::ScopeEndHook() const
+	{		
+		return "END_FUN_WITH_DOC_STR(" + Name + ", " + InnerScopeProcessor->docString_ptr->Translate() + ");";
+	}
+
+
+	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
+
+	ClassDef_Scope_PostProcessor::ClassDef_Scope_PostProcessor() : FuncNames() {}
+
+	ICommandPtr ClassDef_Scope_PostProcessor::Process(ICommandPtr in)
+	{
+		auto FunDef_cmd_Ptr = std::reinterpret_pointer_cast<FunDef>(in);
+		if (FunDef_cmd_Ptr)
+		{
+			FuncNames.push_back(FunDef_cmd_Ptr->Name);
+		}
+
+		return in;
+	}
+
+	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
 
 	std::string ClassDef::GetRegexString() const
 	{
@@ -454,15 +513,27 @@ protected:
 		return result;
 	}
 
+	ICommandPostProcessorPtr ClassDef::ScopeInnerHook()
+	{
+		InnerScopeProcessor.reset(new ClassDef_Scope_PostProcessor());
+		return InnerScopeProcessor;
+	}
+
 
 	std::string ClassDef::ScopeEndHook() const
 	{
-		return
+		std::string ctor = 
 ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 {
 	AddAttributes();
 })";
+		std::string addAttrs =
+			"void " + ClassName + "::AddAttributes()" + "\n{";
+		
+		for (auto& name : InnerScopeProcessor->FuncNames)
+			addAttrs += "\n\tattr(" + name + ") = " + name + ";";
 
+		addAttrs += "\n}";
 	}
 
 	/////////////////
@@ -485,7 +556,8 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<FunDef								>((PyLineParser*)this));
+		//ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
 
 
 		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));

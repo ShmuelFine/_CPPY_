@@ -19,29 +19,33 @@ namespace py
 			return string();
 
 		THROW_UNLESS(commands[0]->Indentation.size() == 0, "First command should start from zero indentation.");
-		Indintations.push_back(Indentation(0, commands[0]));
+		ScopesStack.push_back(ScopeMetaData(0, GetEmptyCommand()));
 
 		string str = "";
 		for (int cmdIdx = 0; cmdIdx < commands.size(); cmdIdx++)
 		{
 			// Handle scopes:
-			auto prevIndentation = Indintations.back();
-			int currIndentation = commands[cmdIdx]->Indentation.length();
+			auto prevIndentation = ScopesStack.back();
+			size_t currIndentation = commands[cmdIdx]->Indentation.length();
 			if (currIndentation > prevIndentation.SpacesAmount)
 			{
 				str += "{" + ENDL;
-				Indintations.push_back(Indentation(currIndentation, commands[cmdIdx]));
+				ScopesStack.push_back(ScopeMetaData(currIndentation, commands[cmdIdx-1]));
 			}
 			else if (currIndentation < prevIndentation.SpacesAmount)
 			{
 				str += string(currIndentation, ' ') + "}" + ENDL;
 				str += prevIndentation.ScopeStarter->ScopeEndHook();
-				Indintations.pop_back();
-				THROW_UNLESS(currIndentation == Indintations.back().SpacesAmount, "Not allwoed indentation");
+				ScopesStack.pop_back();
+				THROW_UNLESS(currIndentation == ScopesStack.back().SpacesAmount, "Not allwoed indentation");
 			}
 			
+			// PostProcess command:
+			auto actualIndentation = ScopesStack.back();
+			auto actualCommand = actualIndentation.ScopePostProcessor->Process(commands[cmdIdx]);
+
 			// Predefine variables:
-			auto vars = commands[cmdIdx]->GetVariables();
+			auto vars = actualCommand->GetVariables();
 			if (!vars.empty())
 			{
 				str += string(currIndentation, ' ') + "object " + *vars.begin();
@@ -49,18 +53,19 @@ namespace py
 					str += ", " + *it;
 				str += ";" + ENDL;
 			}
+			
 			// Go:
-			str += commands[cmdIdx]->Translate();
-			if (commands[cmdIdx]->IsToSemicolon())
+			str += actualCommand->Translate();
+			if (actualCommand->IsToSemicolon())
 				str += ";";
 
 			str += ENDL;
 
 		}
 
-		for (int i = Indintations.size() - 2; i >= 0; i--)
+		for (size_t i = ScopesStack.size() - 2; i >= 0; i--)
 		{
-			str += string(Indintations[i].SpacesAmount, ' ') + "}" + ENDL;
+			str += string(ScopesStack[i].SpacesAmount, ' ') + "}" + ENDL;
 		}
 		return str;
 	}

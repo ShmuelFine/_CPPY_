@@ -11,6 +11,7 @@ namespace py
 	class ICommand;
 	typedef std::shared_ptr<ICommand> ICommandPtr;
 	
+	///////////////// ///////////////// /////////////////
 	class PyLineParser
 	{
 	public:
@@ -19,7 +20,26 @@ namespace py
 
 		ICommandPtr Parse(std::string const& line);
 	};
-	typedef std::shared_ptr<PyLineParser> PyParserPtr;
+	typedef std::shared_ptr<PyLineParser> PyLineParserPtr;
+
+	///////////////// ///////////////// /////////////////
+	
+	class ICommandPostProcessor
+	{
+	public:
+		virtual ICommandPtr Process(ICommandPtr in) = 0;
+	};
+	typedef std::shared_ptr<ICommandPostProcessor> ICommandPostProcessorPtr;
+
+	///////////////// ///////////////// /////////////////
+
+	class DefaultPostProcessor : public ICommandPostProcessor
+	{
+	public:
+		ICommandPtr Process(ICommandPtr in) { return in; }
+	};
+
+	///////////////// ///////////////// /////////////////
 
 	
 	class ICommand
@@ -42,6 +62,7 @@ namespace py
 	
 		virtual bool IsToSemicolon() const { return true; }
 		virtual std::string ScopeEndHook() const { return ""; }
+		virtual ICommandPostProcessorPtr ScopeInnerHook() { return std::make_shared<DefaultPostProcessor>(); }
 
 	protected:
 		// default impl. for almost all commands:
@@ -56,6 +77,7 @@ namespace py
 	};
 
 
+	///////////////// ///////////////// /////////////////
 
 #define COMMAND_INTERFACE(name, base)\
 	class name : public base {\
@@ -245,18 +267,7 @@ namespace py
 	public:
 		virtual std::string ScopeOpenerRGX() const override { return R"(\W\w+\()"; };
 		virtual std::string ScopeCloserRGX() const override { return R"(\))"; };
-		//virtual void ParsePy_innerScope(std::string const& text);
 	};
-
-	//COMMAND_CLASS(InnerScope_FunctionCall_Escaper, InnerScopeEscaperBase)
-	//public:
-	//	virtual std::string GetRegexString() const {
-	//		// Enforce inner expression by the .+ at the beginning:
-	//		return R"(.*\W(\w+\(.*?\)).*)";
-	//	}
-	//	virtual std::string ScopeOpenerRGX() const override { return ""; };
-	//	virtual std::string ScopeCloserRGX() const override { return ""; };
-	//};
 
 	COMMAND_CLASS(InnerScope_RoundBraces_Escaper,InnerScopeEscaperBase)
 	public:
@@ -489,32 +500,57 @@ namespace py
 		virtual std::string Translate_inner() const override;
 	};
 
+	ICommandPtr GetEmptyCommand();
 	//////////////////////////////////
-	// FUN DEFS AND CLASSES			//
+	// FUN DEFS						//
 	//////////////////////////////////
+	class FunDef_Scope_PostProcessor : public ICommandPostProcessor
+	{
+	public:
+		ICommandPtr docString_ptr;
+		FunDef_Scope_PostProcessor();
+
+	public:
+		virtual ICommandPtr Process(ICommandPtr in);
+	};
 	COMMAND_CLASS(FunDef, RegexBasedCommand)
 	public:
 		virtual std::string GetRegexString() const override;
 		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
+		virtual ICommandPostProcessorPtr ScopeInnerHook() override;
 		virtual std::string ScopeEndHook() const;
 	public:
 		std::string Name;
-		std::string DocString;
 		std::vector<std::pair<std::string, std::string>> Params;
+		std::shared_ptr<FunDef_Scope_PostProcessor> InnerScopeProcessor;
 	};
 
+	//////////////////////////////////
+	// CLASS DEFS						//
+	//////////////////////////////////
+	class ClassDef_Scope_PostProcessor : public ICommandPostProcessor
+	{
+	public:
+		std::vector<std::string> FuncNames;
+		ClassDef_Scope_PostProcessor();
+
+	public:
+		virtual ICommandPtr Process(ICommandPtr in);
+	};
 	COMMAND_CLASS(ClassDef, RegexBasedCommand)
 	public:
 		virtual std::string GetRegexString() const override;
 		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
+		virtual ICommandPostProcessorPtr ScopeInnerHook() override;
 		virtual std::string ScopeEndHook() const;
 	public:
 		std::string ClassName;
 		std::string ParentName;
+		std::shared_ptr<ClassDef_Scope_PostProcessor> InnerScopeProcessor;
 	};
 	
 }

@@ -4,24 +4,29 @@
 
 namespace py
 {
-	struct Indentation
+
+	struct ScopeMetaData
 	{
 	public:
-		int SpacesAmount;
+		size_t SpacesAmount;
 		ICommandPtr ScopeStarter;
-		Indentation(int size, ICommandPtr cmd) : SpacesAmount(size), ScopeStarter(cmd) {}
+		ICommandPostProcessorPtr ScopePostProcessor;
+		ScopeMetaData(size_t size, ICommandPtr cmd)//, ICommandPostProcessorPtr postProc = std::make_shared<DefaultPostProcessor>()) 
+			: SpacesAmount(size), ScopeStarter(cmd), ScopePostProcessor(ScopeStarter->ScopeInnerHook())
+		{}
+
 	};
 
 	class PyBlockParser
 	{
 		std::string ENDL;
 	public:
-		PyBlockParser(std::string const & newLine = "\r\n");
+		PyBlockParser(std::string const & newLine = "\n");
 		std::string ParseBlock(std::vector<std::string> const lines);
 	public:
-		PyParserPtr LineParser;
+		PyLineParserPtr LineParser;
 
-		std::vector<Indentation> Indintations;
+		std::vector<ScopeMetaData> ScopesStack;
 	};
 
 }

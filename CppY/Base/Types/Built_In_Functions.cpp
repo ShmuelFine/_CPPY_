@@ -51,9 +51,9 @@ namespace py
 
 	END_FUN(print);
 
-	FUN_DEF(bin);
-	PARAM(value, );
-	return MEM_FUN(value, bin));
-	END_FUN(bin);
+	//FUN_DEF(bin);
+	//PARAM(value, );
+	//return MEM_FUN(value, bin));
+	//END_FUN(bin);
 	
 }

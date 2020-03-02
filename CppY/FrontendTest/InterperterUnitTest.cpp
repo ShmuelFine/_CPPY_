@@ -131,19 +131,15 @@ else
 
 }
 
-TEST(BlockParser, class_Defs)
+TEST(BlockParser, funDefWithDocString)
 {
     // Arrange
     PyBlockParser blockparser("\n");
-    auto classDef =
-        R"(class ComplexFormat(ComplexFloatingFormat):
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "ComplexFormat has been replaced by ComplexFloatingFormat",
-            DeprecationWarning, stacklevel=2)
-        super(ComplexFormat, self).__init__(*args, **kwargs))";
+    std::vector<std::string> lines = {
+R"(def __init__(self, A, B):)"
+R"(     """ this is doc string """ )",
+R"(     pass)" };
 
-	std::vector<std::string> lines = pyStr(classDef).split("\n");
     // Act
     auto cppBlock = blockparser.ParseBlock(lines);
     // Assert
@@ -164,3 +160,4 @@ else
     EXPECT_EQ(cppBlock, expected);
 
 }
+

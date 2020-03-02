@@ -10,5 +10,5 @@ namespace py
 	extern object len ;
 	extern object repr;
 	extern object print;
-	extern object bin ;
+	//extern object bin ;
 }

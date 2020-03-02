@@ -142,19 +142,19 @@ namespace py
 {
 	void list::AddAttributes()
 	{
-		(*this).attr(count) = py_list::count;
-		(*this).attr(extend) = py_list::extend;
-		(*this).attr(append) = py_list::append;
-		(*this).attr(clear) = py_list::clear;
-		(*this).attr(sort) = py_list::sort;
-		(*this).attr(insert) = py_list::insert;
-		(*this).attr(find) = py_list::find;
-		(*this).attr(index) = py_list::index;
-		(*this).attr(pop) = py_list::pop;
-		(*this).attr(remove) = py_list::remove;
-		(*this).attr(reverse) = py_list::reverse;
-		(*this).attr(copy) = py_list::copy;
-		(*this).attr(__len__) = py_list::__len__;
+		attr(count) = py_list::count;
+		attr(extend) = py_list::extend;
+		attr(append) = py_list::append;
+		attr(clear) = py_list::clear;
+		attr(sort) = py_list::sort;
+		attr(insert) = py_list::insert;
+		attr(find) = py_list::find;
+		attr(index) = py_list::index;
+		attr(pop) = py_list::pop;
+		attr(remove) = py_list::remove;
+		attr(reverse) = py_list::reverse;
+		attr(copy) = py_list::copy;
+		attr(__len__) = py_list::__len__;
 	}
 
 	list::list() : object(pyList())
@@ -167,27 +167,5 @@ namespace py
 	{
 		AddAttributes();
 	}
-
-
-	//list::list(std::initializer_list<std::string> const& v)
-	//	: object(pyList())
-	//{
-	//	pyList* impl = reinterpret_cast<pyList*>(get());
-	//	for (std::string const& elem : v)
-	//		impl->append(object(elem));
-
-	//	AddAttributes();
-	//}
-
-	//list::list(std::vector<std::string> const& v)
-	//	: object(pyList())
-	//{
-	//	pyList* impl = reinterpret_cast<pyList*>(get());
-	//	for (std::string const & elem : v)
-	//		impl->append(object(elem));
-
-	//	AddAttributes();
-
-	//}
 
 }
