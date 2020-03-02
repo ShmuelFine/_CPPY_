@@ -185,6 +185,7 @@ namespace py
 
 		(*this).attr(lstrip) = py_bytes::lstrip;
 		(*this).attr(rstrip) = py_bytes::rstrip;
+		(*this).attr(strip) = py_bytes::strip;
 
 	}
 
