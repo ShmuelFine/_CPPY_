@@ -33,7 +33,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
 		auto other = reinterpret_cast<pySet*>(others._ptr.get());
-		return (object)meAsSet->difference(*other);
+		return pyObjPtr(meAsSet->difference(*other));
 		END_FUN(difference);
 
 		FUN_DEF(discard);
@@ -56,7 +56,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
 		auto other = reinterpret_cast<pySet*>(others._ptr.get());
-		return (object)meAsSet->intersection(*other);
+		return pyObjPtr(meAsSet->intersection(*other));
 		END_FUN(intersection);
 
 		FUN_DEF(intersection_update);
@@ -104,7 +104,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
 		auto other = reinterpret_cast<pyList*>(others._ptr.get());
-		return (object)meAsSet->setUnion(*other);
+		return pyObjPtr(meAsSet->setUnion(*other));
 		END_FUN(set_union);
 
 		FUN_DEF(symmetric_difference);
@@ -112,7 +112,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
 		auto other = reinterpret_cast<pySet*>(others._ptr.get());
-		return (object)meAsSet->symmetric_difference(*other);
+		return pyObjPtr(meAsSet->symmetric_difference(*other));
 		END_FUN(symmetric_difference);
 
 		FUN_DEF(symmetric_difference_update);

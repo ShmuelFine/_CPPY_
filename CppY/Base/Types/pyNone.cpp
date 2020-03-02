@@ -47,6 +47,6 @@ namespace py
 
 	pyObjPtr pyNone::Clone() const
 	{
-		return std::shared_ptr<pyObj>(new pyNone());
+		return pyObjPtr(new pyNone());
 	}
 }

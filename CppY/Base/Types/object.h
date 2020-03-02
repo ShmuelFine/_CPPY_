@@ -95,6 +95,7 @@ namespace py
 		}
 
 		///////// Additional conversions ////////////////////////////////////////
+		// TODO: Remove ?
 		operator Double() const { CHECK_PTR;  return get()->operator double(); };
 		operator Float() const	{ CHECK_PTR;  return get()->operator float(); };
 		operator pyInt() const	{ CHECK_PTR;  return get()->operator int(); };
@@ -117,18 +118,18 @@ namespace py
 		///////////// Generic attributes: ////////////////////////
 		void setattr(std::string const& what, object toWhat)
 		{
-			_ptr.attributes[what] = toWhat;
+			_ptr->attributes[what] = toWhat;
 		}
 		
 		bool hasattr(std::string const& what)
 		{
-			return _ptr.attributes.count(what) > 0;
+			return _ptr->attributes.count(what) > 0;
 		}
 
 		object getattr(std::string const& what, object defaultValue = pyNone())
 		{
-			if (_ptr.attributes.count(what))
-				return _ptr.attributes[what];
+			if (_ptr->attributes.count(what))
+				return _ptr->attributes[what];
 			else
 				return defaultValue;
 		}
@@ -136,7 +137,7 @@ namespace py
 		// direct access / definition:
 		object _attr_(std::string const& key)
 		{
-			return _ptr.attributes[key];
+			return _ptr->attributes[key];
 		}
 
 	};

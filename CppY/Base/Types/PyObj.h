@@ -15,13 +15,12 @@
 
 namespace py
 {
+
 	class pyObj;
 	class pyObjPtr : public std::shared_ptr<pyObj>
 	{
 	public:
 		bool IsAssignable;
-
-		std::map<std::string, pyObjPtr> attributes;
 
 	public:
 		pyObjPtr() : std::shared_ptr<pyObj>() { IsAssignable = true; }
@@ -36,6 +35,7 @@ namespace py
 
 namespace py
 {
+	typedef std::map<std::string, pyObjPtr> AttrDict;
 
 	class pyObjIterator
 	{
@@ -54,6 +54,9 @@ namespace py
 
 	class pyObj
 	{
+	public:
+		AttrDict attributes;
+
 	public:
 		virtual operator std::string() const = 0;
 		virtual operator double() const = 0;

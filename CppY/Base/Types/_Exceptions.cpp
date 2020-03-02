@@ -18,7 +18,7 @@ namespace py
 		attr(with_traceback) = with_traceback;
 
 		for (auto& prop : backendType.Props)
-			_ptr.attributes[object(prop.first)] = object(prop.second);
+			_ptr->attributes[object(prop.first)] = object(prop.second);
 	}
 
 	/**/SIMPLE_IMPL(SystemExit			, BaseException);

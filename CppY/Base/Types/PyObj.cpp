@@ -40,7 +40,7 @@ namespace py
 		THROW_UNLESS(IsAssignable, "Can't assign type " + (get() ? get()->Type() : "<Unknown>"));
 
 		::std::shared_ptr<pyObj>::operator=(other);
-		attributes = other.attributes;
+
 		return *this;
 	}
 
