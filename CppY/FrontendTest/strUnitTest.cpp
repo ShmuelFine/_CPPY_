@@ -160,8 +160,8 @@ TEST(str, format_sanity)
 	auto actual2 = MEM_FUN(s1, format).A("world").A("first").A("Jane"));
 
 	//assert
-	ASSERT_EQ(actual, expected);
-	ASSERT_EQ(actual2, expected2);
+	ASSERT_TRUE(actual  == expected);
+	ASSERT_TRUE(actual2 == expected2);
 }
 
 TEST(str, index_sanity)

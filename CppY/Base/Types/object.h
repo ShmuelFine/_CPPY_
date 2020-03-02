@@ -25,7 +25,7 @@ namespace py
 
 
 	public:
-		object()						: _ptr(_tmp_impl)	{ _ptr = nullptr; }
+		object()						: _ptr(_tmp_impl)	{ _ptr = pyObjPtr(new pyInt(0)); }
 		object(pyObjPtr const& other)	: _ptr(_tmp_impl)	{ _ptr = other; }
 		object(pyObjPtr& other)			: _ptr(other)		{ _tmp_impl = nullptr; }
 		object(pyObj const& other)		: _ptr(_tmp_impl)	{ _ptr = other.Clone(); }

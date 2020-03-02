@@ -3,8 +3,6 @@
 #include "PyObj.h"
 #include "pyExceptions.h"
 #include "ComparisonUtils.h"
-#include "pySet.h"
-#include "pyTuple.h"
 #include <sstream>
 #include <iomanip>
 namespace secretPy {
@@ -36,7 +34,6 @@ namespace py
 		virtual pyObjIterator end() const { NOT_SUPPORTED; }
 		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
 
-		
 		virtual std::string Type() const override { return  secretPy::secretKeyword + typeid(T).name(); }
 		virtual pyObjPtr Clone() const override { return std::make_shared<pyNumType<T>>(val); }
 		virtual bool operator <(pyObj const& other) const override {
@@ -48,7 +45,7 @@ namespace py
 			}
 			else
 				EXPLICIT_COMPARE(Type(), othersType);
-			
+
 			return false;
 		}
 
@@ -65,11 +62,11 @@ namespace py
 		virtual pyObjPtr  operator *(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val * (reinterpret_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
 		virtual pyObjPtr  operator /(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val / (reinterpret_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
 
-		virtual pyTuple divmod(pyObjPtr const& x, pyObjPtr const& y);
+
 	};
 
 	//typedef pyNumType<int> pyInt;  //has an implementation at line 116
-	//typedef pyNumType<float> Float;
+	typedef pyNumType<float> Float;
 	typedef pyNumType<double> Double;
 
 	class Bool : public pyObj
@@ -111,7 +108,7 @@ namespace py
 	{
 	public:
 		pyByte(unsigned char in) : pyNumType<uint8_t>(in) {};
-		
+
 		virtual operator std::string() const override;
 
 	};
@@ -120,18 +117,8 @@ namespace py
 	{
 	public:
 		pyInt(int const& i) :pyNumType<int>(i) {};
-		pyInt() :pyNumType<int>(0) {};
+		pyInt() :pyNumType<int>() {};
 
 		std::string bin();
-		pyTuple divmod(pyObjPtr const& x, pyObjPtr const& y);
-	};
-
-	class Float : public pyNumType<float>
-	{
-	public:
-		Float(float const& f) :pyNumType<float>(f) {};
-		Float() :pyNumType<float>(0.0) {};
-
-		pyTuple divmod(pyObjPtr const& x, pyObjPtr const& y);
 	};
 }

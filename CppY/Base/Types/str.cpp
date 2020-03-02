@@ -215,6 +215,8 @@ namespace py
 				return data;
 		}
 		
+		return data;
+
 		END_FUN(format);
 
 		//tested
@@ -602,7 +604,11 @@ namespace py
 		int max = (int)maxsplit;
 		if (max == -1)
 			max = data.length();
-		return list(meAsStr->split(sepStr, max));
+		auto parts = meAsStr->split(sepStr, max);
+		std::vector<object> result;
+		for (auto& p : parts)
+			result.push_back(p);
+		return list(result);
 		END_FUN(split);
 
 		//tested
