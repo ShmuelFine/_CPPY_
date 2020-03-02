@@ -511,5 +511,25 @@ namespace py
 		virtual std::string Translate_inner() const override;
 	};
 
+
+	//////////////////////////////////
+	// CLASSES						//
+	//////////////////////////////////
+	COMMAND_CLASS(ClassDef, RegexBasedCommand)
+	public:
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
+		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return false; }
+	public:
+		std::string ClassName;
+		std::string ParentName;
+	};
+	
+	class test
+	{
+		//class ComplexFloatingFormat(object):
+
+	};
 }
 

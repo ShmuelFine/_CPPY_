@@ -94,39 +94,91 @@ TEST(str, endswith_sanity)
 	auto s1 = str("asdasd");
 
 	//Act
-	//bool actual = MEM_FUN(s1, endswith).A("s"));
-	//bool actual2 = MEM_FUN(s1, endswith).A("d"));
+	bool actual = MEM_FUN(s1, endswith).A("s"));
+	bool actual2 = MEM_FUN(s1, endswith).A("d"));
 	bool actual3 = MEM_FUN(s1, endswith).A("s").A(0).A(4));
-	//bool actual4 = MEM_FUN(s1, endswith).A("s").A(0).A(5));
+	bool actual4 = MEM_FUN(s1, endswith).A("s").A(0).A(5));
+    bool actual5 = MEM_FUN(s1, endswith).A(tuple({"ff", "d"})));
+	bool actual6 = MEM_FUN(s1, endswith).A(tuple({ "ff", "p" })));
 
-	//ASSERT_FALSE(actual);
-	//ASSERT_TRUE(actual2);
+	ASSERT_FALSE(actual);
+	ASSERT_TRUE(actual2);
 	ASSERT_FALSE(actual3);
-	//ASSERT_TRUE(actual4);
+	ASSERT_TRUE(actual4);
+	ASSERT_TRUE(actual5);
+	ASSERT_FALSE(actual6);
 }
 
-//TEST(str, expandtabs_sanity)
-//{
+TEST(str, expandtabs_sanity)
+{
 	//Arrange
-	//auto s1 = str("\td");
-	//auto expected1 = str("        d");
-	//auto expected2 = str("    d");
-	//auto expected3 = str(" d");
-	//auto s2 = str("d\t");
-	//auto expected4 = str("d       ");
+	auto s1 = str("hello\tworld");
+	auto s2 = str("hello\n\tworld");
+	auto s3 = str("hello\tworld\tworld");
+	auto expected1 = str("hello   world");
+	auto expected2 = str("hello\n    world");
+	auto expected3 = str("hello   world   world");
 
 	//Act
-	//auto actual1 = MEM_FUN(s1, expandtabs));
-	//auto actual2 = MEM_FUN(s1, expandtabs).A(4));
-	//auto actual3 = MEM_FUN(s1, expandtabs).A(1));
-	//auto actual4 = MEM_FUN(s2, expandtabs));
+	auto actual1 = MEM_FUN(s1, expandtabs).A(4));
+	auto actual2 = MEM_FUN(s2, expandtabs).A(4));
+	auto actual3 = MEM_FUN(s3, expandtabs));
 
 	//Assert
-//    ASSERT_EQ(expected1, actual1);
-//	ASSERT_EQ(expected2, actual2);
-//	ASSERT_EQ(expected3, actual3);
-//	ASSERT_EQ(expected4, actual4);
-//}
+    ASSERT_EQ(expected1, actual1);
+	ASSERT_EQ(expected2, actual2);
+	ASSERT_EQ(expected3, actual3);
+}
+
+TEST(str, find_sanity)
+{
+	//arrange
+	auto s = str("xfx");
+	auto s1 = str("asasff");
+
+	//act
+	auto actual = MEM_FUN(s, find).A("x"));
+	auto actual1 = MEM_FUN(s, find).A("t"));
+	auto actual2 = MEM_FUN(s1, find).A("as"));
+
+	//assert
+	ASSERT_EQ(actual, 0);
+	ASSERT_EQ(actual1, -1);
+	ASSERT_EQ(actual2, 0);
+}
+
+TEST(str, format_sanity)
+{
+	//arrange
+	auto s = str("hello my name is {}");
+	auto s1 = str("hello {} my {} name is {}");
+	auto expected = str("hello my name is Jane");
+	auto expected2 = str("hello world my first name is Jane");
+
+	//act
+	auto actual = MEM_FUN(s, format).A("Jane"));
+	auto actual2 = MEM_FUN(s1, format).A("world").A("first").A("Jane"));
+
+	//assert
+	ASSERT_EQ(actual, expected);
+	ASSERT_EQ(actual2, expected2);
+}
+
+TEST(str, index_sanity)
+{
+	//arrange
+	auto s = str("xfx");
+	auto s1 = str("asasff");
+
+	//act
+	auto actual = MEM_FUN(s, index).A("x"));
+	auto actual2 = MEM_FUN(s1, index).A("as"));
+
+	//assert
+	ASSERT_EQ(actual, 0);
+	ASSERT_THROW(s.attr(index)(ARGS("t")), PyBaseException);
+	ASSERT_EQ(actual2, 0);
+}
 
 TEST(str, isalnum_sanity)
 {
@@ -305,6 +357,19 @@ TEST(str, isupper_sanity)
 
 }
 
+TEST(str, join_sanity)
+{
+	//Arrange
+	auto s = str(".");
+	auto expected = str("hello.world");
+
+	//act
+	auto actual = MEM_FUN(s, join).A(list({ "hello", "world" })));
+
+	//assert
+	ASSERT_EQ(actual, expected);
+}
+
 TEST(str, ljust_sanity)
 {
 	//Arrange
@@ -322,6 +387,8 @@ TEST(str, ljust_sanity)
 	ASSERT_EQ(expected2, actual2);
 	ASSERT_EQ(s, actual3);
 }
+
+
 
 TEST(str, rjust_sanity)
 {
@@ -363,6 +430,8 @@ TEST(str, lstrip_sanity)
 	//Arrange
 	auto s = str("   FD");
 	auto s2 = str("xxFD");
+	auto s3 = str("xwxwFD");
+	auto s4 = str("asassFD");
 	auto expected = str("FD");
 	
 
@@ -370,11 +439,15 @@ TEST(str, lstrip_sanity)
 	auto actual1 = MEM_FUN(s, lstrip));
 	auto actual2 = MEM_FUN(s2, lstrip).A("x"));
 	auto actual3 = MEM_FUN(s2, lstrip).A("w"));
+	auto actual4 = MEM_FUN(s3, lstrip).A("w"));
+	auto actual5 = MEM_FUN(s4, lstrip).A("as"));
 
 	//Assert
 	ASSERT_EQ(expected, actual1);
 	ASSERT_EQ(expected, actual2);
 	ASSERT_EQ(s2, actual3);
+	ASSERT_EQ(s3, actual4);
+	ASSERT_EQ(expected, actual5);
 }
 
 TEST(str, rstrip_sanity)
@@ -547,20 +620,24 @@ TEST(str, split_sanity)
 {
 	//Arrange
 	auto s = str("helloworld");
+	auto s1 = str("hello world");
 	auto s2 = str("hhiohh");
 	auto expected1 = list({ "hell", "w", "rld" });
 	auto expected2 = list({ "hell", "world"});
 	auto expected3 = list({ "hh", "hh" });
+	auto expected4 = list({ "hello", "world" });
 
 	//act
 	auto actual1 = MEM_FUN(s, split).A("o"));
 	auto actual2 = MEM_FUN(s, split).A("o").A(1));
 	auto actual3 = MEM_FUN(s2, split).A("io"));
+	auto actual4 = MEM_FUN(s1, split));
 
 	//Assert
 	ASSERT_EQ(actual1, expected1);
 	ASSERT_EQ(actual2, expected2);
 	ASSERT_EQ(actual3, expected3);
+	ASSERT_EQ(actual4, expected4);
 }
 
 TEST(str, splitlines_sanity)
@@ -568,21 +645,97 @@ TEST(str, splitlines_sanity)
 	//Arrange
 	auto s = str("helloworld");
 	auto s2 = str("hello\nworld");
-	auto s3 = str("hello\nworld\fhello\vworld");
-	auto s4 = str("hello\u2028world");
+	auto s3 = str("hello\nworld\rhello\nworld");
 	auto expected1 = list({ "helloworld" });
 	auto expected2 = list({ "hello", "world" });
 	auto expected3 = list({ "hello", "world", "hello", "world" });
+	auto expected4 = list({ "hello\n", "world" });
 
 	//act
 	auto actual1 = MEM_FUN(s, splitlines));
 	auto actual2 = MEM_FUN(s2, splitlines));
 	auto actual3 = MEM_FUN(s3, splitlines));
-	auto actual4 = MEM_FUN(s4, splitlines));
+	auto actual4 = MEM_FUN(s2, splitlines).A(True));
+
 
 	//Assert
 	ASSERT_EQ(actual1, expected1);
 	ASSERT_EQ(actual2, expected2);
 	ASSERT_EQ(actual3, expected3);
-	ASSERT_EQ(actual4, expected2);
+	ASSERT_EQ(actual4, expected4);
+}
+
+TEST(str, startswith_sanity)
+{
+	//Arrange
+	auto s = str("asdasd");
+
+	//Act
+	bool b = MEM_FUN(s, startswith).A("as"));
+	bool b1 = MEM_FUN(s, startswith).A("a"));
+	bool b2 = MEM_FUN(s, startswith).A("dds"));
+	bool b3 = MEM_FUN(s, startswith).A(tuple({"dd", "as"})));
+
+	//ASSERT
+	ASSERT_TRUE(b);
+	ASSERT_TRUE(b1);
+	ASSERT_FALSE(b2);
+	ASSERT_TRUE(b3);
+}
+
+TEST(str, strip_sanity)
+{
+	//Arrange
+	auto s = str("  asdasd  ");
+	auto s1 = str("xxasdasdxx");
+	auto expected = str("asdasd");
+
+	//Act
+	auto actual = MEM_FUN(s, strip));
+	auto actual1 = MEM_FUN(s1, strip).A("x"));
+
+	//Assert
+	ASSERT_EQ(actual, expected);
+	ASSERT_EQ(actual1, expected);
+}
+
+TEST(str, swapcase_sanity)
+{
+	//Arrange
+	auto s = str("helloworld");
+	auto s2 = str("HELLOWORLD");
+	auto s3 = str("HeHe");
+	auto s4 = str("He3He");
+	auto expected1 = str("HELLOWORLD");
+	auto expected3 = str("hEhE");
+	auto expected4 = str("hE3hE");
+
+
+	//act
+	auto actual1 = MEM_FUN(s, swapcase));
+	auto actual2 = MEM_FUN(s2, swapcase));
+	auto actual3 = MEM_FUN(s3, swapcase));
+	auto actual4 = MEM_FUN(s4, swapcase));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual2, s);
+	ASSERT_EQ(actual3, expected3);
+	ASSERT_EQ(actual4, expected4);
+}
+
+TEST(str, title_sanity)
+{
+	//arrange
+	auto s = str("hello world");
+	auto s1 = str("hEllo world");
+	auto expected1 = str("Hello World");
+
+	//act
+	auto actual1 = MEM_FUN(s, title));
+	auto actual = MEM_FUN(s1, title));
+
+	//Assert
+	ASSERT_EQ(actual1, expected1);
+	ASSERT_EQ(actual, expected1);
 }

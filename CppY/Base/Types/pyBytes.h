@@ -35,10 +35,11 @@ namespace py
 		std::string decode(std::string encoding, std::string errors);
 		bool endswith(pyBytes const& ending);
 		bool startswith(pyBytes const& open);
-		pyBytes replace(pyBytes const& what, pyBytes const& withWhat);
-		pyBytes center(int width, pyByte fillByte);
+		pyBytes replace(pyBytes const& what, pyBytes const& withWhat,int howMany);
+		pyBytes addPading(int width, pyByte fillByte, std::string pos);
 		pyTuple partition(pyByte const& delimitor);
-		int rindex(pyBytes o, pyInt i, pyInt j, bool throwEx);
+		int rindex(pyBytes whoToSearch, int startIdx, int endIdx, bool throwEx);
+		pyBytes strip(pyByte chars, std::string pos);
 
 
 	public:

@@ -50,9 +50,17 @@ TEST(bytes, center)
 
 	// Act
 	bytes actual = MEM_FUN(b, center).A(5));
-	bytes expected(R"(\x20\x20\xb1\x01\xb6\x20\x20)");
+	bytes expected(R"(\x20\xb1\x01\xb6\x20)");
+
+	/*bytes actual1 = MEM_FUN(b, center).A(3));
+	bytes expected1(R"(xb1\x01\xb6)");
+
+	bytes actual2 = MEM_FUN(b, center).A(10).A(bytes(R"(\xc3)")));
+	bytes expected2(R"(\xc3\xc3\xc3\xb1\x01\xb6\xc3\xc3\xc3\xc3)");*/
 	// Assert
 	ASSERT_TRUE(expected == actual);
+	/*ASSERT_TRUE(expected1 == actual1);
+	ASSERT_TRUE(expected2 == actual2);*/
 }
 TEST(bytes, endswith)
 {
@@ -87,19 +95,17 @@ TEST(bytes, index)
 	ASSERT_EQ(ind, 2);
 }
 
-//TEST(bytes, rindex)
-//{
-//	// Arrange
-//	auto b = bytes(R"(xb6\xb1\x01\xb6)");
-//
-//	// Act
-//	int ind = MEM_FUN(b, rindex).A(182));
-//	int ind2 = MEM_FUN(b, rindex).A(bytes(R"(\xb6)")));
-//
-//	// Assert
-//	ASSERT_EQ(ind, 3);
-//	ASSERT_EQ(ind2, 3);
-//}
+TEST(bytes, find)
+{
+	// Arrange
+	auto b = bytes(R"(\xb1\x01\xb6)");
+
+	// Act
+	int actual = MEM_FUN(b, find).A(5));
+
+	// Assert
+	ASSERT_EQ(actual, -1);
+}
 TEST(bytes, startswith)
 {
 	// Arrange
@@ -123,4 +129,46 @@ TEST(bytes, stringOperator)
 	std::string b_str = (std::string)b;
 	// Assert
 	ASSERT_EQ(b_str, origStr);
+}
+TEST(bytes, rindex)
+{
+	// Arrange
+	auto b = bytes(R"(\xb6\xb1\x01\xb6)");
+	// Act
+	int ind = MEM_FUN(b, rindex).A(bytes(182)));
+	int ind2 = MEM_FUN(b, rindex).A(bytes(R"(\xb6)")));
+	// Assert
+	ASSERT_EQ(ind, 3);
+	ASSERT_EQ(ind2, 3);
+}
+TEST(bytes, rfind)
+{
+	// Arrange
+	auto b = bytes(R"(\xb6\xb1\x01\xb6)");
+	// Act
+	int ind = MEM_FUN(b, rfind).A(bytes(5)));
+	// Assert
+	ASSERT_EQ(ind, -1);
+}
+TEST(bytes, ljust)
+{
+	// Arrange
+	auto b = bytes(R"(\xb1\x01\xb6)");
+
+	// Act
+	bytes actual = MEM_FUN(b, ljust).A(5));
+	bytes expected(R"(\xb1\x01\xb6\x20\x20)");
+	// Assert
+	ASSERT_TRUE(expected == actual);
+}
+TEST(bytes, rjust)
+{
+	// Arrange
+	auto b = bytes(R"(\xb1\x01\xb6)");
+
+	// Act
+	bytes actual = MEM_FUN(b, rjust).A(5));
+	bytes expected(R"(\x20\x20\xb1\x01\xb6)");
+	// Assert
+	ASSERT_TRUE(expected == actual);
 }
