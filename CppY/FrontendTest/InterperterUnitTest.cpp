@@ -143,7 +143,7 @@ TEST(BlockParser, class_Defs)
             DeprecationWarning, stacklevel=2)
         super(ComplexFormat, self).__init__(*args, **kwargs))";
 
-	std::vector<std::string> lines = pyStr(classDef).split();
+	std::vector<std::string> lines = pyStr(classDef).split("\n");
     // Act
     auto cppBlock = blockparser.ParseBlock(lines);
     // Assert

@@ -29,7 +29,7 @@ namespace py
 	{
 		EXPLICIT_COMPARE(Type(), other.Type());
 		pyTuple const* otherPtr = reinterpret_cast<pyTuple const*>(&other);
-		pyList::operator <(other);
+		return pyList::operator <(other);
 	}
 
 }

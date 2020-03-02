@@ -11,30 +11,6 @@ namespace py
 	class ICommand;
 	typedef std::shared_ptr<ICommand> ICommandPtr;
 	
-	class VariablesMetaData;
-	typedef std::shared_ptr<VariablesMetaData> VariablesMetaDataPtr;
-	class VariablesMetaData
-	{
-	public:
-		// Returns true if this name is a new one that wasn't previously defined.
-		// Returns false otherwise.
-		bool IsDefined(std::string const& varName)
-		{
-			bool isDefinedInMe = (0 < std::count(_currentScopeVars.begin(), _currentScopeVars.end(), varName));
-			bool isDefinedInParent = _parentScopeMD && _parentScopeMD->IsDefined(varName);
-			return (!(isDefinedInMe || isDefinedInParent));
-		}
-
-		void Add(std::string const& varName)
-		{
-			_currentScopeVars.push_back(varName);
-		}
-
-	protected:
-		VariablesMetaDataPtr _parentScopeMD;
-		std::vector<std::string> _currentScopeVars;
-	};
-	
 	class PyLineParser
 	{
 	public:
@@ -65,6 +41,8 @@ namespace py
 		virtual ICommandPtr Clone() const = 0;
 	
 		virtual bool IsToSemicolon() const { return true; }
+		virtual std::string ScopeEndHook() const { return ""; }
+
 	protected:
 		// default impl. for almost all commands:
 		virtual std::vector<std::string> GetMyVariables() const {return std::vector<std::string>();}
@@ -511,25 +489,33 @@ namespace py
 		virtual std::string Translate_inner() const override;
 	};
 
+	//////////////////////////////////
+	// FUN DEFS AND CLASSES			//
+	//////////////////////////////////
+	COMMAND_CLASS(FunDef, RegexBasedCommand)
+	public:
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
+		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return false; }
+		virtual std::string ScopeEndHook() const;
+	public:
+		std::string Name;
+		std::string DocString;
+		std::vector<std::pair<std::string, std::string>> Params;
+	};
 
-	//////////////////////////////////
-	// CLASSES						//
-	//////////////////////////////////
 	COMMAND_CLASS(ClassDef, RegexBasedCommand)
 	public:
 		virtual std::string GetRegexString() const override;
 		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
+		virtual std::string ScopeEndHook() const;
 	public:
 		std::string ClassName;
 		std::string ParentName;
 	};
 	
-	class test
-	{
-		//class ComplexFloatingFormat(object):
-
-	};
 }
 

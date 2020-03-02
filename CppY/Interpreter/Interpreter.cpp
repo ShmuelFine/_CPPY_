@@ -380,6 +380,47 @@ namespace py
 	std::string Else_Statement::Translate_inner() const { return "else"; }
 
 	/////////////////
+	std::string FunDef::GetRegexString() const
+	{
+		return R"(def\s+(\w+)\s*\((.*?)\)\:\s+("{3}|'{3})([\w\s\W]*?)("{3}|'{3}))";
+	}
+
+	void FunDef::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
+	{
+		Name = matches[1];
+		pyStr allParams_str = matches[2].str();
+		DocString = matches[4].str();
+		auto params = allParams_str.split(",");
+		for (pyStr param : params)
+		{
+			auto parts = param.split("=");
+			if (parts.size() == 1)
+				parts.push_back("");
+
+			Params.push_back(std::make_pair(parts[0], parts[1]));
+		}
+	}
+
+	std::string FunDef::Translate_inner() const
+	{
+		auto result = "FUN_DEF(" + Name + ");";
+		for (auto paramPair : Params)
+		{
+			result += R"(\nPARAM()" + paramPair.first + "," + paramPair.second + ");";
+		}
+		return result;
+	}
+
+	std::string FunDef::ScopeEndHook() const
+	{
+		throw "";
+		//std::map<std::string, pyObjPtr> m = { {"__doc__", "hello"}  };
+		//return "END_FUN_WITH_ATTR(" + Name + ");";
+	}
+
+
+	////////////////////
+
 	std::string ClassDef::GetRegexString() const
 	{
 		return R"(class\s+(\w+)(\(\w+\))?\:)";
@@ -389,12 +430,11 @@ namespace py
 	{
 		ClassName = matches[1];
 		ParentName = matches.size() > 2 ? matches[2].str() : "";
-		return;
 	}
 
 	std::string ClassDef::Translate_inner() const 
 	{ 
-		auto result = "class" + ClassName;
+		auto result = "class " + ClassName;
 		if (ParentName.empty())
 		{
 			result += " : public object";
@@ -403,14 +443,26 @@ namespace py
 		{
 			result += " : public " + ParentName;
 		}
-		result += R"(
-		{
-		public:
-			)" + ClassName + R"(();
-		protected:
-			void AddAttributes();
-		};)";
+		result += 
+R"(
+{
+public:
+	)" + ClassName + R"(();
+protected:
+	void AddAttributes();
+};)";
 		return result;
+	}
+
+
+	std::string ClassDef::ScopeEndHook() const
+	{
+		return
+ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
+{
+	AddAttributes();
+})";
+
 	}
 
 	/////////////////
@@ -432,6 +484,9 @@ namespace py
 		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
+
+		ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
+
 
 		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<InnerScope_SquareBraces_Escaper					>((PyLineParser *)this));

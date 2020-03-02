@@ -7,8 +7,6 @@ namespace py
 	PyBlockParser::PyBlockParser(std::string const& newLine)
 		:LineParser(new PyLineParser()), ENDL(newLine)
 	{
-		ScopeMDs_Stack.push_back(VariablesMetaDataPtr(new VariablesMetaData()));
-		Indintations.push_back(0);
 	}
 	
 	string PyBlockParser::ParseBlock(vector<string> const lines)
@@ -21,23 +19,25 @@ namespace py
 			return string();
 
 		THROW_UNLESS(commands[0]->Indentation.size() == 0, "First command should start from zero indentation.");
-		
+		Indintations.push_back(Indentation(0, commands[0]));
+
 		string str = "";
 		for (int cmdIdx = 0; cmdIdx < commands.size(); cmdIdx++)
 		{
 			// Handle scopes:
-			int prevIndentation = Indintations.back();
+			auto prevIndentation = Indintations.back();
 			int currIndentation = commands[cmdIdx]->Indentation.length();
-			if (currIndentation > prevIndentation)
+			if (currIndentation > prevIndentation.SpacesAmount)
 			{
 				str += "{" + ENDL;
-				Indintations.push_back(currIndentation);
+				Indintations.push_back(Indentation(currIndentation, commands[cmdIdx]));
 			}
-			else if (currIndentation < prevIndentation)
+			else if (currIndentation < prevIndentation.SpacesAmount)
 			{
 				str += string(currIndentation, ' ') + "}" + ENDL;
+				str += prevIndentation.ScopeStarter->ScopeEndHook();
 				Indintations.pop_back();
-				THROW_UNLESS(currIndentation == Indintations.back(), "Not allwoed indentation");
+				THROW_UNLESS(currIndentation == Indintations.back().SpacesAmount, "Not allwoed indentation");
 			}
 			
 			// Predefine variables:
@@ -60,7 +60,7 @@ namespace py
 
 		for (int i = Indintations.size() - 2; i >= 0; i--)
 		{
-			str += string(Indintations[i], ' ') + "}" + ENDL;
+			str += string(Indintations[i].SpacesAmount, ' ') + "}" + ENDL;
 		}
 		return str;
 	}

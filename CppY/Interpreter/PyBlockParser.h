@@ -4,6 +4,14 @@
 
 namespace py
 {
+	struct Indentation
+	{
+	public:
+		int SpacesAmount;
+		ICommandPtr ScopeStarter;
+		Indentation(int size, ICommandPtr cmd) : SpacesAmount(size), ScopeStarter(cmd) {}
+	};
+
 	class PyBlockParser
 	{
 		std::string ENDL;
@@ -13,8 +21,7 @@ namespace py
 	public:
 		PyParserPtr LineParser;
 
-		std::vector<VariablesMetaDataPtr> ScopeMDs_Stack;
-		std::vector<int> Indintations;
+		std::vector<Indentation> Indintations;
 	};
 
 }
