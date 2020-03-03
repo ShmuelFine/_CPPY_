@@ -99,12 +99,15 @@ namespace py
 	{
 		return Line;
 	}
+	
+	std::string EmptyLine::Translate_inner() const
+	{
+		return "";
+	}
 
 	ICommandPtr GetEmptyCommand()
 	{
-		auto dummy = std::make_shared<SameLine>();
-		dummy->ParsePy("");
-		return dummy;
+		return std::make_shared<EmptyLine>(nullptr);
 	}
 
 	bool TwoSidesOperator::CanParse(std::string const& line) const
@@ -395,7 +398,8 @@ namespace py
 		if (docString_ptr)
 			return in;
 
-		bool isJustSpacesWithNoContent = pyStr(in->Translate()).strip();
+		auto strippedContent = pyStr(in->Translate()).strip();
+		bool isJustSpacesWithNoContent = ! strippedContent;
 		if (isJustSpacesWithNoContent)
 			return in;
 
@@ -410,8 +414,7 @@ namespace py
 		}
 		else
 		{
-			docString_ptr = std::make_shared<SameLine>();
-			docString_ptr->ParsePy("");
+			docString_ptr = GetEmptyCommand();
 			return in;
 		}
 	}
@@ -445,7 +448,7 @@ namespace py
 		auto result = "FUN_DEF_WITH_DOC(" + Name + ", " + "DocString" + ");";
 		for (auto paramPair : Params)
 		{
-			result += R"(\nPARAM()" + paramPair.first + "," + paramPair.second + ");";
+			result += "\nPARAM(" + paramPair.first + "," + paramPair.second + ");";
 		}
 		return result;
 	}
@@ -534,8 +537,27 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 			addAttrs += "\n\tattr(" + name + ") = " + name + ";";
 
 		addAttrs += "\n}";
+		return ctor + "\n\n" + addAttrs;
 	}
 
+
+	/////////////////
+
+	std::string MemberInvocation::GetRegexString() const
+	{
+		return R"(^([a-zA-Z_]\w+)\.([a-zA-Z_]\w+))";
+	}
+
+	void MemberInvocation::ParsePy_inner_byRegex(std::string const& line, std::smatch& matches)
+	{
+		VarName = matches[1];
+		MemberName = matches[2];
+	}
+
+	std::string MemberInvocation::Translate_inner() const
+	{
+		return VarName + ".attr(" + MemberName + ")";
+	}
 	/////////////////
 
 
@@ -556,8 +578,8 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<FunDef								>((PyLineParser*)this));
-		//ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<FunDef											>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
 
 
 		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));

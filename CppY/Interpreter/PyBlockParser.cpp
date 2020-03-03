@@ -63,7 +63,7 @@ namespace py
 
 		}
 
-		for (size_t i = ScopesStack.size() - 2; i >= 0; i--)
+		for (int i = ScopesStack.size() - 2; i >= 0; i--)
 		{
 			str += string(ScopesStack[i].SpacesAmount, ' ') + "}" + ENDL;
 		}

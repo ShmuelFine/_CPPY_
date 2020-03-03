@@ -500,6 +500,12 @@ namespace py
 		virtual std::string Translate_inner() const override;
 	};
 
+	COMMAND_CLASS(EmptyLine, SameLine)
+	public:
+		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return false; }
+	};
+
 	ICommandPtr GetEmptyCommand();
 	//////////////////////////////////
 	// FUN DEFS						//
@@ -551,6 +557,18 @@ namespace py
 		std::string ClassName;
 		std::string ParentName;
 		std::shared_ptr<ClassDef_Scope_PostProcessor> InnerScopeProcessor;
+	};
+
+
+	
+	COMMAND_CLASS(MemberInvocation, RegexBasedCommand)
+	public:
+		virtual std::string GetRegexString() const override;
+		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch& matches) override;
+		virtual std::string Translate_inner() const override;
+	public:
+		std::string VarName;
+		std::string MemberName;
 	};
 	
 }

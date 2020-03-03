@@ -136,7 +136,7 @@ TEST(BlockParser, funDefWithDocString)
     // Arrange
     PyBlockParser blockparser("\n");
     std::vector<std::string> lines = {
-R"(def __init__(self, A, B):)"
+R"(def __init__(self, A, B):)",
 R"(     """ this is doc string """ )",
 R"(     pass)" };
 
