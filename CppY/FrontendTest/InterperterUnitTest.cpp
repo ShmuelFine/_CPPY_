@@ -144,19 +144,15 @@ R"(     pass)" };
     auto cppBlock = blockparser.ParseBlock(lines);
     // Assert
     std::string expected =
-        R"(object x;
-x = 5;
-if (x > 8)
+        R"(FUN_DEF(__init__);
+PARAM(self,);
+PARAM(A,);
+PARAM(B,);
 {
-   print(ARGS("hello"));
+
+     pass;
 }
-else
-{
-   object y;
-   y = 8;
-   print(ARGS(x + y));
-}
-)";
+END_FUN_WITH_DOC_STR(__init__,      """ this is doc string """ );)";
     EXPECT_EQ(cppBlock, expected);
 
 }
