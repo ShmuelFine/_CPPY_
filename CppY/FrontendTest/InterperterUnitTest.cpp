@@ -157,3 +157,27 @@ END_FUN_WITH_DOC_STR(__init__,      """ this is doc string """ );)";
 
 }
 
+TEST(BlockParser, funDefWith_NO_DocString)
+{
+    // Arrange
+    PyBlockParser blockparser("\n");
+    std::vector<std::string> lines = {
+R"(def __init__(self, A, B):)",
+R"(     pass)" };
+
+    // Act
+    auto cppBlock = blockparser.ParseBlock(lines);
+    // Assert
+    std::string expected =
+        R"(FUN_DEF(__init__);
+PARAM(self,);
+PARAM(A,);
+PARAM(B,);
+{
+     pass;
+}
+END_FUN_WITH_DOC_STR(__init__, "");)";
+    EXPECT_EQ(cppBlock, expected);
+
+}
+

@@ -406,7 +406,7 @@ namespace py
 		// here it is. The first line which isn't empty.
 		// Either it's a doc string or we don't have a doc string;
 
-		auto StringLiteral_cmd_Ptr = std::reinterpret_pointer_cast<StringLiterals_OuterScope_EscaperBase>(in);
+		auto StringLiteral_cmd_Ptr = dynamic_cast<StringLiterals_OuterScope_EscaperBase *>(in.get());
 		if (StringLiteral_cmd_Ptr)
 		{
 			docString_ptr = in;
@@ -414,7 +414,8 @@ namespace py
 		}
 		else
 		{
-			docString_ptr = GetEmptyCommand();
+			docString_ptr = std::make_shared<SameLine>(nullptr);
+			docString_ptr->ParsePy(R"("")");
 			return in;
 		}
 	}
@@ -472,7 +473,7 @@ namespace py
 
 	ICommandPtr ClassDef_Scope_PostProcessor::Process(ICommandPtr in)
 	{
-		auto FunDef_cmd_Ptr = std::reinterpret_pointer_cast<FunDef>(in);
+		auto FunDef_cmd_Ptr = dynamic_cast<FunDef *>(in.get());
 		if (FunDef_cmd_Ptr)
 		{
 			FuncNames.push_back(FunDef_cmd_Ptr->Name);
