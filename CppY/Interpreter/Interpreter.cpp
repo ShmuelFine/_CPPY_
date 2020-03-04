@@ -445,7 +445,7 @@ namespace py
 
 	std::string FunDef::Translate_inner() const
 	{
-		auto result = "FUN_DEF_WITH_DOC(" + Name + ", " + "DocString" + ");";
+		auto result = "FUN_DEF(" + Name + ");";
 		for (auto paramPair : Params)
 		{
 			result += "\nPARAM(" + paramPair.first + "," + paramPair.second + ");";

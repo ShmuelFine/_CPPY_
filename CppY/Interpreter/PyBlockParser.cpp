@@ -66,6 +66,9 @@ namespace py
 		for (int i = ScopesStack.size() - 2; i >= 0; i--)
 		{
 			str += string(ScopesStack[i].SpacesAmount, ' ') + "}" + ENDL;
+			str += ScopesStack.back().ScopeStarter->ScopeEndHook();
+			ScopesStack.pop_back();
+
 		}
 		return str;
 	}
