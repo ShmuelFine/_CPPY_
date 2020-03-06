@@ -73,7 +73,7 @@ namespace py {
 	{
 		EXPLICIT_COMPARE(Type(), other.Type());
 
-		pySet const* otherPtr = reinterpret_cast<pySet const*> (&other);
+		pySet const* otherPtr = dynamic_cast<pySet const*> (&other);
 		return ToList() < otherPtr->ToList();
 	}
 

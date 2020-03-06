@@ -98,7 +98,7 @@ namespace py
 		itPos = std::search(itPos,_impl.end(),what.begin(),what.end());
 		newObj = std::copy(withWhat.begin(), withWhat.end(), itPos);
 		}
-		auto asBytes = reinterpret_cast<pyBytes*>(newObj._Ptr->get());
+		auto asBytes = dynamic_cast<pyBytes*>(newObj._Ptr->get());
 		return asBytes->_impl;*/
 		throw;
 	}
@@ -132,8 +132,8 @@ namespace py
 
 	pyTuple pyBytes::partition(pyByte const& delimitor)
 	{
-		/*auto meAsList = reinterpret_cast<pyList*>(this);
-		auto len= reinterpret_cast<pyObj*>(meAsList->_impl.size());
+		/*auto meAsList = dynamic_cast<pyList*>(this);
+		auto len= dynamic_cast<pyObj*>(meAsList->_impl.size());
 		auto sep = delimitor.Clone();
 		int sepInd = meAsList->index(sep, 0, len, true);
 		std::vector<unsigned char> vec;

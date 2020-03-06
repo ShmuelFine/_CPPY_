@@ -12,7 +12,7 @@ namespace py
 		FUN_DEF(count);
 		PARAM(self, );
 		PARAM(whatToCount, );
-		auto meAsRange = reinterpret_cast<pyRange*>(self._ptr.get());
+		auto meAsRange = dynamic_cast<pyRange*>(self._ptr.get());
 		int start = meAsRange->_start;
 		int step = meAsRange->_step;
 		int stop = meAsRange->_stop;
@@ -35,7 +35,7 @@ namespace py
 		FUN_DEF(index);
 		PARAM(self, );
 		PARAM(value, );
-		auto meAsRange = reinterpret_cast<pyRange*>(self._ptr.get());
+		auto meAsRange = dynamic_cast<pyRange*>(self._ptr.get());
 		int step = meAsRange->_step;
 		int start = meAsRange->_start;
 		if (count(ARGS(self).A(value)) == 0)
@@ -51,9 +51,9 @@ namespace py
 {
 	void range::AddAttributes()
 	{
-		int startVal = reinterpret_cast<pyRange*>(get())->_start;
-		int stepVal = reinterpret_cast<pyRange*>(get())->_step;
-		int stopVal = reinterpret_cast<pyRange*>(get())->_stop;
+		int startVal = dynamic_cast<pyRange*>(get())->_start;
+		int stepVal = dynamic_cast<pyRange*>(get())->_step;
+		int stopVal = dynamic_cast<pyRange*>(get())->_stop;
 		(*this).attr(start) = pyInt(startVal);
 		(*this).attr(start)._ptr.IsAssignable = false;
 		(*this).attr(step) = pyInt(stepVal);

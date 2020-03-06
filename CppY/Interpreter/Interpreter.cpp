@@ -31,7 +31,7 @@ namespace py
 
 	std::string ICommand::Translate()
 	{
-		return Indentation + Translate_inner() + SuffixSpace;
+		return Indentation + (std::string)pyStr(Translate_inner()).replace("\n", "\n" + Indentation) + SuffixSpace;
 	}
 	
 	std::set<std::string> ICommand::GetVariables() const
@@ -391,11 +391,16 @@ namespace py
 
 	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
 
-	FunDef_Scope_PostProcessor::FunDef_Scope_PostProcessor() : docString_ptr(nullptr) {}
+	FunDef_Scope_PostProcessor::FunDef_Scope_PostProcessor()
+		:IsBeforeFirstMeaningfullLine(true)
+	{
+		docString_ptr = std::make_shared<SameLine>(nullptr);
+		docString_ptr->ParsePy(R"("")");
+	}
 
 	ICommandPtr FunDef_Scope_PostProcessor::Process(ICommandPtr in)
 	{
-		if (docString_ptr)
+		if ( ! IsBeforeFirstMeaningfullLine)
 			return in;
 
 		auto strippedContent = pyStr(in->Translate()).strip();
@@ -405,19 +410,16 @@ namespace py
 
 		// here it is. The first line which isn't empty.
 		// Either it's a doc string or we don't have a doc string;
-
+		IsBeforeFirstMeaningfullLine = false;
 		auto StringLiteral_cmd_Ptr = dynamic_cast<StringLiterals_OuterScope_EscaperBase *>(in.get());
 		if (StringLiteral_cmd_Ptr)
 		{
 			docString_ptr = in;
 			return GetEmptyCommand();
 		}
-		else
-		{
-			docString_ptr = std::make_shared<SameLine>(nullptr);
-			docString_ptr->ParsePy(R"("")");
-			return in;
-		}
+
+		return in;
+
 	}
 
 	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
@@ -469,7 +471,11 @@ namespace py
 
 	///////////////// ///////////////// ///////////////// ///////////////// ///////////////// /////////////////
 
-	ClassDef_Scope_PostProcessor::ClassDef_Scope_PostProcessor() : FuncNames() {}
+	ClassDef_Scope_PostProcessor::ClassDef_Scope_PostProcessor() : FuncNames(), IsBeforeFirstMeaningfullLine(true) 
+	{
+		docString_ptr = std::make_shared<SameLine>(nullptr);
+		docString_ptr->ParsePy(R"("")");
+	}
 
 	ICommandPtr ClassDef_Scope_PostProcessor::Process(ICommandPtr in)
 	{
@@ -477,8 +483,36 @@ namespace py
 		if (FunDef_cmd_Ptr)
 		{
 			FuncNames.push_back(FunDef_cmd_Ptr->Name);
+			IsBeforeFirstMeaningfullLine = false;
+			return in;
 		}
 
+		if (IsBeforeFirstMeaningfullLine)
+		{
+			auto strippedContent = pyStr(in->Translate()).strip();
+			bool isJustSpacesWithNoContent = !strippedContent;
+			if (isJustSpacesWithNoContent)
+				return in;
+
+			// here it is. The first line which isn't empty.
+			IsBeforeFirstMeaningfullLine = false;
+			{
+				auto StringLiteral_cmd_Ptr = dynamic_cast<StringLiterals_OuterScope_EscaperBase*>(in.get());
+				if (StringLiteral_cmd_Ptr)
+				{
+					docString_ptr = in;
+					return GetEmptyCommand();
+				}
+			}
+			//{ Wrong ! Inner string means that something encoses it and therefore its not a comment.
+			//	auto StringLiteral_cmd_Ptr = dynamic_cast<StringLiteral_InnerScope_Base*>(in.get());
+			//	if (StringLiteral_cmd_Ptr)
+			//	{
+			//		docString_ptr = in;
+			//		return GetEmptyCommand();
+			//	}
+			//}
+		}
 		return in;
 	}
 
@@ -536,6 +570,8 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 		
 		for (auto& name : InnerScopeProcessor->FuncNames)
 			addAttrs += "\n\tattr(" + name + ") = " + name + ";";
+		
+		addAttrs += "\n\tattr(__doc__) = " + InnerScopeProcessor->docString_ptr->Translate() + ";";
 
 		addAttrs += "\n}";
 		return ctor + "\n\n" + addAttrs;
@@ -564,6 +600,13 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 
 	PyLineParser::PyLineParser()
 	{
+		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_OuterScope		 	>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_OuterScope	 	>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_OuterScope		 	>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser*)this));
+		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 	>((PyLineParser*)this));
+
 		ParsingChain.push_back(std::make_shared<CommentLine_InnerScope							>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_InnerScope			>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_InnerScope		>((PyLineParser *)this));
@@ -572,12 +615,6 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_InnerScope		>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_InnerScope			>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_OuterScope	 	>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<SingleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<DoubleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_OuterScope		 	>((PyLineParser *)this));
 
 		ParsingChain.push_back(std::make_shared<FunDef											>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));

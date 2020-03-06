@@ -347,50 +347,53 @@ namespace py
 #pragma endregion
 
 	
-#pragma region string literals : outer and inner
+#pragma region string literals and comments : outer and inner
 	//////// STRING LITERALS: Inner /////////////////////
 
 	COMMAND_CLASS(CommentLine_InnerScope,InnerScopeEscaperBase)
 	public:
 		virtual std::string GetRegexString() const override {
-			// Enforce inner expression by the .+ at the beginning:
 			return R"(.*?(\#.*))";
 		}
 		virtual std::string ScopeOpenerRGX() const { return ""; }
 		virtual std::string ScopeCloserRGX() const { return ""; }
 	};
+	
+	COMMAND_INTERFACE(StringLiteral_InnerScope_Base, InnerScopeEscaperBase)
+		// This class is for convinence of parsing.
+	};
 
-	COMMAND_CLASS(TripleQuote_StringLiteral_InnerScope,InnerScopeEscaperBase)
+	COMMAND_CLASS(TripleQuote_StringLiteral_InnerScope,StringLiteral_InnerScope_Base)
 	public:
 		virtual std::string ScopeOpenerRGX() const { return R"(''')"; }
 		virtual std::string ScopeCloserRGX() const { return R"(''')"; }
 	};
 
-	COMMAND_CLASS(TripleDoubleQuote_StringLiteral_InnerScope,InnerScopeEscaperBase)
+	COMMAND_CLASS(TripleDoubleQuote_StringLiteral_InnerScope,StringLiteral_InnerScope_Base)
 	public:
 		virtual std::string ScopeOpenerRGX() const { return R"(""")"; }
 		virtual std::string ScopeCloserRGX() const { return R"(""")"; }
 	};
 
-	COMMAND_CLASS(SingleQuote_REAL_StringLiteral_InnerScope,InnerScopeEscaperBase)
+	COMMAND_CLASS(SingleQuote_REAL_StringLiteral_InnerScope,StringLiteral_InnerScope_Base)
 	public:
 		virtual std::string ScopeOpenerRGX() const { return R"(r')"; }
 		virtual std::string ScopeCloserRGX() const { return R"(')"; }
 	};
 
-	COMMAND_CLASS(SingleQuote_StringLiteral_InnerScope,InnerScopeEscaperBase)
+	COMMAND_CLASS(SingleQuote_StringLiteral_InnerScope,StringLiteral_InnerScope_Base)
 	public:
 		virtual std::string ScopeOpenerRGX() const { return R"(')"; }
 		virtual std::string ScopeCloserRGX() const { return R"(')"; }
 	};
 
-	COMMAND_CLASS(DoubleQuote_REAL_StringLiteral_InnerScope,InnerScopeEscaperBase)
+	COMMAND_CLASS(DoubleQuote_REAL_StringLiteral_InnerScope,StringLiteral_InnerScope_Base)
 	public:
 		virtual std::string ScopeOpenerRGX() const { return R"(r")"; }
 		virtual std::string ScopeCloserRGX() const { return R"(")"; }
 	};
 
-	COMMAND_CLASS(DoubleQuote_StringLiteral_InnerScope,InnerScopeEscaperBase)
+	COMMAND_CLASS(DoubleQuote_StringLiteral_InnerScope,StringLiteral_InnerScope_Base)
 	public:
 		virtual std::string ScopeOpenerRGX() const { return R"(")"; }
 		virtual std::string ScopeCloserRGX() const { return R"(")"; }
@@ -514,6 +517,7 @@ namespace py
 	{
 	public:
 		ICommandPtr docString_ptr;
+		bool IsBeforeFirstMeaningfullLine;
 		FunDef_Scope_PostProcessor();
 
 	public:
@@ -540,6 +544,8 @@ namespace py
 	{
 	public:
 		std::vector<std::string> FuncNames;
+		ICommandPtr docString_ptr;
+		bool IsBeforeFirstMeaningfullLine;
 		ClassDef_Scope_PostProcessor();
 
 	public:

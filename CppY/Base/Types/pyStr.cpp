@@ -27,7 +27,7 @@ namespace py
 	{
 		if (Type() != other.Type())
 			return Type() < other.Type();
-		pyStr const * otherPtr = reinterpret_cast<pyStr const *>(&other);
+		pyStr const * otherPtr = dynamic_cast<pyStr const *>(&other);
 		return (string)_impl < (string)*otherPtr;
 	}
 
@@ -174,9 +174,14 @@ namespace py
 
 	pyStr pyStr::replace(const char& what, const char& withWhat)
 	{
-		auto pyStr = _impl;
-		std::replace(pyStr.begin(), pyStr.end(), what, withWhat);
-		return pyStr;
+		auto result = _impl;
+		std::replace(result.begin(), result.end(), what, withWhat);
+		return result;
+	}
+
+	pyStr pyStr::replace(std::string const & what_rgx, std::string const & withWhat)
+	{
+		return std::regex_replace(_impl, std::regex(what_rgx), withWhat);
 	}
 
 	std::vector<std::string> pyStr::chars()

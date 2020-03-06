@@ -52,7 +52,7 @@ namespace py
 		virtual bool operator <(pyObj const& other) const override
 		{
 			EXPLICIT_COMPARE(Type(), other.Type());
-			pyRange const* otherPtr = reinterpret_cast<pyRange const*>(&other);
+			pyRange const* otherPtr = dynamic_cast<pyRange const*>(&other);
 			EXPLICIT_COMPARE(_start, otherPtr->_start);
 			EXPLICIT_COMPARE(_stop, otherPtr->_stop);
 			EXPLICIT_COMPARE(_step, otherPtr->_step);

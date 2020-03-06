@@ -23,7 +23,7 @@ namespace py
 		PARAM(value, );
 		PARAM(start, None);
 		PARAM(stop, None);
-		auto meAsTuple = reinterpret_cast<pyTuple*>(self._ptr.get());
+		auto meAsTuple = dynamic_cast<pyTuple*>(self._ptr.get());
 		if (is_ofType(start, None))
 			start = 0;
 		if (is_ofType(stop, None))
@@ -39,7 +39,7 @@ namespace py
 	{
 
 		//doesn't really belong here but trying to DRY the code
-		auto myTuple = reinterpret_cast<pyTuple*>(get());
+		auto myTuple = dynamic_cast<pyTuple*>(get());
 
 		for (pyObjPtr& elem : myTuple->_impl)
 			elem.IsAssignable = false;

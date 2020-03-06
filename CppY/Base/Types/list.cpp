@@ -11,7 +11,7 @@ namespace py
 		PARAM(whatToCount, );
 		PARAM(start, None);
 		PARAM(end, None);
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		if (is_ofType(start, None))
 			start = 0;
 		if (is_ofType(end, None))
@@ -39,14 +39,14 @@ namespace py
 
 		FUN_DEF(clear);
 		PARAM(self, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		meAsList->_impl.clear();
 		END_FUN(clear);
 
 		// '', 'copy', '', '', '-index-', '-insert-', '-pop-', '-remove-', 'reverse', '-sort-'
 		FUN_DEF(sort);
 		PARAM(self, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		std::sort(meAsList->_impl.begin(), meAsList->_impl.end(),
 			[](pyObjPtr const& a, pyObjPtr const& b) { return (*a) < (*b); });
 
@@ -55,7 +55,7 @@ namespace py
 		FUN_DEF(pop);
 		PARAM(self, );
 		PARAM(indexObj, -1);
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		int index = indexObj;
 		return meAsList->pop(index);
 		END_FUN(pop);
@@ -64,14 +64,14 @@ namespace py
 		PARAM(self, );
 		PARAM(indexObj, );
 		PARAM(obj, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		meAsList->insert(indexObj, obj);
 		END_FUN(insert);
 
 		FUN_DEF(remove);
 		PARAM(self, );
 		PARAM(x, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		meAsList->remove(x);
 		END_FUN(remove);
 
@@ -80,7 +80,7 @@ namespace py
 		PARAM(x, );
 		PARAM(i, None);
 		PARAM(j, None);
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		if (is_ofType(i, None))
 			i = 0;
 		if (is_ofType(j, None))
@@ -93,7 +93,7 @@ namespace py
 		PARAM(x, );
 		PARAM(i, None);
 		PARAM(j, None);
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		if (is_ofType(i, None))
 			i = 0;
 		if (is_ofType(j, None))
@@ -103,19 +103,19 @@ namespace py
 
 		FUN_DEF(reverse);
 		PARAM(self, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		meAsList->reverse();
 		END_FUN(reverse);
 
 		FUN_DEF(copy);
 		PARAM(self, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		return meAsList->copy();
 		END_FUN(copy);
 
 		FUN_DEF(__len__);
 		PARAM(self, );
-		auto meAsList = reinterpret_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
 		return meAsList->_impl.size();
 		END_FUN(__len__);
 	}

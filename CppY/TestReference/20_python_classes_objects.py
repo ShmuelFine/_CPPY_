@@ -11,6 +11,7 @@ print(p1.x)
 
 # The __init__() Function
 class Person:
+	"""THIS IS A PERSON"""
     def __init__(self, name, age):
         self.name = name
         self.age = age

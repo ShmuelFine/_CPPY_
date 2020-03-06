@@ -28,7 +28,7 @@ namespace py
 	bool pyTuple::operator < (pyObj const& other) const
 	{
 		EXPLICIT_COMPARE(Type(), other.Type());
-		pyTuple const* otherPtr = reinterpret_cast<pyTuple const*>(&other);
+		pyTuple const* otherPtr = dynamic_cast<pyTuple const*>(&other);
 		return pyList::operator <(other);
 	}
 

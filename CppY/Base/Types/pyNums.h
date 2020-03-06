@@ -57,10 +57,10 @@ namespace py
 
 		operator T() { return val; }
 
-		virtual pyObjPtr  operator +(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val + (reinterpret_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
-		virtual pyObjPtr  operator -(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val - (reinterpret_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
-		virtual pyObjPtr  operator *(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val * (reinterpret_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
-		virtual pyObjPtr  operator /(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val / (reinterpret_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual pyObjPtr  operator +(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val + (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual pyObjPtr  operator -(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val - (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual pyObjPtr  operator *(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val * (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual pyObjPtr  operator /(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val / (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
 
 
 	};
@@ -95,7 +95,7 @@ namespace py
 		virtual pyObjPtr Clone() const override { return std::make_shared<Bool>(val); }
 		virtual bool operator <(pyObj const& other) const override {
 			EXPLICIT_COMPARE(Type(), other.Type());
-			return val < (reinterpret_cast<Bool const*>(&other))->val;
+			return val < (dynamic_cast<Bool const*>(&other))->val;
 		}
 
 		virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; }

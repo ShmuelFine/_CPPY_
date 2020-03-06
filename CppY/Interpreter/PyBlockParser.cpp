@@ -29,7 +29,7 @@ namespace py
 			size_t currIndentation = commands[cmdIdx]->Indentation.length();
 			if (currIndentation > prevIndentation.SpacesAmount)
 			{
-				str += "{" + ENDL;
+				str += prevIndentation.ScopeStarter->Indentation + "{" + ENDL;
 				ScopesStack.push_back(ScopeMetaData(currIndentation, commands[cmdIdx-1]));
 			}
 			else if (currIndentation < prevIndentation.SpacesAmount)

@@ -16,6 +16,12 @@
 namespace py
 {
 #define CHECK_PTR THROW_UNLESS(get(), "Can't invoke null object")
+#define INIT_PTR
+
+//{\
+//	if (_ptr->attributes.count("__init__"))\
+//		(*(_ptr->attributes["__init__"]))(*_ptr);\
+//}
 
 	class object
 	{
@@ -25,19 +31,19 @@ namespace py
 
 
 	public:
-		object()						: _ptr(_tmp_impl)	{ _ptr = pyObjPtr(new pyInt(0)); }
+		object() : _ptr(_tmp_impl) { _ptr = pyObjPtr(new pyInt(0)); INIT_PTR; }
+
 		object(pyObjPtr const& other)	: _ptr(_tmp_impl)	{ _ptr = other; }
 		object(pyObjPtr& other)			: _ptr(other)		{ _tmp_impl = nullptr; }
 		object(pyObj const& other)		: _ptr(_tmp_impl)	{ _ptr = other.Clone(); }
 
-		object(int i)					: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyInt(i))		;}
-		object(float i)					: _ptr(_tmp_impl){_ptr = pyObjPtr(new Float(i))	;}
-		object(double i)				: _ptr(_tmp_impl){_ptr = pyObjPtr(new Double(i))	;}
-		object(std::string const& i)	: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyStr(i))	;}
-
-		object(const char * i)			: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyStr(i))	;}
-		object(size_t sz)				: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyInt((int)sz))	;}
-		object(uint8_t i) : _ptr(_tmp_impl) { _ptr = pyObjPtr(new pyByte(i)); }
+		object(int i)					: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyInt(i))		;INIT_PTR;}
+		object(float i)					: _ptr(_tmp_impl){_ptr = pyObjPtr(new Float(i))	;INIT_PTR;}
+		object(double i)				: _ptr(_tmp_impl){_ptr = pyObjPtr(new Double(i))	;INIT_PTR;}
+		object(std::string const& i)	: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyStr(i))	;INIT_PTR;}
+		object(const char * i)			: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyStr(i))	;INIT_PTR;}
+		object(size_t sz)				: _ptr(_tmp_impl){_ptr = pyObjPtr(new pyInt((int)sz))	;INIT_PTR;}
+		object(uint8_t i)				: _ptr(_tmp_impl) { _ptr = pyObjPtr(new pyByte(i)); INIT_PTR;}
 
 		object(object const& other)		: _ptr(_tmp_impl) { _ptr = other._ptr; }
 

@@ -13,13 +13,13 @@ namespace py
 		FUN_DEF(add);
 		PARAM(self, );
 		PARAM(o, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
 		meAsSet->_impl.insert(o);
 		END_FUN(add);
 
 		FUN_DEF(clear);
 		PARAM(self, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
 		meAsSet->_impl.clear();
 		END_FUN(clear);
 
@@ -31,69 +31,69 @@ namespace py
 		FUN_DEF(difference);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		return pyObjPtr(meAsSet->difference(*other));
 		END_FUN(difference);
 
 		FUN_DEF(discard);
 		PARAM(self, );
 		PARAM(value, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
 		meAsSet->_impl.erase(value);
 		END_FUN(discard);
 
 		FUN_DEF(difference_update);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		meAsSet->difference_update(*other);
 		END_FUN(difference_update);
 
 		FUN_DEF(intersection);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		return pyObjPtr(meAsSet->intersection(*other));
 		END_FUN(intersection);
 
 		FUN_DEF(intersection_update);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		meAsSet->intersection_update(*other);
 		END_FUN(intersection_update);
 
 		FUN_DEF(issuperset);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		return meAsSet->issuperset(*other);
 		END_FUN(issuperset);
 
 		FUN_DEF(isdisjoint);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		return meAsSet->isdisjoint(*other);
 		END_FUN(isdisjoint);
 
 		FUN_DEF(issubset);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		return meAsSet->issubset(*other);
 		END_FUN(issubset);
 
 		FUN_DEF(pop);
 		PARAM(self, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
 		object o = *(meAsSet->_impl.begin());
 		meAsSet->_impl.erase(meAsSet->_impl.begin());
 		return o;
@@ -102,39 +102,39 @@ namespace py
 		FUN_DEF(set_union);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pyList*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pyList*>(others._ptr.get());
 		return pyObjPtr(meAsSet->setUnion(*other));
 		END_FUN(set_union);
 
 		FUN_DEF(symmetric_difference);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		return pyObjPtr(meAsSet->symmetric_difference(*other));
 		END_FUN(symmetric_difference);
 
 		FUN_DEF(symmetric_difference_update);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		meAsSet->symmetric_difference_update(*other);
 		END_FUN(symmetric_difference_update);
 
 		FUN_DEF(remove);
 		PARAM(self, );
 		PARAM(o, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
 		meAsSet->remove(o);
 		END_FUN(remove);
 
 		FUN_DEF(update);
 		PARAM(self, );
 		PARAM(others, );
-		auto meAsSet = reinterpret_cast<pySet*>(self._ptr.get());
-		auto other = reinterpret_cast<pySet*>(others._ptr.get());
+		auto meAsSet = dynamic_cast<pySet*>(self._ptr.get());
+		auto other = dynamic_cast<pySet*>(others._ptr.get());
 		*meAsSet  = pySet(meAsSet->setUnion(*other));
 		END_FUN(update);
 	}

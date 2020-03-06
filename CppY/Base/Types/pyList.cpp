@@ -57,7 +57,7 @@ namespace py
 	{
 		EXPLICIT_COMPARE(Type(), other.Type());
 
-		pyList const* otherPtr = reinterpret_cast<pyList const*>(&other);
+		pyList const* otherPtr = dynamic_cast<pyList const*>(&other);
 		if (_impl.empty() && !otherPtr->_impl.empty())
 			return true;
 
@@ -126,7 +126,7 @@ namespace py
 
 	pyObj& pyList::operator += (pyObj const& other)
 	{
-		pyList const* otherPtr = reinterpret_cast<pyList const*>(&other);
+		pyList const* otherPtr = dynamic_cast<pyList const*>(&other);
 		if (!otherPtr)
 			NOT_SUPPORTED_PAIR(other);
 
@@ -217,7 +217,7 @@ namespace py
 	//	pyList dummyList;
 	//	if (v->Type() == dummyList.Type())
 	//	{
-	//		pyList const* l = reinterpret_cast<pyList const*>(v.get());
+	//		pyList const* l = dynamic_cast<pyList const*>(v.get());
 	//		if (l)
 	//		{
 	//			for (auto element : *l)
@@ -261,7 +261,7 @@ namespace py
 	//{
 	//	EXPLICIT_COMPARE(Type(), other.Type());
 
-	//	pySet const* otherPtr = reinterpret_cast<pySet const*> (&other);
+	//	pySet const* otherPtr = dynamic_cast<pySet const*> (&other);
 	//	return ToList() < otherPtr->ToList();
 	//}
 

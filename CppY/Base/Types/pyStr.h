@@ -88,6 +88,7 @@ namespace py
 		pyStr strip();
 		std::vector<std::string> split(std::string const & delim = R"(\s+)", int maxsplit = -1);
 		pyStr replace(const char& what, const char& withWhat);
+		pyStr replace(std::string const& what, std::string const & withWhat);
 
 	};
 }

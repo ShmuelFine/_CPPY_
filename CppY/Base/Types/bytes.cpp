@@ -83,6 +83,7 @@ namespace py
 		PARAM(what, );
 		PARAM(start, None);
 		PARAM(end, None);
+		// TODO: All those reinterpret_cast should be in face dynamic_cast !
 		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
 		auto sub = reinterpret_cast<pyBytes*>(what._ptr.get());
 		if (is_ofType(start, None))

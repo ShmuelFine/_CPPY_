@@ -181,3 +181,30 @@ END_FUN_WITH_DOC_STR(__init__, "");)";
 
 }
 
+TEST(BlockParser, class_DefWith_DocString)
+{
+    // Arrange
+    PyBlockParser blockparser("\n");
+    std::vector<std::string> lines = {
+R"(class Person:)"                     ,
+R"(    """THIS IS A PERSON""")"           ,
+R"(    def __init__(self, name, age):)",
+R"(        self.name = name)"          ,
+R"(        self.age = age)"            ,
+};
+
+    // Act
+    auto cppBlock = blockparser.ParseBlock(lines);
+    // Assert
+    std::string expected =
+        R"(FUN_DEF(__init__);
+PARAM(self,);
+PARAM(A,);
+PARAM(B,);
+{
+     pass;
+}
+END_FUN_WITH_DOC_STR(__init__, "");)";
+    EXPECT_EQ(cppBlock, expected);
+
+}
