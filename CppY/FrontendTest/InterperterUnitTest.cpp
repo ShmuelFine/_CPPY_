@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "..\Interpreter\Interpreter.h"
 #include "..\Interpreter\PyBlockParser.h"
+#include "..\Interpreter\PyLineSplitter.h"
 #include "..\Base\Types\pyStr.h"
+#include <fstream>
 
 using namespace py;
 
@@ -207,4 +209,37 @@ PARAM(B,);
 END_FUN_WITH_DOC_STR(__init__, "");)";
     EXPECT_EQ(cppBlock, expected);
 
+}
+
+
+TEST(BlockParser, ACTUAL_WORK)
+{
+    using namespace std;
+
+    // Arrange
+    PyBlockParser blockparser("\n");
+    PyLineAggregator lineAgg;
+
+
+    auto fileName = R"(C:\Dev\Stabilization\MeshFlow4Android\Orig\RT_Stab.py)";
+    ifstream ifs(fileName);
+
+    string line;
+    vector<string> pyLines;
+    while (getline(ifs, line))
+    {
+        lineAgg.Append(line);
+        if (lineAgg.IsComplete())
+        {
+            pyLines.push_back(lineAgg.Line);
+            lineAgg = PyLineAggregator();
+        }
+    }
+    ifs.close();
+
+    auto cppBlock = blockparser.ParseBlock(pyLines);
+
+    ofstream ofs(R"(C:\Dev\Stabilization\MeshFlow4Android\Cpp\Src\RT_Stab.cpp)");
+    ofs << cppBlock;
+    ofs.close();
 }

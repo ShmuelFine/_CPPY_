@@ -10,7 +10,7 @@ namespace py
 
 	void ICommand::ParsePy(std::string const & line)
 	{
-		std::regex statement(R"(^(\s*)(.+?)(\s*)$)");
+		std::regex statement(R"(^(\s*)(.*)(\s*)$)");
 		if (!std::regex_match(line, statement))
 		{
 			Indentation = "";
@@ -94,6 +94,7 @@ namespace py
 	void SameLine::ParsePy_inner(std::string const &  line)
 	{
 		Line = line;
+		_isToSemicolon = true;
 	}
 	std::string SameLine::Translate_inner() const
 	{
@@ -383,6 +384,15 @@ namespace py
 		return result;
 	}
 
+	std::string CommentLine_OuterScope::Translate_inner() const
+	{
+		pyStr result;
+		result += pyStr(R"(/*)");
+		result += elements ? (pyStr)*elements.FetchByIdx(0) : pyStr("");
+		result += pyStr(R"(*/)");
+		return result;
+	}
+
 	/////////////////
 
 	std::string Else_Statement::GetRegexString() const { return "else\\:"; }
@@ -465,7 +475,7 @@ namespace py
 
 	std::string FunDef::ScopeEndHook() const
 	{		
-		return "END_FUN_WITH_DOC_STR(" + Name + ", " + InnerScopeProcessor->docString_ptr->Translate() + ");";
+		return "END_FUN_WITH_DOC_STR(" + Name + ", " + InnerScopeProcessor->docString_ptr->Translate() + ");\n";
 	}
 
 
@@ -475,18 +485,16 @@ namespace py
 	{
 		docString_ptr = std::make_shared<SameLine>(nullptr);
 		docString_ptr->ParsePy(R"("")");
+
+		auto publicStrPtr = std::make_shared<SameLine>(nullptr);
+		publicStrPtr->ParsePy(R"(public:)");
+		publicStrPtr->_isToSemicolon = false;
+		publicSectionString_ptr = publicStrPtr;
+
 	}
 
 	ICommandPtr ClassDef_Scope_PostProcessor::Process(ICommandPtr in)
 	{
-		auto FunDef_cmd_Ptr = dynamic_cast<FunDef *>(in.get());
-		if (FunDef_cmd_Ptr)
-		{
-			FuncNames.push_back(FunDef_cmd_Ptr->Name);
-			IsBeforeFirstMeaningfullLine = false;
-			return in;
-		}
-
 		if (IsBeforeFirstMeaningfullLine)
 		{
 			auto strippedContent = pyStr(in->Translate()).strip();
@@ -501,18 +509,27 @@ namespace py
 				if (StringLiteral_cmd_Ptr)
 				{
 					docString_ptr = in;
-					return GetEmptyCommand();
+					return publicSectionString_ptr;
 				}
 			}
-			//{ Wrong ! Inner string means that something encoses it and therefore its not a comment.
-			//	auto StringLiteral_cmd_Ptr = dynamic_cast<StringLiteral_InnerScope_Base*>(in.get());
-			//	if (StringLiteral_cmd_Ptr)
-			//	{
-			//		docString_ptr = in;
-			//		return GetEmptyCommand();
-			//	}
-			//}
 		}
+
+		auto FunDef_cmd_Ptr = dynamic_cast<FunDef *>(in.get());
+		if (FunDef_cmd_Ptr)
+		{
+			FuncNames.push_back(FunDef_cmd_Ptr->Name);
+			auto result = in;
+			if (IsBeforeFirstMeaningfullLine)
+			{
+				publicSectionString_ptr->Children.push_back(in);
+				result = publicSectionString_ptr;
+			}
+			IsBeforeFirstMeaningfullLine = false;
+			
+			return result;
+		}
+
+		
 		return in;
 	}
 
@@ -527,27 +544,13 @@ namespace py
 	{
 		ClassName = matches[1];
 		ParentName = matches.size() > 2 ? matches[2].str() : "";
+		if (ParentName.empty())
+			ParentName = "object";
 	}
 
 	std::string ClassDef::Translate_inner() const 
 	{ 
-		auto result = "class " + ClassName;
-		if (ParentName.empty())
-		{
-			result += " : public object";
-		}
-		else
-		{
-			result += " : public " + ParentName;
-		}
-		result += 
-R"(
-{
-public:
-	)" + ClassName + R"(();
-protected:
-	void AddAttributes();
-};)";
+		auto result = "class " + ClassName + " : public " + ParentName;
 		return result;
 	}
 
@@ -560,21 +563,17 @@ protected:
 
 	std::string ClassDef::ScopeEndHook() const
 	{
-		std::string ctor = 
-ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
-{
-	AddAttributes();
-})";
-		std::string addAttrs =
-			"void " + ClassName + "::AddAttributes()" + "\n{";
-		
-		for (auto& name : InnerScopeProcessor->FuncNames)
-			addAttrs += "\n\tattr(" + name + ") = " + name + ";";
-		
-		addAttrs += "\n\tattr(__doc__) = " + InnerScopeProcessor->docString_ptr->Translate() + ";";
 
-		addAttrs += "\n}";
-		return ctor + "\n\n" + addAttrs;
+		std::string ctor =
+			ClassName + "::" + ClassName + "() : " + ParentName + "()"; 
+		
+		ctor += "\n{";
+		for (auto& name : InnerScopeProcessor->FuncNames)
+			ctor += "\n\tattr(" + name + ") = " + name + ";";
+		ctor += "\n\tattr(__doc__) = " + InnerScopeProcessor->docString_ptr->Translate() + ";";
+		ctor += "\n}";
+
+		return ctor + "\n\n};";
 	}
 
 
@@ -600,6 +599,7 @@ ClassName + "::" + ClassName + "() : object(" + ParentName + "())" + R"(
 
 	PyLineParser::PyLineParser()
 	{
+		ParsingChain.push_back(std::make_shared<CommentLine_OuterScope							>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<TripleQuote_StringLiteral_OuterScope		 	>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<TripleDoubleQuote_StringLiteral_OuterScope	 	>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<SingleQuote_REAL_StringLiteral_OuterScope	 	>((PyLineParser*)this));

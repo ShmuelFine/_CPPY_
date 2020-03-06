@@ -144,10 +144,12 @@
   <ItemGroup>
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="PyBlockParser.h" />
+    <ClInclude Include="PyLineSplitter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="PyBlockParser.cpp" />
+    <ClCompile Include="PyLineSplitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Backend\Backend.vcxproj">

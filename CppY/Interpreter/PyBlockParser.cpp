@@ -29,12 +29,12 @@ namespace py
 			size_t currIndentation = commands[cmdIdx]->Indentation.length();
 			if (currIndentation > prevIndentation.SpacesAmount)
 			{
-				str += prevIndentation.ScopeStarter->Indentation + "{" + ENDL;
+				str += string(prevIndentation.SpacesAmount, ' ') + "{" + ENDL;
 				ScopesStack.push_back(ScopeMetaData(currIndentation, commands[cmdIdx-1]));
 			}
 			else if (currIndentation < prevIndentation.SpacesAmount)
 			{
-				str += string(currIndentation, ' ') + "}" + ENDL;
+				str += string(prevIndentation.SpacesAmount, ' ') + "}" + ENDL;
 				str += prevIndentation.ScopeStarter->ScopeEndHook();
 				ScopesStack.pop_back();
 				THROW_UNLESS(currIndentation == ScopesStack.back().SpacesAmount, "Not allwoed indentation");
@@ -63,10 +63,10 @@ namespace py
 
 		}
 
-		for (int i = ScopesStack.size() - 2; i >= 0; i--)
+		for (int i = ScopesStack.size() - 1; i >= 1; i--)
 		{
-			str += string(ScopesStack[i].SpacesAmount, ' ') + "}" + ENDL;
-			str += ScopesStack.back().ScopeStarter->ScopeEndHook();
+			str += string(ScopesStack[i - 1].SpacesAmount, ' ') + "}" + ENDL;
+			str += string(ScopesStack[i - 1].SpacesAmount, ' ') + ScopesStack.back().ScopeStarter->ScopeEndHook();
 			ScopesStack.pop_back();
 
 		}

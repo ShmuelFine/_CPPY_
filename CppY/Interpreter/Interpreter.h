@@ -61,6 +61,7 @@ namespace py
 		virtual ICommandPtr Clone() const = 0;
 	
 		virtual bool IsToSemicolon() const { return true; }
+		virtual std::string ScopeStartHook() const { return ""; }
 		virtual std::string ScopeEndHook() const { return ""; }
 		virtual ICommandPostProcessorPtr ScopeInnerHook() { return std::make_shared<DefaultPostProcessor>(); }
 
@@ -75,7 +76,6 @@ namespace py
 
 		std::vector<ICommandPtr> Children;
 	};
-
 
 	///////////////// ///////////////// /////////////////
 
@@ -99,7 +99,22 @@ namespace py
 		virtual void ParsePy_inner_byRegex(std::string const& line, std::smatch & matches) = 0;
 	};
 
-	/////////////////////////////////
+	///////////////////////////////////
+	//COMMAND_INTERFACE(ChainedCommand, ICommand)
+	//public:
+	//	std::vector<ICommandPtr> _commands;
+	//public:
+	//	ChainedCommand(std::vector<ICommandPtr> commands) : _commands(commands) {}
+	//	virtual bool CanParse(std::string const& line) const { return false; }
+	//	virtual void ParsePy_inner(std::string const& line) {}
+	//	virtual std::string Translate_inner() const
+	//	{
+	//		std::string result = "";
+	//		for (auto& cmd : _commands)
+	//			result += cmd.Translate();
+	//	}
+	//};
+
 #pragma region two sides operators
 	COMMAND_INTERFACE(TwoSidesOperator,ICommand)
 	public:
@@ -352,10 +367,7 @@ namespace py
 
 	COMMAND_CLASS(CommentLine_InnerScope,InnerScopeEscaperBase)
 	public:
-		virtual std::string GetRegexString() const override {
-			return R"(.*?(\#.*))";
-		}
-		virtual std::string ScopeOpenerRGX() const { return ""; }
+		virtual std::string ScopeOpenerRGX() const { return "#"; }
 		virtual std::string ScopeCloserRGX() const { return ""; }
 	};
 	
@@ -411,6 +423,14 @@ namespace py
 		virtual bool IsRealString() const = 0;
 		
 		virtual std::string Translate_inner() const;
+	};
+
+	COMMAND_CLASS(CommentLine_OuterScope, StringLiterals_OuterScope_EscaperBase)
+	public:
+		virtual std::string ScopeOpenerRGX() const { return "#"; }
+		virtual std::string ScopeCloserRGX() const { return ""; }
+		virtual std::string Translate_inner() const;
+		virtual bool IsRealString() const { return false; } // needed just for interface
 	};
 
 	COMMAND_CLASS(TripleQuote_StringLiteral_OuterScope,StringLiterals_OuterScope_EscaperBase)
@@ -498,9 +518,11 @@ namespace py
 	COMMAND_CLASS(SameLine, ICommand)
 	public:
 		std::string Line;
+		bool _isToSemicolon;
 		virtual bool CanParse(std::string const& line) const override;
 		virtual void ParsePy_inner(std::string const & line) override;
 		virtual std::string Translate_inner() const override;
+		virtual bool IsToSemicolon() const { return _isToSemicolon; }
 	};
 
 	COMMAND_CLASS(EmptyLine, SameLine)
@@ -545,6 +567,7 @@ namespace py
 	public:
 		std::vector<std::string> FuncNames;
 		ICommandPtr docString_ptr;
+		ICommandPtr publicSectionString_ptr;
 		bool IsBeforeFirstMeaningfullLine;
 		ClassDef_Scope_PostProcessor();
 
