@@ -111,6 +111,9 @@ namespace py
 
 	std::string pyFormat(std::string const & s);
 
+	std::string ReplaceAll(std::string const& orig, std::string const& pattern, std::string const& replacement, bool isOnlyFirst = false);
+	
+
 	template<typename T, typename... Args>
 	std::string pyFormat(std::string const & s, T value, Args... args)
 	{
@@ -126,9 +129,9 @@ namespace py
 			std::string newS;
 			std::string valueStr = toString(value);
 			if (!nextToken.empty())
-				newS = regex_replace(s, regex("\\{" + nextToken + "\\}"), valueStr);
+				newS = ReplaceAll(s, "{" + nextToken + "}", valueStr);
 			else
-				newS = regex_replace(s, regex("\\{" + nextToken + "\\}"), valueStr, std::regex_constants::format_first_only);
+				newS = ReplaceAll(s, "{" + nextToken + "}", valueStr, /*only first=*/true);
 
 			return pyFormat(newS, args...);
 		}

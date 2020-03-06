@@ -216,6 +216,8 @@ TEST(BlockParser, ACTUAL_WORK)
 {
     using namespace std;
 
+    std::string valueStr = pyStr("({})").format("$123$");
+    
     // Arrange
     PyBlockParser blockparser("\n");
     PyLineAggregator lineAgg;

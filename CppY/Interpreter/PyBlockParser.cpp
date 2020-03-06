@@ -33,6 +33,8 @@ namespace py
 				continue;
 			}
 
+			if (cmdIdx == 21)
+				int kalsd = 0;
 			// Handle scopes:
 			auto prevIndentation = ScopesStack.back();
 			size_t currIndentation = commands[cmdIdx]->Indentation.length();

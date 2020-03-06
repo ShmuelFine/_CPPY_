@@ -179,9 +179,9 @@ namespace py
 		return result;
 	}
 
-	pyStr pyStr::replace(std::string const & what_rgx, std::string const & withWhat)
+	pyStr pyStr::replace(std::string const & what, std::string const & withWhat)
 	{
-		return std::regex_replace(_impl, std::regex(what_rgx), withWhat);
+		return ReplaceAll(_impl, what, withWhat);
 	}
 
 	std::vector<std::string> pyStr::chars()
@@ -294,6 +294,26 @@ namespace py
 
 	std::string pyFormat(std::string const & s)
 	{
+		return s;
+	}
+
+	std::string ReplaceAll(std::string const& orig, std::string const& pattern, std::string const& replacement, bool isOnlyFirst)
+	{
+		auto s = orig;
+		for (size_t pos = 0; pos != std::string::npos; pos += replacement.length())
+		{
+			// Locate the substring to result
+			pos = s.find(pattern, pos);
+			if (pos == std::string::npos)
+				break;
+
+			// Replace by erasing and inserting
+			s.erase(pos, pattern.length());
+			s.insert(pos, replacement);
+			if (isOnlyFirst)
+				break;
+		}
+
 		return s;
 	}
 
