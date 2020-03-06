@@ -1,4 +1,6 @@
 #include "PyBlockParser.h"
+#include "pyStr.h"
+
 using namespace std;
 
 namespace py
@@ -24,6 +26,13 @@ namespace py
 		string str = "";
 		for (int cmdIdx = 0; cmdIdx < commands.size(); cmdIdx++)
 		{
+			// If command is empty don't bother:
+			if (commands[cmdIdx]->IsEmpty())
+			{
+				str += commands[cmdIdx]->Translate();
+				continue;
+			}
+
 			// Handle scopes:
 			auto prevIndentation = ScopesStack.back();
 			size_t currIndentation = commands[cmdIdx]->Indentation.length();
@@ -37,7 +46,7 @@ namespace py
 				str += string(prevIndentation.SpacesAmount, ' ') + "}" + ENDL;
 				str += prevIndentation.ScopeStarter->ScopeEndHook();
 				ScopesStack.pop_back();
-				THROW_UNLESS(currIndentation == ScopesStack.back().SpacesAmount, "Not allwoed indentation");
+				//THROW_UNLESS(currIndentation == ScopesStack.back().SpacesAmount, "Not allwoed indentation");
 			}
 			
 			// PostProcess command:

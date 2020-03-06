@@ -64,6 +64,7 @@ namespace py
 		virtual std::string ScopeStartHook() const { return ""; }
 		virtual std::string ScopeEndHook() const { return ""; }
 		virtual ICommandPostProcessorPtr ScopeInnerHook() { return std::make_shared<DefaultPostProcessor>(); }
+		virtual bool IsEmpty() { return false; }
 
 	protected:
 		// default impl. for almost all commands:
@@ -280,7 +281,7 @@ namespace py
 
 	COMMAND_CLASS(InnerScope_FunctionCall_Escaper,InnerScopeEscaperBase)
 	public:
-		virtual std::string ScopeOpenerRGX() const override { return R"(\W\w+\()"; };
+		virtual std::string ScopeOpenerRGX() const override { return R"([^A-Za-z0-9.][\w\.]+\()"; };
 		virtual std::string ScopeCloserRGX() const override { return R"(\))"; };
 	};
 
@@ -523,12 +524,15 @@ namespace py
 		virtual void ParsePy_inner(std::string const & line) override;
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return _isToSemicolon; }
+		virtual bool IsEmpty() { return std::regex_match(Line, std::regex(R"(^\s*$)")); }
+
 	};
 
 	COMMAND_CLASS(EmptyLine, SameLine)
 	public:
 		virtual std::string Translate_inner() const override;
 		virtual bool IsToSemicolon() const { return false; }
+		virtual bool IsEmpty() { return true; }
 	};
 
 	ICommandPtr GetEmptyCommand();

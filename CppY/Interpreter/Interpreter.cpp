@@ -413,9 +413,9 @@ namespace py
 		if ( ! IsBeforeFirstMeaningfullLine)
 			return in;
 
-		auto strippedContent = pyStr(in->Translate()).strip();
-		bool isJustSpacesWithNoContent = ! strippedContent;
-		if (isJustSpacesWithNoContent)
+		//auto strippedContent = pyStr(in->Translate()).strip();
+		//bool isJustSpacesWithNoContent = ! strippedContent;
+		if (in->IsEmpty())
 			return in;
 
 		// here it is. The first line which isn't empty.
@@ -497,9 +497,9 @@ namespace py
 	{
 		if (IsBeforeFirstMeaningfullLine)
 		{
-			auto strippedContent = pyStr(in->Translate()).strip();
-			bool isJustSpacesWithNoContent = !strippedContent;
-			if (isJustSpacesWithNoContent)
+			//auto strippedContent = pyStr(in->Translate()).strip();
+			//bool isJustSpacesWithNoContent = !strippedContent;
+			if (in->IsEmpty())
 				return in;
 
 			// here it is. The first line which isn't empty.
