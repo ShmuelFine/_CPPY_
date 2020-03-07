@@ -11,3 +11,13 @@
 /CppY/x64/Debug
 /CppY/VSProj/x64/Debug
 /CppY/VSProj/*.user
+/CppY/Backend/x64/Release
+/CppY/Frontend/x64/Release
+/CppY/Base/Types/*.bak
+/CppY/Backend/*.user
+/CppY/MeshFlow/x64/Debug
+/CppY/MeshFlow/x64/Release
+/CppY/x64/Release
+/CppY/MeshFlow/*.user
+/CppY/Interpreter/*.bak
+/CppY/Frontend/*.user

@@ -12,3 +12,9 @@ namespace mf
 	float PIX(cv::Mat const& m, int i, int j);
 
 }
+
+#ifdef _DEBUG
+	#pragma comment(lib, "opencv_world412d.lib")
+#else
+	#pragma comment(lib, "opencv_world412.lib")
+#endif

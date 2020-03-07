@@ -3,20 +3,17 @@
 #include <opencv2/core.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/imgproc.hpp>
+#include <map>
 #include "Utils.h"
-#include "range.h"
+
+//#include "range.h"
 
 using namespace cv;
 using namespace std;
-using namespace py;
+//
 
 namespace mf
 {
-	// block of size : mesh
-	const float PIXELS = 16;
-	;
-	// motion propogation radius                                                                        ;
-	const float RADIUS = 300;
 
 	//@param { H is homography matrix of dimension(3x3)  
 	//@param { pt is the(x, y) point to be transformed   
@@ -52,9 +49,9 @@ namespace mf
 
 		// pre - warping with global homography                                                          
 		Matx33f H = cv::findHomography(old_points, new_points, cv::RANSAC);
-		for (int i : range(rows))
+		for (int i = 0; i < cols; i++)
 		{
-			for (int j : range(cols))
+			for (int j = 0; j < rows; j++)
 			{
 				Vec2f pt(PIXELS * j, PIXELS * i);
 				Vec2f ptrans = point_transform(H, pt);
@@ -65,9 +62,9 @@ namespace mf
 		// disturbute feature motion vectors                                                        
 		std::map<std::pair<int, int>, vector<float>> temp_x_motion;
 		std::map<std::pair<int, int>, vector<float>> temp_y_motion;
-		for (int i : range(rows))
+		for (int i = 0; i < cols; i++)
 		{
-			for (int j : range(cols))
+			for (int j = 0; j < rows; j++)
 			{
 				Vec2f vertex(PIXELS * j, PIXELS * i);
 				for (int pt_idx = 0; pt_idx < min(old_points.size(), new_points.size()); pt_idx++)
@@ -86,8 +83,8 @@ namespace mf
 			}
 		}
 		// apply median filter(f - 1) on obtained motion for each vertex                                
-		Mat x_motion_mesh = Mat::zeros(Size(rows, cols), CV_32FC1);
-		Mat y_motion_mesh = Mat::zeros(Size(rows, cols), CV_32FC1);
+		Mat x_motion_mesh = Mat::zeros(Size(cols, rows), CV_32FC1);
+		Mat y_motion_mesh = Mat::zeros(Size(cols, rows), CV_32FC1);
 		for (auto kvp : x_motion)
 		{
 			auto key = kvp.first;
@@ -165,9 +162,9 @@ namespace mf
 		// define handles on mesh : y-direction
 		Mat map_y = Mat::zeros(frame.size(), CV_32FC1);
 
-		for (int i : range(x_motion_mesh.cols - 1))
+		for (int i = 0; i < x_motion_mesh.cols - 1; i++)
 		{
-			for (int j : range(x_motion_mesh.rows - 1))
+			for (int j = 0; j < x_motion_mesh.rows - 1; j++)
 			{
 				vector<Vec2f> src = {
 					Vec2f(j * PIXELS, i * PIXELS),
@@ -186,9 +183,9 @@ namespace mf
 
 				Matx33f H = cv::findHomography(src, dst, cv::RANSAC);
 
-				for (float k : range(PIXELS* i, PIXELS* (i + 1)))
+				for (float k = PIXELS* i; k <  PIXELS* (i + 1); k++)
 				{
-					for (float l : range(PIXELS* j, PIXELS* (j + 1)))
+					for (float l = PIXELS* j; l <  PIXELS* (j + 1); l++)
 					{
 						float x = H(0, 0) * l + H(0, 1) * k + H(0, 2);
 						float y = H(1, 0) * l + H(1, 1) * k + H(1, 2);
@@ -208,13 +205,13 @@ namespace mf
 			}
 		}
 		// repeat motion vectors for remaining frame : y - direction                                       ;
-		for (float i : range(PIXELS* x_motion_mesh.cols, map_x.cols))
+		for (float i = PIXELS* x_motion_mesh.cols; i <  map_x.cols; i++)
 		{
 			map_x.row(PIXELS * x_motion_mesh.cols - 1).copyTo(map_x.row(i));
 			map_y.row(PIXELS * x_motion_mesh.cols - 1).copyTo(map_y.row(i));
 		}
 		// repeat motion vectors for remaining frame : x - direction                                   ;
-		for (float j : range(PIXELS* x_motion_mesh.rows, map_x.rows))
+		for (float j = PIXELS* x_motion_mesh.rows; j <  map_x.rows; j++)
 		{
 			map_x.col(PIXELS * x_motion_mesh.cols - 1).copyTo(map_x.col(j));
 			map_y.col(PIXELS * x_motion_mesh.cols - 1).copyTo(map_y.col(j));

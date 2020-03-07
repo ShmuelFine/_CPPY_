@@ -8,7 +8,7 @@
 #include <opencv2/video.hpp>
 
 #include "MeshFlow.h"
-#include "range.h"
+//#include "range.h"
 #include "Utils.h"
 #include "Optimization.h"
 
@@ -16,7 +16,7 @@
 
 using namespace cv;
 using namespace std;
-using namespace py;
+
 
 namespace mf
 {
@@ -80,8 +80,6 @@ namespace mf
 	public:
 		VideoCapture cap;
 		shared_ptr<OutVideoWriter> output;
-		int PIXELS;
-		int RADIUS;
 		ShiTomasi_params feature_params;
 		LK_params lk_params;
 
@@ -106,15 +104,15 @@ namespace mf
 		RT_VideoStab(string const& file_name)
 		{
 			this->cap = VideoCapture(file_name);
-			this->output.reset(new OutVideoWriter(this->cap, R"(C:\Dev\Stabilization\MeshFlow4Android\outTest_3)"));
+			this->output.reset(new OutVideoWriter(this->cap, R"(C:\Dev\Stabilization\MeshFlow4Android\outTest_cpp)"));
 
 			// block of size : mesh
-			this->PIXELS = 16;
+			//PIXELS = 16;
 			// motion propogation radius
-			this->RADIUS = 300;
+			//RADIUS = 300;
 			// params for (auto ShiTomasi corner detection
 			this->feature_params.maxCorners = 1000;
-			this->feature_params.qualityLevel = 0.3;
+			this->feature_params.qualityLevel = 0.3f;
 			this->feature_params.minDistance = 7;
 			this->feature_params.blockSize = 7;
 
@@ -137,24 +135,24 @@ namespace mf
 			this->VERTICAL_BORDER = int((this->HORIZONTAL_BORDER * this->ImgSize[1]) / this->ImgSize[0]);
 
 			// path parameters
-			this->VtxGridSize = Vec2i(int(this->ImgSize[0] / this->PIXELS), int(this->ImgSize[1] / this->PIXELS));
+			this->VtxGridSize = Vec2i(int(this->ImgSize[0] / PIXELS), int(this->ImgSize[1] / PIXELS));
 
 			this->x_paths.push_back(Mat::zeros(Size(this->VtxGridSize[0], this->VtxGridSize[1]), CV_32FC1));
 			this->y_paths.push_back(Mat::zeros(Size(this->VtxGridSize[0], this->VtxGridSize[1]), CV_32FC1));
 
 			this->W = Mat::zeros(Size(this->buffer_size, this->buffer_size), CV_32FC1);
-			for (auto i : range(this->buffer_size))
+			for (int i = 0; i < this->buffer_size; i++)
 			{
-				for (auto j : range(this->buffer_size))
+				for (int j = 0; j < this->buffer_size; j++)
 				{
 					PIX(W, i, j) = gauss(i, j, this->window_size);
 				}
 			}
-			for (auto i : range(this->VtxGridSize[0]))
+			for (int i = 0; i < this->VtxGridSize[0]; i++)
 			{
 				vector<RealTimeSinglePathOptimizerPtr> currRow_X, currRow_Y;
 
-				for (auto j : range(this->VtxGridSize[1]))
+				for (int j = 0; j < this->VtxGridSize[1]; j++)
 				{
 					currRow_X.push_back(make_shared<RealTimeSinglePathOptimizer>(i, j, W, this->buffer_size, this->window_size));
 					currRow_Y.push_back(make_shared<RealTimeSinglePathOptimizer>(i, j, W, this->buffer_size, this->window_size));
@@ -174,9 +172,9 @@ namespace mf
 
 		void OptimizePaths()
 		{
-			for (auto i : range(this->VtxGridSize[0]))
+			for (int i = 0; i < this->VtxGridSize[0]; i++)
 			{
-				for (auto j : range(this->VtxGridSize[1]))
+				for (int j = 0; j < this->VtxGridSize[1]; j++)
 				{
 					this->PathOptimizers_x[i][j]->OptimizeNext(this->x_paths);
 					this->PathOptimizers_y[i][j]->OptimizeNext(this->y_paths);
@@ -184,12 +182,12 @@ namespace mf
 			}
 
 			//  sx_paths, sy_paths  are the Y vectors of the optimizers.
-			if (new_x_motion_mesh.empty())
-				new_x_motion_mesh = Mat(Size(this->VtxGridSize[0], this->VtxGridSize[1]), CV_32FC1);
+			if (new_x_motion_mesh.empty()) new_x_motion_mesh = Mat(Size(this->VtxGridSize[0], this->VtxGridSize[1]), CV_32FC1);
+			if (new_y_motion_mesh.empty()) new_y_motion_mesh = Mat(Size(this->VtxGridSize[0], this->VtxGridSize[1]), CV_32FC1);
 
-			for (auto i : range(this->VtxGridSize[0]))
+			for (int i = 0; i < this->VtxGridSize[0]; i++)
 			{
-				for (auto j : range(this->VtxGridSize[1]))
+				for (int j = 0; j < this->VtxGridSize[1]; j++)
 				{
 					PIX(this->new_x_motion_mesh, i, j) = this->PathOptimizers_x[i][j]->Motion.back();
 					PIX(this->new_y_motion_mesh, i, j) = this->PathOptimizers_y[i][j]->Motion.back();

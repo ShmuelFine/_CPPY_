@@ -6,6 +6,12 @@
 
 namespace mf
 {
+	// block of size : mesh
+	static const float PIXELS = 16;
+	;
+	// motion propogation radius                                                                        ;
+	static const float RADIUS = 300;
+
 	void motion_propagate(
 		std::vector<cv::Vec2f> const& old_points,
 		std::vector<cv::Vec2f> const& new_points,
