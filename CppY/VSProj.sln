@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FrontendTest", "FrontendTes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{30F9E52D-C6C9-4AA6-A469-6C637C5DA8FE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshFlow", "MeshFlow\MeshFlow.vcxproj", "{C3110968-5CD3-45FA-B624-AC5915F521F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -83,6 +85,14 @@ Global
 		{610EC914-0885-480E-AEDD-463835C23422}.Release|x64.Build.0 = Release|x64
 		{610EC914-0885-480E-AEDD-463835C23422}.Release|x86.ActiveCfg = Release|Win32
 		{610EC914-0885-480E-AEDD-463835C23422}.Release|x86.Build.0 = Release|Win32
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Debug|x64.ActiveCfg = Debug|x64
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Debug|x64.Build.0 = Debug|x64
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Debug|x86.ActiveCfg = Debug|Win32
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Debug|x86.Build.0 = Debug|Win32
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Release|x64.ActiveCfg = Release|x64
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Release|x64.Build.0 = Release|x64
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Release|x86.ActiveCfg = Release|Win32
+		{C3110968-5CD3-45FA-B624-AC5915F521F7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

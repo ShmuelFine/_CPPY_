@@ -223,7 +223,7 @@ TEST(BlockParser, ACTUAL_WORK)
     PyLineAggregator lineAgg;
 
 
-    auto fileName = R"(C:\Dev\Stabilization\MeshFlow4Android\Orig\RT_Stab.py)";
+    auto fileName = R"(C:\Dev\Stabilization\MeshFlow4Android\Orig\MeshFlow.py)";
     ifstream ifs(fileName);
 
     string line;
@@ -241,7 +241,7 @@ TEST(BlockParser, ACTUAL_WORK)
 
     auto cppBlock = blockparser.ParseBlock(pyLines);
 
-    ofstream ofs(R"(C:\Dev\Stabilization\MeshFlow4Android\Cpp\Src\RT_Stab.cpp)");
+    ofstream ofs(R"(C:\Dev\Stabilization\MeshFlow4Android\Cpp\Src\MeshFlow.cpp)");
     ofs << cppBlock;
     ofs.close();
 }

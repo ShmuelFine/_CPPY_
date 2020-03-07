@@ -616,21 +616,21 @@ namespace py
 		ParsingChain.push_back(std::make_shared<DoubleQuote_StringLiteral_InnerScope			>((PyLineParser *)this));
 
 
-		ParsingChain.push_back(std::make_shared<FunDef											>((PyLineParser*)this));
-		ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
+		//ParsingChain.push_back(std::make_shared<FunDef											>((PyLineParser*)this));
+		//ParsingChain.push_back(std::make_shared<ClassDef										>((PyLineParser*)this));
 
 
-		ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<InnerScope_SquareBraces_Escaper					>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<InnerScope_FunctionCall_Escaper					>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<FunctionCall									>((PyLineParser*)this));
-		ParsingChain.push_back(std::make_shared<InnerScope_RoundBraces_Escaper 					>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<InnerScope_CurlyBraces_Escaper 					>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<InnerScope_SquareBraces_Escaper					>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<InnerScope_FunctionCall_Escaper					>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<FunctionCall									>((PyLineParser*)this));
+		//ParsingChain.push_back(std::make_shared<InnerScope_RoundBraces_Escaper 					>((PyLineParser *)this));
 
-		ParsingChain.push_back(std::make_shared<ListImplicitConstruction						>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<DictImplicitConstruction						>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<EmptyDictImplicitConstruction					>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<SetImplicitConstruction							>((PyLineParser *)this));
-		ParsingChain.push_back(std::make_shared<BytesImplicitConstruction						>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<ListImplicitConstruction						>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<DictImplicitConstruction						>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<EmptyDictImplicitConstruction					>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<SetImplicitConstruction							>((PyLineParser *)this));
+		//ParsingChain.push_back(std::make_shared<BytesImplicitConstruction						>((PyLineParser *)this));
 
 		ParsingChain.push_back(std::make_shared<If_Statement			  						>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<Else_Statement			  						>((PyLineParser*)this));
@@ -658,7 +658,7 @@ namespace py
 		ParsingChain.push_back(std::make_shared<NgatedObjIdentity 								>((PyLineParser *)this));
 		ParsingChain.push_back(std::make_shared<NegationOP		  								>((PyLineParser *)this));
 
-		
+		ParsingChain.push_back(std::make_shared<MemberInvocation				  				>((PyLineParser*)this));
 		ParsingChain.push_back(std::make_shared<SameLine				  						>((PyLineParser *)this));
 	}
 

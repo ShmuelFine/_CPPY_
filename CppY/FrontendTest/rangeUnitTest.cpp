@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "../Base/Types/range.h"
 #include "../Base/Types/FunDefs.h"
+#include <iostream>
 using namespace py;
 
 TEST(range, initialization_3_params_Sanity_Test)
@@ -12,7 +13,10 @@ TEST(range, initialization_3_params_Sanity_Test)
 
 	//Act
 	int t = 0;
-
+	for (auto i : r)
+	{
+		std::cout << (std::string)i;
+	}
 	for (int i = r.attr(start); i < int(r.attr(stop)); i += int(r.attr(step)), t++)
 		resArr[t] = i;
 
