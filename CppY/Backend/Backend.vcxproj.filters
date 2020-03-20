@@ -14,6 +14,7 @@
     <ClCompile Include="..\Base\Types\pyBytes.cpp" />
     <ClCompile Include="..\Base\Types\pyList.cpp" />
     <ClCompile Include="..\Base\Types\pyNums.cpp" />
+    <ClCompile Include="..\Base\Types\pyType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Base\Types\pyBytes.h" />
@@ -31,5 +32,6 @@
     <ClInclude Include="..\Base\Types\pyStr.h" />
     <ClInclude Include="..\Base\Types\pyTuple.h" />
     <ClInclude Include="..\Base\Types\PyByteArray.h" />
+    <ClInclude Include="..\Base\Types\pyType.h" />
   </ItemGroup>
 </Project>

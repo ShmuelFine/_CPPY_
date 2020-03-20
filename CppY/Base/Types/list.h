@@ -11,15 +11,14 @@ namespace py
 		extern object find;
 	}
 
-	class list : public object
+	class listType : public object
 	{
 	public:
-		list();
-		list(std::vector<object> const& v);
-
-	protected:
-		void AddAttributes();
+		listType();
+		void INIT();
+		virtual object operator()(object params = None) const override;
 	};
-
+	
+	extern listType list;
 
 }

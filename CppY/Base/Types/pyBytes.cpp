@@ -5,14 +5,14 @@ namespace py
 {
 	pyBytes::pyBytes(std::initializer_list<unsigned char> const& v)
 	{
-		for (auto elem : v) _impl.push_back(new pyByte(elem));
-		for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		for (auto elem : v) _impl.push_back(pyByte(elem).Clone());
+		//for (pyObjPtr& i : _impl) i.IsAssignable = false;
 
 	}
 	pyBytes::pyBytes(std::vector<unsigned char> const& v)
 	{
-		for (auto elem : v) _impl.push_back(new pyByte(elem));
-		for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		for (auto elem : v) _impl.push_back(pyByte(elem).Clone());
+		//for (pyObjPtr& i : _impl) i.IsAssignable = false;
 	}
 
 	pyBytes::pyBytes(std::string const& v) {
@@ -25,9 +25,9 @@ namespace py
 			int tst;
 			ss >> tst;
 			//res.push_back(tst);
-			_impl.push_back(new pyByte(tst));
+			_impl.push_back(pyByte(tst).Clone());
 		}
-		for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		//for (pyObjPtr& i : _impl) i.IsAssignable = false;
 		//*this=pyBytes(res);
 	}
 
@@ -49,7 +49,7 @@ namespace py
 		std::string result = "";
 		for (auto elem : _impl)
 		{
-			result += "\\x" + (std::string)*elem;
+			result += "\\x" + (std::string)elem;
 		}
 		return result;
 	}
@@ -59,7 +59,7 @@ namespace py
 		std::string result = "";
 		for (auto elem : _impl)
 		{
-			result += (std::string) * elem;
+			result += (std::string) elem;
 		}
 		return result;
 	}
@@ -121,11 +121,11 @@ namespace py
 		std::vector<unsigned char> result_vec(width + _impl.size(), fillByte);
 		for (int i = 0; i < _impl.size(); i++) {
 			if (pos == "ljust")
-				result_vec[i] = *_impl[i];
+				result_vec[i] = _impl[i];
 			else if (pos == "rjust")
-				result_vec[width + i] = *_impl[i];
+				result_vec[width + i] = _impl[i];
 			else  //"center"
-				result_vec[width / 2 + i] = *_impl[i];
+				result_vec[width / 2 + i] = _impl[i];
 		}
 		return pyBytes(result_vec);
 	}

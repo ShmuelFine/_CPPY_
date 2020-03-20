@@ -211,37 +211,37 @@ END_FUN_WITH_DOC_STR(__init__, "");)";
 
 }
 
-
-TEST(BlockParser, ACTUAL_WORK)
-{
-    using namespace std;
-
-    std::string valueStr = pyStr("({})").format("$123$");
-    
-    // Arrange
-    PyBlockParser blockparser("\n");
-    PyLineAggregator lineAgg;
-
-
-    auto fileName = R"(C:\Dev\Stabilization\MeshFlow4Android\Orig\MeshFlow.py)";
-    ifstream ifs(fileName);
-
-    string line;
-    vector<string> pyLines;
-    while (getline(ifs, line))
-    {
-        lineAgg.Append(line);
-        if (lineAgg.IsComplete())
-        {
-            pyLines.push_back(lineAgg.Line);
-            lineAgg = PyLineAggregator();
-        }
-    }
-    ifs.close();
-
-    auto cppBlock = blockparser.ParseBlock(pyLines);
-
-    ofstream ofs(R"(C:\Dev\Stabilization\MeshFlow4Android\Cpp\Src\MeshFlow.cpp)");
-    ofs << cppBlock;
-    ofs.close();
-}
+//
+//TEST(BlockParser, ACTUAL_WORK)
+//{
+//    using namespace std;
+//
+//    std::string valueStr = pyStr("({})").format("$123$");
+//    
+//    // Arrange
+//    PyBlockParser blockparser("\n");
+//    PyLineAggregator lineAgg;
+//
+//
+//    auto fileName = R"(C:\Dev\Stabilization\MeshFlow4Android\Orig\MeshFlow.py)";
+//    ifstream ifs(fileName);
+//
+//    string line;
+//    vector<string> pyLines;
+//    while (getline(ifs, line))
+//    {
+//        lineAgg.Append(line);
+//        if (lineAgg.IsComplete())
+//        {
+//            pyLines.push_back(lineAgg.Line);
+//            lineAgg = PyLineAggregator();
+//        }
+//    }
+//    ifs.close();
+//
+//    auto cppBlock = blockparser.ParseBlock(pyLines);
+//
+//    ofstream ofs(R"(C:\Dev\Stabilization\MeshFlow4Android\Cpp\Src\MeshFlow.cpp)");
+//    ofs << cppBlock;
+//    ofs.close();
+//}

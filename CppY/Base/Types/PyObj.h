@@ -2,6 +2,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <stdexcept>
 #include "ComparisonUtils.h"
 #include "booleanOperators.h"
 
@@ -17,25 +18,113 @@ namespace py
 {
 
 	class pyObj;
-	class pyObjPtr : public std::shared_ptr<pyObj>
-	{
-	public:
-		bool IsAssignable;
-
-	public:
-		pyObjPtr() : std::shared_ptr<pyObj>() { IsAssignable = true; }
-		pyObjPtr(pyObj* px) : std::shared_ptr<pyObj>(px) { IsAssignable = true; }
-		template <typename T>
-		pyObjPtr(std::shared_ptr<T> const& other) : std::shared_ptr<pyObj>(other) { IsAssignable = true; }
-
-		pyObjPtr& operator =(pyObjPtr const& other);
-		bool operator == (pyObjPtr const& other) const;
-	};
+	typedef std::shared_ptr<pyObj> pyObjPtr;
+	class pyObjIterator;
 };
 
 namespace py
 {
-	typedef std::map<std::string, pyObjPtr> AttrDict;
+	class object;
+	// For pretty syntax coloring, using two step definition:
+	extern const object _True;
+	extern const object _False;
+	extern const object _None;
+
+#define False _False
+#define True _True
+#define None _None
+}
+
+
+namespace py
+{
+#define CHECK_PTR { if (! get()) throw std::runtime_error("Can't invoke null object"); }
+
+
+	class object : public pyObjPtr
+	{
+	public:
+		object();
+		object(pyObjPtr const& other);
+		object(pyObj const& other);
+		object(int i);
+		object(float i);
+		object(double i);
+		object(std::string const& i);
+		object(const char* i);
+		object(size_t sz);
+		object(uint8_t i);
+		object(object const& other);
+		object(std::initializer_list<object> const& v);
+
+		///////////// virtuals forwarding: /////////////////////////////////////////
+		operator std::string() const;
+		operator double() const;
+		operator float() const;
+		operator int() const;
+		operator bool() const;
+		operator unsigned char() const;
+
+	public:
+
+		class ObjectIterator
+		{
+		protected:
+			std::shared_ptr<pyObjIterator> _statePtr;
+
+		public:
+			ObjectIterator(std::shared_ptr<pyObjIterator> state);
+			ObjectIterator& operator ++();
+			bool operator != (ObjectIterator const& other);
+			bool operator == (ObjectIterator const& other);
+			object operator *();
+		};
+		ObjectIterator begin() const;
+		ObjectIterator end() const;
+		std::string Type() const;
+
+		template <typename T> object operator [](T const& key)
+		{
+			CHECK_PTR;
+			return get()->operator[](object(key));
+		}
+		virtual object operator()(object params = None) const;
+
+
+		bool operator <(object const& other) const;
+		object operator ++(int x);
+		object operator ++();
+		object& operator += (object const& other);
+		bool operator == (object const& other) const;
+		bool operator != (object const& other) const;
+
+		// Using templates for supporting all POD types: ////////////////////////
+		template <typename T> bool operator == (T const& other) const { return operator ==(object(other)); }
+		template <typename T> bool operator != (T const& other) const { return operator !=(object(other)); }
+		template <typename T> object operator +(T const& other) const { CHECK_PTR;  return get()->operator +(*object(other).get()); }
+		template <typename T> object operator -(T const& other) const { CHECK_PTR;  return get()->operator -(*object(other).get()); }
+		template <typename T> object operator *(T const& other) const { CHECK_PTR;  return get()->operator *(*object(other).get()); }
+		template <typename T> object operator /(T const& other) const { CHECK_PTR;  return get()->operator /(*object(other).get()); }
+		template <typename T> bool operator < (T const& other) const { CHECK_PTR;  return get()->operator < (*object(other).get()); }
+
+
+
+		///////////// Generic attributes: ////////////////////////
+		void setattr(std::string const& what, object toWhat);
+		bool hasattr(std::string const& what);
+		object getattr(std::string const& what, object defaultValue = None);
+
+		// direct access / definition:
+		object& _attr_(std::string const& key);
+
+	};
+
+#define attr(name) _attr_(#name)
+}
+
+namespace py
+{
+	typedef std::map<std::string, object> AttrDict;
 
 	class pyObjIterator
 	{
@@ -51,12 +140,11 @@ namespace py
 		pyObjPtr operator *();
 	};
 
-
 	class pyObj
 	{
 	public:
 		AttrDict attributes;
-
+		
 	public:
 		virtual operator std::string() const = 0;
 		virtual operator double() const = 0;
@@ -71,7 +159,7 @@ namespace py
 		virtual pyObjIterator begin() const = 0;
 		virtual pyObjIterator end() const = 0;
 
-		virtual pyObjPtr operator()(pyObj& params) const = 0;
+		virtual pyObjPtr operator()(pyObj const & params) const = 0;
 
 		virtual std::string Type() const = 0;
 

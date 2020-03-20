@@ -29,12 +29,12 @@ namespace py
 public:\
 virtual std::string Type() const override { return std::string("_func_") + #funName; }\
 virtual pyObjPtr Clone() const override {return pyObjPtr(new func_ ##funName());}\
-virtual pyObjPtr operator()(pyObj& paramsObj) const override { return CALL(paramsObj); }\
+virtual pyObjPtr operator()(pyObj const& paramsObj) const override { return CALL(paramsObj); }\
 \
-virtual object CALL(pyObj& paramsObj) const \
+virtual object CALL(pyObj const & paramsObj) const \
 { \
-	pyDict * params_ptr = reinterpret_cast<pyDict *>(&paramsObj);\
-	pyDict & params = *params_ptr;\
+	pyDict const * params_ptr = reinterpret_cast<pyDict const *>(&paramsObj);\
+	pyDict const & params = *params_ptr;\
 	int __param_counter__ = 0;
 
 #define PARAM_GENERIC(paramName, isByKeyAllowed, isByPositionAllowed, ...)\
@@ -46,8 +46,8 @@ virtual object CALL(pyObj& paramsObj) const \
 		bool hasDefaultValue__ ##paramName = strlen(#__VA_ARGS__) > 0;\
 		THROW_UNLESS(isNamedArgExist__ ##paramName || isUnNamedArgExist__ ##paramName || hasDefaultValue__ ##paramName,\
 					"Not enough parameters given - can't fetch param " #paramName); \
-		if (isNamedArgExist__ ##paramName)			{paramName = params[_key__ ##paramName];} \
-		else if (isUnNamedArgExist__ ##paramName)	{paramName = params[object(__param_counter__++)];}\
+		if (isNamedArgExist__ ##paramName)			{paramName = params.at(_key__ ##paramName);} \
+		else if (isUnNamedArgExist__ ##paramName)	{paramName = params.at(object(__param_counter__++));}\
 		else if (hasDefaultValue__ ##paramName)		{paramName = object(__VA_ARGS__); }\
 	}
 

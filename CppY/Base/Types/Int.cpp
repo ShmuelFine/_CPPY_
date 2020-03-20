@@ -53,7 +53,7 @@ namespace py
 		FUN_DEF(bin);
 		PARAM(self, );
 		throw "Not yet tested";
-		auto meAsInt = dynamic_cast<pyInt*>(self._ptr.get());
+		auto meAsInt = dynamic_cast<pyInt*>(self.get());
 		return meAsInt->bin();
 		END_FUN(bin);
 

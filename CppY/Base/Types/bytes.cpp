@@ -10,7 +10,7 @@ namespace py
 	namespace py_bytes {
 		FUN_DEF(hex);
 		PARAM(self, );
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
 		return meAsBytes->hex();
 		END_FUN(hex);
 
@@ -18,7 +18,7 @@ namespace py
 		PARAM(self, );
 		PARAM(encoding, /*'utf-8'*/);
 		PARAM(errors, /*'strict'*/);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
 		meAsBytes->decode(encoding, errors);
 		END_FUN(decode);
 
@@ -26,23 +26,23 @@ namespace py
 		FUN_DEF(endswith);
 		PARAM(self, );
 		PARAM(ending, );
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto end = reinterpret_cast<pyBytes*>(ending._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto end = reinterpret_cast<pyBytes*>(ending.get());
 		return meAsBytes->endswith(*end);
 		END_FUN(endswith);
 
 		FUN_DEF(startswith);
 		PARAM(self, );
 		PARAM(opening, );
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto open = reinterpret_cast<pyBytes*>(opening._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto open = reinterpret_cast<pyBytes*>(opening.get());
 		return meAsBytes->startswith(*open);
 		END_FUN(startswith);
 
 		FUN_DEF(join);
 		PARAM(self, );
 		PARAM(iterable, );
-		auto meAsStr = reinterpret_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = reinterpret_cast<pyStr*>(self.get());
 		meAsStr->join(iterable);
 		END_FUN(join);
 
@@ -51,9 +51,9 @@ namespace py
 		PARAM(what, );
 		PARAM(withWhat, );
 		PARAM(howMany,None);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto old = reinterpret_cast<pyBytes*>(what._ptr.get());
-		auto new1 = reinterpret_cast<pyBytes*>(withWhat._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto old = reinterpret_cast<pyBytes*>(what.get());
+		auto new1 = reinterpret_cast<pyBytes*>(withWhat.get());
 		if (is_ofType(howMany, None))
 			howMany = meAsBytes->_impl.size();
 		return meAsBytes->replace(*old, *new1,howMany);
@@ -64,8 +64,8 @@ namespace py
 		FUN_DEF(partition);
 		PARAM(self, );
 		PARAM(sep, );
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto delimitor = reinterpret_cast<pyByte*>(sep._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto delimitor = reinterpret_cast<pyByte*>(sep.get());
 		return meAsBytes->partition(*delimitor);
 		END_FUN(partition);
 
@@ -73,8 +73,8 @@ namespace py
 		PARAM(self, );
 		PARAM(width, );
 		PARAM(fillByte, 32);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto filling = reinterpret_cast<pyByte*>(fillByte._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto filling = reinterpret_cast<pyByte*>(fillByte.get());
 		return meAsBytes->addPading(width, *filling,"center");
 		END_FUN(center);
 
@@ -84,8 +84,8 @@ namespace py
 		PARAM(start, None);
 		PARAM(end, None);
 		// TODO: All those reinterpret_cast should be in face dynamic_cast !
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto sub = reinterpret_cast<pyBytes*>(what._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto sub = reinterpret_cast<pyBytes*>(what.get());
 		if (is_ofType(start, None))
 			start = 0;
 		if (is_ofType(end, None))
@@ -98,8 +98,8 @@ namespace py
 		PARAM(what, );
 		PARAM(i, None);
 		PARAM(j, None);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto sub = reinterpret_cast<pyBytes*>(what._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto sub = reinterpret_cast<pyBytes*>(what.get());
 		if (is_ofType(i, None))
 			i = 0;
 		if (is_ofType(j, None))
@@ -111,8 +111,8 @@ namespace py
 		PARAM(self, );
 		PARAM(width, );
 		PARAM(fillByte, 32);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto filling = reinterpret_cast<pyByte*>(fillByte._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto filling = reinterpret_cast<pyByte*>(fillByte.get());
 		return meAsBytes->addPading(width, *filling,"ljust");
 		END_FUN(ljust);
 
@@ -120,24 +120,24 @@ namespace py
 		PARAM(self, );
 		PARAM(width, );
 		PARAM(fillByte, 32);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto filling = reinterpret_cast<pyByte*>(fillByte._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto filling = reinterpret_cast<pyByte*>(fillByte.get());
 		return meAsBytes->addPading(width, *filling, "rjust");
 		END_FUN(rjust);
 
 		FUN_DEF(rstrip);
 		PARAM(self, );
 		PARAM(whatToRemove, 32);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto chars = reinterpret_cast<pyByte*>(whatToRemove._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto chars = reinterpret_cast<pyByte*>(whatToRemove.get());
 		return meAsBytes->strip(*chars, "rstrip");
 		END_FUN(rstrip);
 		
 		FUN_DEF(lstrip);
 		PARAM(self, );
 		PARAM(whatToRemove, 32);
-		auto meAsBytes = reinterpret_cast<pyBytes*>(self._ptr.get());
-		auto chars = reinterpret_cast<pyByte*>(whatToRemove._ptr.get());
+		auto meAsBytes = reinterpret_cast<pyBytes*>(self.get());
+		auto chars = reinterpret_cast<pyByte*>(whatToRemove.get());
 		return meAsBytes->strip(*chars, "lstrip");
 		END_FUN(lstrip);
 

@@ -45,7 +45,7 @@ namespace py
 
 		virtual pyObjIterator begin() const { return pyObjIterator((pyObj*)this, 0); }
 		virtual pyObjIterator end() const { return pyObjIterator((pyObj*)this, (_stop - _start) / _step); }
-		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
+		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
 		virtual std::string Type() const override { return "range"; }
 
 		virtual pyObjPtr Clone() const override { return pyObjPtr(new pyRange(_start, _stop, _step)); }

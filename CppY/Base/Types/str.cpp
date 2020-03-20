@@ -19,7 +19,7 @@ namespace py
 		//tested
 		FUN_DEF(capitalize);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::transform(data.begin(), data.end(), data.begin(),
 			[](unsigned char c) { return std::tolower(c); });
@@ -31,7 +31,7 @@ namespace py
 		//tested
 		FUN_DEF(casefold);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		return meAsStr->lower();
 		END_FUN(casefold);
 
@@ -52,7 +52,7 @@ namespace py
 
 		//if(fllChr.length() != 1)
 		//	THROW("The fill character must be exactly one character long");
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		int fillspaces;
@@ -71,7 +71,7 @@ namespace py
 		PARAM(end, None);
 		auto subStr = (std::string) sub;
 
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		if (is_ofType(end, None))
 			end = data.length();
@@ -97,7 +97,7 @@ namespace py
 		PARAM(ending, );
 		PARAM(start, 0);
 		PARAM(end, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 
@@ -131,7 +131,7 @@ namespace py
 		//if (not is_ofType(tabSize, Int(tabSize)))
 		//	THROW("integer value expected");
 		int tabNum = (int)tabSize;
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string spaceStr = "";
 
@@ -168,7 +168,7 @@ namespace py
 		PARAM(sub, );
 		PARAM(start, 0);
 		PARAM(end, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		//if (not is_ofType(sub, str("s")))
@@ -186,7 +186,7 @@ namespace py
 
 		FUN_DEF(format);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		while (HAS_MORE_POS_PARAMS())
@@ -225,7 +225,7 @@ namespace py
 		PARAM(sub, );
 		PARAM(start, 0);
 		PARAM(end, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		//if (not is_ofType(sub, str("s")))
@@ -246,7 +246,7 @@ namespace py
 		//tested
 		FUN_DEF(isalnum);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		return find_if(data.begin(), data.end(), [](char c) { return !(std::isalnum(c)); }) == data.end() && data.length() > 0;
 		END_FUN(isalnum);
@@ -254,7 +254,7 @@ namespace py
 		//tested
 		FUN_DEF(isalpha);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		return find_if(data.begin(), data.end(), [](char c) { return !(std::isalpha(c)); }) == data.end() && data.length() > 0;
 		END_FUN(isalpha);
@@ -263,7 +263,7 @@ namespace py
 		//TODO: test with a non-ascii string
 		FUN_DEF(Isascii);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		for (int i = 0; i < data.length(); i++)
 		{
@@ -276,7 +276,7 @@ namespace py
 		//tested
 		FUN_DEF(isdecimal);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		bool retVal = find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
 		return retVal;
@@ -286,7 +286,7 @@ namespace py
 		//https://www.includehelp.com/python/difference-between-string-isdecimal-isdigit-isnumeric-and-methods.aspx
 		FUN_DEF(isdigit);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		bool retVal = find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
 		return retVal;
@@ -295,7 +295,7 @@ namespace py
 		//tested
 		FUN_DEF(isidentifier);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 
@@ -313,7 +313,7 @@ namespace py
 		//tested
 		FUN_DEF(islower);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		bool retVal;
 		return (find_if(data.begin(), data.end(), [](char c) { return (std::isalpha(c)) && !(std::islower(c)); }) == data.end()) &&
@@ -323,7 +323,7 @@ namespace py
 		//TODO: for now just acts like isdecimal
 		FUN_DEF(isnumeric);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		bool retVal = find_if(data.begin(), data.end(), [](char c) { return !(std::isdigit(c)); }) == data.end() && data.length() > 0;
 		return retVal;
@@ -332,7 +332,7 @@ namespace py
 		//tested
 		FUN_DEF(isprintable);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		return (find_if(data.begin(), data.end(), [](char c) { return !(std::isprint(c)); }) == data.end()) || (data.length() == 0);
 		END_FUN(isprintable);
@@ -340,14 +340,14 @@ namespace py
 		//tested
 		FUN_DEF(isspace);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		return find_if(data.begin(), data.end(), [](char c) { return !(std::isspace(c)); }) == data.end() && data.length() > 0;
 		END_FUN(isspace);
 
 		FUN_DEF(istitle);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		END_FUN(istitle);
@@ -355,7 +355,7 @@ namespace py
 		//tested
 		FUN_DEF(isupper);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		return (find_if(data.begin(), data.end(), [](char c) { return (std::isalpha(c)) && !(std::isupper(c)); }) == data.end()) &&
 			std::any_of(data.begin(), data.end(), [](char c) { return (std::isalpha(c)); });
@@ -365,7 +365,7 @@ namespace py
 		FUN_DEF(join);
 		PARAM(self, );
 		PARAM(iterable, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		return meAsStr->join(iterable);
 		END_FUN(join);
 
@@ -374,7 +374,7 @@ namespace py
 		PARAM(self, );
 		PARAM(width, );
 		PARAM(fillchar, " ");
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string addStr = "";
 		//if (not is_ofType(width, Int(1)))
@@ -390,7 +390,7 @@ namespace py
 		//tested
 		FUN_DEF(lower);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		return meAsStr->lower();
 		END_FUN(lower);
 
@@ -398,7 +398,7 @@ namespace py
 		FUN_DEF(lstrip);
 		PARAM(self, );
 		PARAM(chars, None)
-			auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+			auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		//if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
 		//	THROW("TypeError: lstrip arg must be None or str");
@@ -446,7 +446,7 @@ namespace py
 		PARAM(sep, );
 		//if (not is_ofType(sep, str("sss")))
 		//	THROW("TypeError: must be str");
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string sepstr = (std::string)sep;
 		int sepPos = data.find(sepstr);
@@ -471,7 +471,7 @@ namespace py
 		int cnt = (int)count;
 		std::string what = (std::string)old;
 		std::string withWhat = (std::string)New;
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		int occurencesToReplace = ((is_ofType(count, None)) ? data.length(): cnt);
@@ -493,7 +493,7 @@ namespace py
 		PARAM(sub, );
 		PARAM(start, 0);
 		PARAM(end, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		//if (not is_ofType(sub, str("s")))
@@ -515,7 +515,7 @@ namespace py
 		PARAM(sub, );
 		PARAM(start, 0);
 		PARAM(end, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 		//if (not is_ofType(sub, str("s")))
@@ -538,7 +538,7 @@ namespace py
 		PARAM(self, );
 		PARAM(width, );
 		PARAM(fillchar, " ");
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string addStr = "";
 		//if (not is_ofType(width, Int(1)))
@@ -557,7 +557,7 @@ namespace py
 		PARAM(sep, );
 		//if (not is_ofType(sep, str("sss")))
 		//	THROW("TypeError: must be str");
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string sepStr = (std::string)sep;
 		int sepPos = data.rfind(sepStr);
@@ -573,7 +573,7 @@ namespace py
 		FUN_DEF(rstrip);
 		PARAM(self, );
 		PARAM(chars, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		//if (!is_ofType(chars, str("sss")) && !is_ofType(chars, None))
 		//    THROW("TypeError: rstrip arg must be None or str");
@@ -598,24 +598,25 @@ namespace py
 		PARAM(self, );
 		PARAM(sep, " ");
 		PARAM(maxsplit, -1);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string sepStr = (std::string)sep;
 		int max = (int)maxsplit;
 		if (max == -1)
 			max = data.length();
 		auto parts = meAsStr->split(sepStr, max);
-		std::vector<object> result;
-		for (auto& p : parts)
-			result.push_back(p);
-		return list(result);
+		auto result = list();
+		for (pyStr p : parts)
+			MEM_FUN(result, append).A(p));
+		return result;
+
 		END_FUN(split);
 
 		//tested
 		FUN_DEF(splitlines);
 		PARAM(self, );
 		PARAM(keepends, False);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		bool keependsBool = (bool)keepends;
 		std::string whatToSearchFor = "\n\r";
@@ -652,7 +653,7 @@ namespace py
 		PARAM(ending, );
 		PARAM(start, 0);
 		PARAM(end, None);
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 
 
@@ -686,7 +687,7 @@ namespace py
 		if (is_ofType(chars, None))
 			chars = " ";
 		std::string charStr = (std::string)chars;
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string retStr = MEM_FUN(self, lstrip).A(chars));
 		return MEM_FUN(str(retStr), rstrip).A(chars));
@@ -695,7 +696,7 @@ namespace py
 		//tested
 		FUN_DEF(swapcase);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::string retStr = "";
 		int len = data.length();
@@ -716,7 +717,7 @@ namespace py
 		FUN_DEF(title);
 		PARAM(self, );
 		std::string retStr = "";
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		auto splitList = MEM_FUN(str(data), split));
 		for (auto elem : splitList)
@@ -737,7 +738,7 @@ namespace py
 		//tested
 		FUN_DEF(upper);
 		PARAM(self, );
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		std::transform(data.begin(), data.end(), data.begin(),
 			[](unsigned char c) { return std::toupper(c); });
@@ -751,7 +752,7 @@ namespace py
 		//if (not is_ofType(width, Int(3)))
 		//	THROW("TypeError: must be an integer");
 		int finalWidth = (int)width;
-		auto meAsStr = dynamic_cast<pyStr*>(self._ptr.get());
+		auto meAsStr = dynamic_cast<pyStr*>(self.get());
 		std::string data = meAsStr->_impl;
 		if (finalWidth > data.length())
 			data.insert(0, finalWidth - data.length(), '0');

@@ -20,7 +20,7 @@ namespace py
 		virtual pyObjPtr FetchByIdx(int idx) const { NOT_SUPPORTED; }
 		virtual pyObjIterator begin() const {NOT_SUPPORTED;}
 		virtual pyObjIterator end() const {NOT_SUPPORTED;}
-		virtual pyObjPtr operator()(pyObj& params) const {NOT_SUPPORTED;}
+		virtual pyObjPtr operator()(pyObj const& params) const {NOT_SUPPORTED;}
 
 		virtual std::string Type() const override;
 

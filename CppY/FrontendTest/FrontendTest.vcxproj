@@ -61,6 +61,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Backend\Backend.vcxproj">
+      <Project>{3a55f710-64a8-44fc-b47c-ed4da6b3ef83}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Frontend\Frontend.vcxproj">
+      <Project>{613ac14b-23a9-4c5e-8d43-24c2bddbd725}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Interpreter\Interpreter.vcxproj">
       <Project>{57bb305e-3cb4-43fc-92b4-5dd1f8843a47}</Project>
     </ProjectReference>

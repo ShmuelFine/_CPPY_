@@ -32,7 +32,7 @@ namespace py
 		virtual pyObjIterator end() const;
 
 
-		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
+		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
 		virtual pyObjPtr Clone() const override;
 		virtual bool operator <(pyObj const& other) const override;

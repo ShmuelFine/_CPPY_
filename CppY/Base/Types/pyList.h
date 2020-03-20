@@ -10,12 +10,12 @@ namespace py
 	class pyList : public pyObj
 	{
 	public:
-		std::vector<pyObjPtr> _impl;
+		std::vector<object> _impl;
 
 	public:
 		pyList();
-		pyList(std::initializer_list<pyObjPtr> const& v);
-		pyList(std::vector<pyObjPtr> const& v);
+		pyList(std::initializer_list<object> const& v);
+		pyList(std::vector<object> const& v);
 
 		// copy ctors
 		pyList(pyList const& other);
@@ -33,7 +33,7 @@ namespace py
 		virtual pyObjPtr FetchByIdx(int idx) const;
 		virtual pyObjIterator begin() const;
 		virtual pyObjIterator end() const;
-		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
+		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
 		virtual std::string Type() const override;
 
 		virtual pyObjPtr Clone() const override;
@@ -90,7 +90,7 @@ namespace py
 	//	virtual pyObjPtr FetchByIdx(int idx) const { NOT_SUPPORTED; }
 	//	virtual pyObjIterator begin() const { NOT_SUPPORTED; }
 	//	virtual pyObjIterator end() const { NOT_SUPPORTED; }
-	//	virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
+	//	virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
 	//	virtual pyObjPtr Clone() const override;
 	//	virtual bool operator <(pyObj const& other) const override;

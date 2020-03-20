@@ -21,7 +21,7 @@ namespace py
 		virtual pyObjIterator begin() const override;
 		virtual pyObjIterator end() const override;
 		
-		virtual pyObjPtr operator()(pyObj& params) const = 0;
+		virtual pyObjPtr operator()(pyObj const& params) const = 0;
 		virtual std::string Type() const = 0;
 		virtual pyObjPtr Clone() const  = 0;
 

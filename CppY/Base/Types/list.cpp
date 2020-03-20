@@ -1,6 +1,7 @@
 #include "list.h"
 #include "FunDefs.h"
 #include "Comparisons.h"
+#include "pyType.h"
 
 namespace py
 {
@@ -11,7 +12,7 @@ namespace py
 		PARAM(whatToCount, );
 		PARAM(start, None);
 		PARAM(end, None);
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		if (is_ofType(start, None))
 			start = 0;
 		if (is_ofType(end, None))
@@ -39,14 +40,14 @@ namespace py
 
 		FUN_DEF(clear);
 		PARAM(self, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		meAsList->_impl.clear();
 		END_FUN(clear);
 
 		// '', 'copy', '', '', '-index-', '-insert-', '-pop-', '-remove-', 'reverse', '-sort-'
 		FUN_DEF(sort);
 		PARAM(self, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		std::sort(meAsList->_impl.begin(), meAsList->_impl.end(),
 			[](pyObjPtr const& a, pyObjPtr const& b) { return (*a) < (*b); });
 
@@ -55,7 +56,7 @@ namespace py
 		FUN_DEF(pop);
 		PARAM(self, );
 		PARAM(indexObj, -1);
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		int index = indexObj;
 		return meAsList->pop(index);
 		END_FUN(pop);
@@ -64,14 +65,14 @@ namespace py
 		PARAM(self, );
 		PARAM(indexObj, );
 		PARAM(obj, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		meAsList->insert(indexObj, obj);
 		END_FUN(insert);
 
 		FUN_DEF(remove);
 		PARAM(self, );
 		PARAM(x, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		meAsList->remove(x);
 		END_FUN(remove);
 
@@ -80,12 +81,12 @@ namespace py
 		PARAM(x, );
 		PARAM(i, None);
 		PARAM(j, None);
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		if (is_ofType(i, None))
 			i = 0;
 		if (is_ofType(j, None))
 			j = meAsList->_impl.size();
-		return meAsList->index(x, i, j,false);
+		return meAsList->index(x, i, j, false);
 		END_FUN(find);
 
 		FUN_DEF(index);
@@ -93,54 +94,47 @@ namespace py
 		PARAM(x, );
 		PARAM(i, None);
 		PARAM(j, None);
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		if (is_ofType(i, None))
 			i = 0;
 		if (is_ofType(j, None))
 			j = meAsList->_impl.size();
-		return meAsList->index(x, i, j,true);
+		return meAsList->index(x, i, j, true);
 		END_FUN(index);
 
 		FUN_DEF(reverse);
 		PARAM(self, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		meAsList->reverse();
 		END_FUN(reverse);
 
 		FUN_DEF(copy);
 		PARAM(self, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		return meAsList->copy();
 		END_FUN(copy);
 
 		FUN_DEF(__len__);
 		PARAM(self, );
-		auto meAsList = dynamic_cast<pyList*>(self._ptr.get());
+		auto meAsList = dynamic_cast<pyList*>(self.get());
 		return meAsList->_impl.size();
 		END_FUN(__len__);
-	}
 
-
-	object dict(std::vector<std::vector<object>> const& v)
-	{
-		pyDict result;
-		for (auto kvp : v)
+		FUN_DEF(__init__);
+		PARAM(self, );
+		PARAM(iterable, );
+		auto meAsList = dynamic_cast<pyList*>(self.get());
+		for (auto o : iterable)
 		{
-			THROW_UNLESS(kvp.size() == 2, "Key Value Pair has more than two values !");
-			result._impl[kvp[0]] = kvp[1];
+			meAsList->_impl.push_back(o);
 		}
-		return result;
-	}
-
-	object str(object const& v)
-	{
-		return v.operator pyStr();
+		END_FUN(__init__);
 	}
 };
 
 namespace py
 {
-	void list::AddAttributes()
+	listType::listType() : object(pyList())
 	{
 		attr(count) = py_list::count;
 		attr(extend) = py_list::extend;
@@ -155,17 +149,18 @@ namespace py
 		attr(reverse) = py_list::reverse;
 		attr(copy) = py_list::copy;
 		attr(__len__) = py_list::__len__;
+		attr(__init__) = py_list::__init__;
 	}
 
-	list::list() : object(pyList())
+	object listType::operator()(object params) const
 	{
-		AddAttributes();
+		//auto meAsType = dynamic_cast<pyType*>(get());
+		//object result = meAsType->Template->Clone();
+		object result = get()->Clone();
+		result->attributes = get()->attributes;
+		MEM_FUN(result, __init__).A(params));
+		return result;
 	}
 
-	list::list(std::vector<object> const& v)
-		: object(pyList(std::vector<pyObjPtr>(v.begin(), v.end())))
-	{
-		AddAttributes();
-	}
-
+	listType list;
 }

@@ -8,8 +8,8 @@ namespace py
 	{
 	public:
 		pyTuple();
-		pyTuple(std::vector<pyObjPtr> const& values);
-		pyTuple(std::pair<pyObjPtr, pyObjPtr> const& values);
+		pyTuple(std::vector<object> const& values);
+		pyTuple(std::pair<object, object> const& values);
 
 		virtual std::string Type() const override;
 		virtual pyObjPtr Clone() const override;

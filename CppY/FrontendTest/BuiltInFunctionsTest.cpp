@@ -9,8 +9,8 @@ using namespace py;
 TEST(len, SanityTest)
 {
 	// Arrange
-	list emptyList;
-	list l({ 1,"hello",3.5 });
+	auto emptyList = list();
+	auto l = list({ 1,"hello",3.5 });
 	object x = 5;
 	
 	// Act, Assert

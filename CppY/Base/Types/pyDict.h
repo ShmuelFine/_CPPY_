@@ -57,9 +57,10 @@ public:
 		return pyObjIterator((pyObj*)this, (int)_impl.size());
 	}
 
-	virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; };
+	virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; };
 	virtual pyObjPtr FetchByIdx(int idx) const;
 	virtual pyObjPtr & operator [](pyObjPtr const & key) override;
+	pyObjPtr const& at(pyObjPtr const& key) const;
 	virtual pyObjPtr Clone() const override;	
 
 	// for using as key in sets, maps, etc:

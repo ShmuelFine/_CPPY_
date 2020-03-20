@@ -12,7 +12,7 @@ namespace py
 		FUN_DEF(count);
 		PARAM(self, );
 		PARAM(whatToCount, );
-		auto meAsRange = dynamic_cast<pyRange*>(self._ptr.get());
+		auto meAsRange = dynamic_cast<pyRange*>(self.get());
 		int start = meAsRange->_start;
 		int step = meAsRange->_step;
 		int stop = meAsRange->_stop;
@@ -35,7 +35,7 @@ namespace py
 		FUN_DEF(index);
 		PARAM(self, );
 		PARAM(value, );
-		auto meAsRange = dynamic_cast<pyRange*>(self._ptr.get());
+		auto meAsRange = dynamic_cast<pyRange*>(self.get());
 		int step = meAsRange->_step;
 		int start = meAsRange->_start;
 		if (count(ARGS(self).A(value)) == 0)
@@ -55,11 +55,8 @@ namespace py
 		int stepVal = dynamic_cast<pyRange*>(get())->_step;
 		int stopVal = dynamic_cast<pyRange*>(get())->_stop;
 		(*this).attr(start) = pyInt(startVal);
-		(*this).attr(start)._ptr.IsAssignable = false;
 		(*this).attr(step) = pyInt(stepVal);
-		(*this).attr(step)._ptr.IsAssignable = false;
 		(*this).attr(stop) = pyInt(stopVal);
-		(*this).attr(stop)._ptr.IsAssignable = false;
 		(*this).attr(count) = py_range::count;
 		(*this).attr(index) = py_range::index;
 	}

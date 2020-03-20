@@ -42,6 +42,12 @@ namespace py
 		THROW_UNLESS(_impl.count(params), "KeyError: " + params->operator std::string());
 		return _impl[params];
 	}
+	
+	pyObjPtr const& pyDict::at(pyObjPtr const& params) const
+	{
+		THROW_UNLESS(_impl.count(params), "KeyError: " + params->operator std::string());
+		return _impl.at(params);
+	}
 
 
 	pyObjPtr pyDict::FetchByIdx(int index) const

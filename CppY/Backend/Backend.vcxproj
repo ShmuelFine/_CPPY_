@@ -151,6 +151,7 @@
     <ClCompile Include="..\Base\Types\pySet.cpp" />
     <ClCompile Include="..\Base\Types\pyStr.cpp" />
     <ClCompile Include="..\Base\Types\pyTuple.cpp" />
+    <ClCompile Include="..\Base\Types\pyType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Base\Types\PyByteArray.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="..\Base\Types\pySet.h" />
     <ClInclude Include="..\Base\Types\pyStr.h" />
     <ClInclude Include="..\Base\Types\pyTuple.h" />
+    <ClInclude Include="..\Base\Types\pyType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

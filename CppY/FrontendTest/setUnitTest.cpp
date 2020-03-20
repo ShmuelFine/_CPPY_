@@ -13,7 +13,7 @@ TEST(set, difference_Sanity)
 	set other = set({ 1,3 });
 	set other2 = set({ 2 });
 	set expected = set({ 4 });
-	list other_lst = list({ other,other2 });
+	auto other_lst = list({ other,other2 });
 
 	// Act
 	auto actual = MEM_FUN(s, difference).A(other_lst));
@@ -80,7 +80,7 @@ TEST(set, intersection_Sanity)
 	set other = set({ 3,2,7 });
 	set other1 = set({ 2,4 });
 	set expected = set({ 2 });
-	list other_lst({ other,other1 });
+	auto other_lst = list({ other,other1 });
 	// Act
 	auto actual = MEM_FUN(s, intersection).A(other_lst));
 
@@ -103,7 +103,7 @@ TEST(set, intersection_update_Sanity)
 	set other = set({ 3,2,7 });
 	set other1 = set({ 2,4,6 });
 	set expected = set({ 2 });
-	list other_lst = list({ other,other1 });
+	auto other_lst = list({ other,other1 });
 
 	// Act
 	MEM_FUN(s, intersection_update).A(other_lst));

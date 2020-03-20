@@ -210,19 +210,13 @@ namespace py {
 
 	bool pySet::issubset(pySet const& others) const
 	{
-		pySetPtr other_lst = pySetPtr(new pySet(others));
-		auto result = this->difference(pyList({ other_lst }));
-		
-		return result->_impl.empty();
+		return others.difference(*this)->_impl.empty();
 	}
 
 
 	bool pySet::isdisjoint(pySet const& others) const
 	{
-		pySetPtr other_lst = pySetPtr(new pySet(others));
-		pySet intersect = *this->intersection(pyList({ other_lst  }));
-
-		return intersect._impl.empty();
+		return others.intersection(*this)->_impl.empty();
 	}
 
 
@@ -244,18 +238,18 @@ namespace py {
 	pySetPtr pySet::symmetric_difference(pySet const& others) const
 	{
 
-		auto differ1 = this->difference(pyList({ pySetPtr(new pySet(others)) }));
-		auto differ2 = others.difference(pyList({ pySetPtr(new pySet(*this)) }));
+		auto differ1 = (*this).difference(others);
+		auto differ2 = others.difference(*this);
 
-		return differ1->setUnion(pyList({ differ2 }));
+		return differ1->setUnion(*differ2);
 	}
 
 	void pySet::symmetric_difference_update(pySet const& others)
 	{
-		auto differ1 = this->difference(pyList({ pySetPtr(new pySet(others)) }));
-		auto differ2 = others.difference(pyList({ pySetPtr(new pySet(*this)) }));
+		auto differ1 = this->difference(others);
+		auto differ2 = others.difference(*this);
 
-		*this = *differ1->setUnion(pyList({ differ2 }));
+		*this = *differ1->setUnion(*differ2);
 	}
 
 	void pySet::remove(pyObjPtr o)

@@ -18,7 +18,7 @@ namespace py
 
 	pyList::operator std::string() const
 	{
-		return pyStr("[ ") + pyStr(",").join(LAMBDA_BASE(pyStr(*x).Clone(), x, (_impl))) + pyStr(" ]");
+		return pyStr("[ ") + pyStr(",").join(LAMBDA_BASE(pyStr(x).Clone(), x, (_impl))) + pyStr(" ]");
 	}
 
 	int pyList::CorrectIdx(int idx) const
@@ -63,7 +63,7 @@ namespace py
 
 		for (size_t i = 0; i < min(_impl.size(), otherPtr->_impl.size()); i++)
 		{
-			EXPLICIT_COMPARE(*_impl[i], *(*otherPtr)._impl[i]);
+			EXPLICIT_COMPARE(_impl[i], (*otherPtr)._impl[i]);
 		}
 
 		EXPLICIT_COMPARE(_impl.size(), otherPtr->_impl.size());
@@ -74,12 +74,12 @@ namespace py
 	pyList::pyList()
 	{}
 
-	pyList::pyList(std::initializer_list<pyObjPtr> const& v)
+	pyList::pyList(std::initializer_list<object> const& v)
 	{
 		_impl.insert(_impl.end(), v.begin(), v.end());
 	}
 
-	pyList::pyList(std::vector<pyObjPtr> const& v)
+	pyList::pyList(std::vector<object> const& v)
 	{
 		_impl.insert(_impl.end(), v.begin(), v.end());
 	}
@@ -139,7 +139,7 @@ namespace py
 
 		int count = 0;
 		for (auto it = _impl.begin() + startdx; it < _impl.end() - (_impl.size() - enddx); it++)
-			if (**it == *whatToCount)
+			if (*it == whatToCount)
 				count++;
 		return count;
 	}

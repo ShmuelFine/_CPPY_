@@ -7,7 +7,7 @@ namespace py
 	template<typename Deduction, typename Container>
 	pyList CreateListWithLambda(Deduction what, Container const & inWhere)
 	{
-		std::vector<pyObjPtr> result;
+		std::vector<object> result;
 		for (auto x : inWhere)
 		{
 			result.push_back(what(x));

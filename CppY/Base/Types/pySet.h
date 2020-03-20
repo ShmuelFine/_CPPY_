@@ -41,7 +41,7 @@ namespace py {
 		virtual operator bool() const override;
 
 		virtual pyObjPtr& operator [](pyObjPtr const& key) { NOT_SUPPORTED; }
-		virtual pyObjPtr operator()(pyObj& params) const { NOT_SUPPORTED; }
+		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
 		virtual pyObjPtr FetchByIdx(int idx) const;
 

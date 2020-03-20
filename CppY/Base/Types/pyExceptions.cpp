@@ -13,7 +13,7 @@ namespace py
 	pyObjPtr PyBaseException::FetchByIdx(int idx) const { NOT_IMPL; }
 	pyObjIterator PyBaseException::begin() const { NOT_IMPL; }
 	pyObjIterator PyBaseException::end() const { NOT_IMPL; }
-	pyObjPtr PyBaseException::operator()(pyObj& params) const { NOT_IMPL; }
+	pyObjPtr PyBaseException::operator()(pyObj const& params) const { NOT_IMPL; }
 
 	//PyBaseException::operator std::string() const 
 	std::string PyBaseException::Type() const { return "BaseException"; }

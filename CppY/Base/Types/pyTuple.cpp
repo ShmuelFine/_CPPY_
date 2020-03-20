@@ -5,12 +5,12 @@ namespace py
 	{
 	}
 
-	pyTuple::pyTuple(std::vector<pyObjPtr> const& values)
+	pyTuple::pyTuple(std::vector<object> const& values)
 		:pyList(values)
 	{
 	}
 
-	pyTuple::pyTuple(std::pair<pyObjPtr, pyObjPtr> const& values)
+	pyTuple::pyTuple(std::pair<object, object> const& values)
 		: pyList({ values.first,values.second })
 	{
 	}

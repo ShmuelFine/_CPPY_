@@ -115,7 +115,7 @@ namespace py
 		virtual pyObjPtr FetchByIdx(int idx) const override;
 		virtual pyObjIterator begin() const override;
 		virtual pyObjIterator end() const override;
-		virtual pyObjPtr operator()(pyObj& params) const override;
+		virtual pyObjPtr operator()(pyObj const& params) const override;
 		virtual std::string Type() const override;
 		virtual pyObjPtr Clone() const override;
 		virtual bool operator<(pyObj const& other) const override;
