@@ -28,55 +28,55 @@ namespace py
 		virtual operator float() const override { NOT_IMPL; }
 		virtual operator int() const override { NOT_IMPL; }
 		virtual operator bool() const override { return not _impl.empty(); }
-		virtual pyObjPtr& operator [](pyObjPtr const& key);
+		virtual object& operator [](object const& key);
 
-		virtual pyObjPtr FetchByIdx(int idx) const;
+		virtual object FetchByIdx(int idx) const;
 		virtual pyObjIterator begin() const;
 		virtual pyObjIterator end() const;
-		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
+		virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; }
 		virtual std::string Type() const override;
 
-		virtual pyObjPtr Clone() const override;
+		virtual object Clone() const override;
 		virtual bool operator <(pyObj const& other) const override;
 
-		virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; };
+		virtual object  operator ++(int) { NOT_SUPPORTED; };
 		virtual pyObj& operator ++() { NOT_SUPPORTED; };
 		virtual pyObj& operator += (pyObj const& other);
 
-		virtual pyObjPtr  operator +(pyObj const& other)  const override;
+		virtual object  operator +(pyObj const& other)  const override;
 
 		/////////////////////////////////////////////////////////////
 
-		void append(pyObjPtr o);
-		pyObjPtr pop(int idx = -1);
+		void append(object o);
+		object pop(int idx = -1);
 		operator bool() { return !_impl.empty(); }
 
-		int count(pyObjPtr whatToCount, pyObjPtr start, pyObjPtr end);
-		int index(pyObjPtr whoToSearch, pyObjPtr startIdx, pyObjPtr endIdx, bool isToThrow) const;
+		int count(object whatToCount, object start, object end);
+		int index(object whoToSearch, object startIdx, object endIdx, bool isToThrow) const;
 
 		pyList SUB(int start, int end);
 		int CorrectIdx(int idx) const;
 
-		void remove(pyObjPtr o);
-		void insert(pyObjPtr idx, pyObjPtr o);
+		void remove(object o);
+		void insert(object idx, object o);
 		void reverse();
 
 		pyList copy();
 
 	public:
 		// Shouldn't be used. if the other is a list, use As<list>
-		pyList(pyObjPtr const& other) = delete;
+		pyList(object const& other) = delete;
 	};
 
 
 	pyList ToList(std::string const& s);
 
-	//class pySet : private std::set<pyObjPtr>, public pyObj
+	//class pySet : private std::set<object>, public pyObj
 	//{
 	//public:
 	//	pySet();
-	//	pySet(std::vector<pyObjPtr> const& v);
-	//	pySet(pyObjPtr v);
+	//	pySet(std::vector<object> const& v);
+	//	pySet(object v);
 
 	//	// pyObj: //////////////////////////////////////////////////
 	//	virtual std::string Type() const override;
@@ -86,16 +86,16 @@ namespace py
 	//	virtual operator int() const override;
 	//	virtual operator bool() const override;
 
-	//	virtual pyObjPtr& operator [](pyObjPtr const& key) { NOT_SUPPORTED; }
-	//	virtual pyObjPtr FetchByIdx(int idx) const { NOT_SUPPORTED; }
+	//	virtual object& operator [](object const& key) { NOT_SUPPORTED; }
+	//	virtual object FetchByIdx(int idx) const { NOT_SUPPORTED; }
 	//	virtual pyObjIterator begin() const { NOT_SUPPORTED; }
 	//	virtual pyObjIterator end() const { NOT_SUPPORTED; }
-	//	virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
+	//	virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
-	//	virtual pyObjPtr Clone() const override;
+	//	virtual object Clone() const override;
 	//	virtual bool operator <(pyObj const& other) const override;
 
-	//	virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; };
+	//	virtual object  operator ++(int) { NOT_SUPPORTED; };
 	//	virtual pyObj& operator ++() { NOT_SUPPORTED; };
 	//	virtual pyObj& operator += (pyObj const& other) { NOT_SUPPORTED; };
 
@@ -104,13 +104,13 @@ namespace py
 	//	void update(pyList const& l);
 	//	//void update(std::vector<std::string> const& v);
 
-	//	void add(pyObjPtr o);
+	//	void add(object o);
 	//	pySet operator -(pySet const& other) const;
 
 	//	pyList ToList() const;
 	//};
 
-	//pyObjPtr sum(pyList const& l);
+	//object sum(pyList const& l);
 
 
 	template<typename IterableA, typename IterableB>

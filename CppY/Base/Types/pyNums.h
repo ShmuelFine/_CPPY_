@@ -28,14 +28,14 @@ namespace py
 		virtual operator bool() const	override { return (bool)val; }
 		virtual operator uint8_t() const	override { return (uint8_t)val; }
 
-		virtual pyObjPtr& operator [](pyObjPtr const& key) { NOT_SUPPORTED; }
-		virtual pyObjPtr FetchByIdx(int idx) const { NOT_SUPPORTED; }
+		virtual object& operator [](object const& key) { NOT_SUPPORTED; }
+		virtual object FetchByIdx(int idx) const { NOT_SUPPORTED; }
 		virtual pyObjIterator begin() const { NOT_SUPPORTED; }
 		virtual pyObjIterator end() const { NOT_SUPPORTED; }
-		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
+		virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
 		virtual std::string Type() const override { return  secretPy::secretKeyword + typeid(T).name(); }
-		virtual pyObjPtr Clone() const override { return std::make_shared<pyNumType<T>>(val); }
+		virtual object Clone() const override { return object(val); }
 		virtual bool operator <(pyObj const& other) const override {
 			std::string othersType = other.Type();
 			if (othersType.compare(0, secretPy::secretKeyword.length(), secretPy::secretKeyword) == 0)
@@ -49,7 +49,7 @@ namespace py
 			return false;
 		}
 
-		virtual pyObjPtr operator ++(int) override { auto result = *this; val++; return result.Clone(); }
+		virtual object operator ++(int) override { auto result = *this; val++; return result.Clone(); }
 		virtual pyObj& operator ++() override { val++; return *this; }
 		virtual pyObj& operator += (pyObj const& other) override { val += (T)other; return *this; }
 
@@ -57,10 +57,10 @@ namespace py
 
 		operator T() { return val; }
 
-		virtual pyObjPtr  operator +(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val + (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
-		virtual pyObjPtr  operator -(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val - (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
-		virtual pyObjPtr  operator *(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val * (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
-		virtual pyObjPtr  operator /(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val / (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual object  operator +(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val + (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual object  operator -(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val - (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual object  operator *(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val * (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
+		virtual object  operator /(pyObj const& other) const override { if (Type() == other.Type()) return decltype(*this)(val / (dynamic_cast<pyNumType<T> const*>(&other))->val).Clone(); else NOT_SUPPORTED_PAIR(other); }
 
 
 	};
@@ -85,20 +85,20 @@ namespace py
 		virtual operator bool() const	override { return (bool)val; }
 		virtual operator uint8_t() const	override { return (uint8_t)val; }
 
-		virtual pyObjPtr& operator [](pyObjPtr const& key) { NOT_SUPPORTED; }
-		virtual pyObjPtr FetchByIdx(int idx) const { NOT_SUPPORTED; }
+		virtual object& operator [](object const& key) { NOT_SUPPORTED; }
+		virtual object FetchByIdx(int idx) const { NOT_SUPPORTED; }
 		virtual pyObjIterator begin() const { NOT_SUPPORTED; }
 		virtual pyObjIterator end() const { NOT_SUPPORTED; }
-		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
+		virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
 		virtual std::string Type() const override { return typeid(bool).name(); }
-		virtual pyObjPtr Clone() const override { return std::make_shared<Bool>(val); }
+		virtual object Clone() const override { return object(val); }
 		virtual bool operator <(pyObj const& other) const override {
 			EXPLICIT_COMPARE(Type(), other.Type());
 			return val < (dynamic_cast<Bool const*>(&other))->val;
 		}
 
-		virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; }
+		virtual object  operator ++(int) { NOT_SUPPORTED; }
 		virtual pyObj& operator ++() { NOT_SUPPORTED; }
 		virtual pyObj& operator += (pyObj const& other) { NOT_SUPPORTED; }
 

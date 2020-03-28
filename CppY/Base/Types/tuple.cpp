@@ -41,7 +41,7 @@ namespace py
 		//doesn't really belong here but trying to DRY the code
 		auto myTuple = dynamic_cast<pyTuple*>(get());
 
-		//for (pyObjPtr& elem : myTuple->_impl)
+		//for (object& elem : myTuple->_impl)
 		//	elem.IsAssignable = false;
 
 		(*this).attr(count) = py_tuple::count;
@@ -54,7 +54,7 @@ namespace py
 	}
 
 	tuple::tuple(std::vector<object> const& v)
-		: object(pyTuple(std::vector<pyObjPtr>(v.begin(), v.end())))
+		: object(pyTuple(std::vector<object>(v.begin(), v.end())))
 	{
 		AddAttributes();
 	}

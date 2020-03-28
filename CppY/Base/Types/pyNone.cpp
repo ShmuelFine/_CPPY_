@@ -45,8 +45,8 @@ namespace py
 		return true;
 	}
 
-	pyObjPtr pyNone::Clone() const
+	object pyNone::Clone() const
 	{
-		return pyObjPtr(new pyNone());
+		return object(new pyNone());
 	}
 }

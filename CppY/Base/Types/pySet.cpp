@@ -16,15 +16,15 @@ namespace py {
 	{
 	}
 
-	pySet::pySet(std::vector<pyObjPtr> const& v)
+	pySet::pySet(std::vector<object> const& v)
 	{
 		for (auto& element : v)
 			_impl.insert(element);
 	}
 
-	pySet::pySet(pyObjPtr v)
+	pySet::pySet(object v)
 	{
-		for (auto elem : *v)
+		for (auto elem : v)
 		{
 			_impl.insert(elem);
 		}
@@ -44,7 +44,7 @@ namespace py {
 
 	pySet::operator std::string() const
 	{
-		pyStr values = pyStr(",").join(LAMBDA_BASE(pyStr(*x).Clone(), x, (*this)));
+		pyStr values = pyStr(",").join(LAMBDA_BASE(pyStr(x).Clone(), x, (*this)));
 		pyStr result = pyStr("{ ") + values + pyStr(" }");
 		return result;
 	}
@@ -77,33 +77,36 @@ namespace py {
 		return ToList() < otherPtr->ToList();
 	}
 
-	pyObjPtr pySet::FetchByIdx(int index) const
+	object pySet::FetchByIdx(int index) const
 	{
 		int idx = index;
 		auto it = _impl.begin();
 		for (int i = 0; i < idx; i++)
 			it++;
-		return pyObjPtr(*it);
+		return object(*it);
 	}
 
 
-	pyObjPtr pySet::Clone() const
+	object pySet::Clone() const
 	{
-		shared_ptr<pySet> result(new pySet());
-		for (pyObjPtr const& oPtr : *this)
-			result->add(oPtr);
-		return result;
+		object resultObj(new pySet());
+		pySet* resultPtr = reinterpret_cast<pySet*>(resultObj.get());
+		pySet& result = *resultPtr;
+
+		for (object const& oPtr : *this)
+			result.add(oPtr);
+		return resultObj;
 	}
 
 
 	void pySet::update(pyList const& v)
 	{
-		for (pyObjPtr element : v)
+		for (object element : v)
 			_impl.insert(element);
 	}
 
 
-	void pySet::add(pyObjPtr o)
+	void pySet::add(object o)
 	{
 		_impl.insert(o);
 	}
@@ -125,10 +128,10 @@ namespace py {
 		return result;
 	}
 
-	bool HasElement(pyObj& iterable, pyObjPtr toFind)
+	bool HasElement(pyObj const & iterable, object const & toFind)
 	{
 		for (auto elem : iterable)
-			if (*toFind == *elem)
+			if (toFind == elem)
 				return true;
 
 		return false;
@@ -221,21 +224,21 @@ namespace py {
 
 
 
-	pySetPtr pySet::setUnion(pyObj const& others) const
+	pySet pySet::setUnion(pyObj const& others) const
 	{
 		pySet result = *this;
 		for (auto iterable : others)
 		{
-			for (auto elem : *iterable)
+			for (auto elem : iterable)
 			{
 				result.add(elem);
 			}
 		}
-		return std::make_shared<pySet>(result);
+		return result;
 	}
 
 
-	pySetPtr pySet::symmetric_difference(pySet const& others) const
+	pySet pySet::symmetric_difference(pySet const& others) const
 	{
 
 		auto differ1 = (*this).difference(others);
@@ -249,10 +252,10 @@ namespace py {
 		auto differ1 = this->difference(others);
 		auto differ2 = others.difference(*this);
 
-		*this = *differ1->setUnion(*differ2);
+		*this = differ1->setUnion(*differ2);
 	}
 
-	void pySet::remove(pyObjPtr o)
+	void pySet::remove(object o)
 	{
 		if (0 == this->_impl.erase(o))
 			THROW("element doesnt exist in the set");
@@ -265,7 +268,7 @@ namespace py {
 	//	return result;
 	//}
 
-	//pyObjPtr sum(pyList const& l)
+	//object sum(pyList const& l)
 	//{
 	//	double sum = 0;
 	//	for (auto elem : l)

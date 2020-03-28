@@ -6,13 +6,13 @@ namespace py
 	pyBytes::pyBytes(std::initializer_list<unsigned char> const& v)
 	{
 		for (auto elem : v) _impl.push_back(pyByte(elem).Clone());
-		//for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		//for (object& i : _impl) i.IsAssignable = false;
 
 	}
 	pyBytes::pyBytes(std::vector<unsigned char> const& v)
 	{
 		for (auto elem : v) _impl.push_back(pyByte(elem).Clone());
-		//for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		//for (object& i : _impl) i.IsAssignable = false;
 	}
 
 	pyBytes::pyBytes(std::string const& v) {
@@ -27,16 +27,20 @@ namespace py
 			//res.push_back(tst);
 			_impl.push_back(pyByte(tst).Clone());
 		}
-		//for (pyObjPtr& i : _impl) i.IsAssignable = false;
+		//for (object& i : _impl) i.IsAssignable = false;
 		//*this=pyBytes(res);
 	}
 
-	pyObjPtr pyBytes::Clone() const
+	object pyBytes::Clone() const
 	{
-		std::shared_ptr<pyBytes> result(new pyBytes());
-		for (pyObjPtr oPtr : this->_impl)
-			result->append(oPtr);
-		return result;
+		object resultObj(new pyBytes());
+		pyBytes* resultPtr = reinterpret_cast<pyBytes*>(resultObj.get());
+		pyBytes& result = *resultPtr;
+		
+		for (object oPtr : this->_impl)
+			result.append(oPtr->Clone());
+		
+		return resultObj;
 	}
 
 	std::string pyBytes::Type() const

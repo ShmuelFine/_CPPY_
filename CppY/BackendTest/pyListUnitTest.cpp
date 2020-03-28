@@ -8,7 +8,7 @@ using namespace py;
 TEST(listTest, InitializationAndIteration_Sanity)
 {
 	// Arrange
-	std::vector<pyObjPtr> expected = { pyInt(1).Clone(), Float(2.5f).Clone(), Double(3.).Clone(), pyStr("hello").Clone() };
+	std::vector<object> expected = { 1, 2.5f, 3., "hello" };
 	pyList l(expected);
 	
 	auto it = l.begin();

@@ -220,7 +220,7 @@ namespace py
 	}
 
 	bytes::bytes(const char* v_str)
-		:object(pyBytes(v_str))
+		:object(pyBytes(std::string(v_str)))
 	{
 		AddAttributes();
 	}

@@ -78,13 +78,13 @@ namespace py
 		return !_impl.empty();
 	}
 
-	pyObjPtr & pyStr::operator [](pyObjPtr const & key)
+	object & pyStr::operator [](object const & key)
 	{
 		NOT_IMPL; // for implementing we should add ordinary operator [] that returns ptr without ref.
 		//return FetchByIdx(key->operator int());
 	}
 
-	pyObjPtr pyStr::FetchByIdx(int idx) const
+	object pyStr::FetchByIdx(int idx) const
 	{
 		char theChar = _impl.operator[](idx);
 		pyStr result = std::string(1, theChar);
@@ -115,9 +115,9 @@ namespace py
 	{
 	}
 
-	pyObjPtr pyStr::Clone() const
+	object pyStr::Clone() const
 	{
-		return make_shared<pyStr>(_impl);
+		return new pyStr(_impl);
 	}
 
 
@@ -130,7 +130,7 @@ namespace py
 		return *this;
 	}
 
-	pyObjPtr pyStr::operator+(pyObj const& other) const
+	object pyStr::operator+(pyObj const& other) const
 	{
 		pyStr result = _impl;
 		result += other;

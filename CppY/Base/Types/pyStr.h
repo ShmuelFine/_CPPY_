@@ -26,21 +26,21 @@ namespace py
 		virtual operator int() const override;
 		virtual operator bool() const override;
 
-		virtual pyObjPtr & operator [](pyObjPtr const & key);
-		virtual pyObjPtr FetchByIdx(int idx) const;
+		virtual object & operator [](object const & key);
+		virtual object FetchByIdx(int idx) const;
 		virtual pyObjIterator begin() const;
 		virtual pyObjIterator end() const;
 
 
-		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
+		virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
-		virtual pyObjPtr Clone() const override;
+		virtual object Clone() const override;
 		virtual bool operator <(pyObj const& other) const override;
 
-		virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; };
+		virtual object  operator ++(int) { NOT_SUPPORTED; };
 		virtual pyObj& operator ++() { NOT_SUPPORTED; };
 		virtual pyObj& operator += (pyObj const& other);
-		virtual pyObjPtr  operator +(pyObj const& other)  const override;
+		virtual object  operator +(pyObj const& other)  const override;
 
 		/////////////////////////////////////////////////////////////
 
@@ -57,7 +57,7 @@ namespace py
 			std::string retStr = "";
 			for (auto part : parts)
 			{
-				retStr = retStr + (std::string)(*((pyObjPtr)part)) + (std::string)(*this);
+				retStr = retStr + (std::string)(part) + (std::string)(*this);
 			}
 			retStr = std::string(retStr.begin(), retStr.end() - this->_impl.size());
 

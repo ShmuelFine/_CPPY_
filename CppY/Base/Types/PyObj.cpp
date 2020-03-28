@@ -33,16 +33,16 @@ namespace py
 			iterable == other.iterable;
 	}
 
-	pyObjPtr pyObjIterator::operator*()
+	object pyObjIterator::operator*()
 	{
 		return (*iterable).FetchByIdx(currIdx)->Clone();
 	}
 
 
-	pyObjPtr  pyObj::operator +(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
-	pyObjPtr  pyObj::operator -(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
-	pyObjPtr  pyObj::operator *(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
-	pyObjPtr  pyObj::operator /(pyObj const& other) const { NOT_SUPPORTED_PAIR(other); }
+	object  pyObj::operator +(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
+	object  pyObj::operator -(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
+	object  pyObj::operator *(pyObj const& other)  const { NOT_SUPPORTED_PAIR(other); }
+	object  pyObj::operator /(pyObj const& other) const { NOT_SUPPORTED_PAIR(other); }
 
 
 	pyObj::operator uint8_t() const
@@ -84,9 +84,13 @@ namespace py
 
 	object::object() : pyObjPtr(new pyInt(0)) {}
 
+	//object::object(object const& other) : pyObjPtr(other) {}
+	
 	object::object(pyObjPtr const& other) : pyObjPtr(other) {}
 
 	object::object(pyObj const& other) : pyObjPtr(other.Clone()) {}
+
+	object::object(pyObj* other) : pyObjPtr(other) {}
 
 	object::object(int i) : pyObjPtr(new pyInt(i)) {}
 
@@ -101,8 +105,6 @@ namespace py
 	object::object(size_t sz) : pyObjPtr(new pyInt((int)sz)) {}
 
 	object::object(uint8_t i) : pyObjPtr(new pyByte(i)) {}
-
-	object::object(object const& other) : pyObjPtr(other) {}
 
 	object::object(std::initializer_list<object> const& v) : pyObjPtr(new pyList(v)) {}
 
@@ -124,6 +126,8 @@ namespace py
 	
 	object::operator unsigned char() const { CHECK_PTR; return get()->operator unsigned char(); }
 
+	pyObj& object::operator *() { return *get(); }
+	pyObj const& object::operator *() const { return *get(); }
 
 	object::ObjectIterator object::begin() const { CHECK_PTR; return std::make_shared<pyObjIterator>(get()->begin()); }
 

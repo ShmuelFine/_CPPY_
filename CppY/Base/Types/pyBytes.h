@@ -28,7 +28,7 @@ namespace py
 		// Overrides:
 		virtual std::string Type() const override;
 		virtual operator std::string() const override;
-		virtual pyObjPtr Clone() const override;
+		virtual object Clone() const override;
 
 	public:
 		std::string hex() const;
@@ -44,7 +44,7 @@ namespace py
 
 	public:
 		// Shouldn't be used. if the other is a list, use As<list>
-		pyBytes(pyObjPtr const& other) = delete;
+		pyBytes(object const& other) = delete;
 	};
 
 }

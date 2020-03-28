@@ -20,7 +20,7 @@ namespace py
 	}
 
 	dict::dict(std::map<object, object> const& m)
-		:object(pyDict(std::map<pyObjPtr, pyObjPtr>(m.begin(), m.end())))
+		:object(pyDict(std::map<object, object>(m.begin(), m.end())))
 	{
 		AddAttributes();
 	}

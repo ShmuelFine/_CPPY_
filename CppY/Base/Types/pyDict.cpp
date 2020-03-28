@@ -10,94 +10,100 @@ namespace py
 	using namespace std;
 
 	
-	bool compareObjPtrs::operator()(const pyObjPtr & a, const pyObjPtr & b) const {
-		return (*a) < (*b);
+	bool compareObjPtrs::operator()(const object & a, const object & b) const {
+		return (*a.get()) < (*b.get());
 	}
 
 	pyDict::pyDict() : _impl() {};
 	
-	pyDict::pyDict(std::map<pyObjPtr, pyObjPtr> const& v)
+	pyDict::pyDict(std::map<object, object> const& v)
 	{
 		_impl.insert(v.begin(), v.end());
 	}
 
-	pyDict::pyDict(std::initializer_list<std::pair<pyObjPtr, pyObjPtr> > const& v)
+	pyDict::pyDict(std::initializer_list<std::pair<object, object> > const& v)
 	{	
 		_impl.insert(v.begin(), v.end());
 	}
 
-	pyDict::pyDict(std::vector<std::pair<pyObjPtr, pyObjPtr>> const& v)
+	pyDict::pyDict(std::vector<std::pair<object, object>> const& v)
 	{
 		_impl.insert(v.begin(), v.end());
 	}
 
 	pyDict::operator std::string() const 
 	{
-		pyStr result = pyStr("{ ") + pyStr(" , ").join(LAMBDA_BASE(pyStr("{ " + (std::string) * (kvp.first) + " : " + (std::string) * (kvp.second) + " }").Clone(), kvp, _impl)) + pyStr(" }");
+		pyStr result = pyStr("{ ") + pyStr(" , ").join(LAMBDA_BASE(pyStr("{ " + (std::string) (kvp.first) + " : " + (std::string) (kvp.second) + " }").Clone(), kvp, _impl)) + pyStr(" }");
 		return result;
 	}
 
-	pyObjPtr & pyDict::operator [](pyObjPtr const & params)
+	object & pyDict::operator [](object const & params)
 	{
 		THROW_UNLESS(_impl.count(params), "KeyError: " + params->operator std::string());
 		return _impl[params];
 	}
 	
-	pyObjPtr const& pyDict::at(pyObjPtr const& params) const
+	object const& pyDict::at(object const& params) const
 	{
 		THROW_UNLESS(_impl.count(params), "KeyError: " + params->operator std::string());
 		return _impl.at(params);
 	}
 
 
-	pyObjPtr pyDict::FetchByIdx(int index) const
+	object pyDict::FetchByIdx(int index) const
 	{
 		int idx = index;
 		auto it = _impl.begin();
 		for (int i = 0; i < idx; i++)
 			it++;
-		return pyObjPtr(new pyTuple(*it));
+		return new pyTuple(*it);
 	}
 
 
-	pyObjPtr pyDict::Clone() const
+	object pyDict::Clone() const
 	{
-		std::shared_ptr<pyDict> result(new pyDict());
+		object resultObj(new pyDict());
+		pyDict* resultPtr = reinterpret_cast<pyDict*>(resultObj.get());
+		pyDict& result = *resultPtr;
 		for (auto const currPair : this->_impl)
 		{
-			result->_impl[currPair.first->Clone()] = currPair.second->Clone();
+			result._impl[currPair.first->Clone()] = currPair.second->Clone();
 		}
-		return result;
+
+		return resultObj;
 	}
 
 	////////////////// default dict: //////////////////
 
 	pyDefaultDict::pyDefaultDict() : pyDict() {}
 
-	pyDefaultDict::pyDefaultDict(std::map<pyObjPtr, pyObjPtr> const& v) : pyDict(v) {}
+	pyDefaultDict::pyDefaultDict(std::map<object, object> const& v) : pyDict(v) {}
 
-	pyDefaultDict::pyDefaultDict(std::initializer_list<std::pair<pyObjPtr, pyObjPtr>> const& v) : pyDict(v) {}
+	pyDefaultDict::pyDefaultDict(std::initializer_list<std::pair<object, object>> const& v) : pyDict(v) {}
 
-	pyDefaultDict::pyDefaultDict(std::vector<std::pair<pyObjPtr, pyObjPtr>> const& v) : pyDict(v) {}
+	pyDefaultDict::pyDefaultDict(std::vector<std::pair<object, object>> const& v) : pyDict(v) {}
 
-	pyObjPtr & pyDefaultDict::operator[](pyObjPtr const& key)
+	object & pyDefaultDict::operator[](object const& key)
 	{
 		return _impl[key];
 	}
 
-	pyObjPtr pyDefaultDict::Clone() const
+	object pyDefaultDict::Clone() const
 	{
-		std::shared_ptr<pyDefaultDict> result(new pyDefaultDict());
+		object resultObj(new pyDict());
+		pyDict* resultPtr = reinterpret_cast<pyDict*>(resultObj.get());
+		pyDict& result = *resultPtr;
 		for (auto const currPair : this->_impl)
 		{
-			result->_impl[currPair.first->Clone()] = currPair.second->Clone();
+			result._impl[currPair.first->Clone()] = currPair.second->Clone();
 		}
-		return result;
+
+		return resultObj;
 	}
 
 
 
-	//pyObjPtr const & pyDict::get(pyObjPtr const & key, pyObjPtr const & defaultValue) const
+	//object const & pyDict::get(object const & key, object const & defaultValue) const
 	//{
 	//	if (this->_impl.count(key))
 	//		return this->_impl.at(key);

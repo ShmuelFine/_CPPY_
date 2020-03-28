@@ -33,7 +33,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = dynamic_cast<pySet*>(self.get());
 		auto other = dynamic_cast<pySet*>(others.get());
-		return pyObjPtr(meAsSet->difference(*other));
+		return object(meAsSet->difference(*other));
 		END_FUN(difference);
 
 		FUN_DEF(discard);
@@ -56,7 +56,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = dynamic_cast<pySet*>(self.get());
 		auto other = dynamic_cast<pySet*>(others.get());
-		return pyObjPtr(meAsSet->intersection(*other));
+		return object(meAsSet->intersection(*other));
 		END_FUN(intersection);
 
 		FUN_DEF(intersection_update);
@@ -104,7 +104,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = dynamic_cast<pySet*>(self.get());
 		auto other = dynamic_cast<pyList*>(others.get());
-		return pyObjPtr(meAsSet->setUnion(*other));
+		return object(meAsSet->setUnion(*other));
 		END_FUN(set_union);
 
 		FUN_DEF(symmetric_difference);
@@ -112,7 +112,7 @@ namespace py
 		PARAM(others, );
 		auto meAsSet = dynamic_cast<pySet*>(self.get());
 		auto other = dynamic_cast<pySet*>(others.get());
-		return pyObjPtr(meAsSet->symmetric_difference(*other));
+		return object(meAsSet->symmetric_difference(*other));
 		END_FUN(symmetric_difference);
 
 		FUN_DEF(symmetric_difference_update);
@@ -168,7 +168,7 @@ namespace py
 	}
 
 	set::set(std::vector<object> const& s)
-		: object(pySet(std::vector<pyObjPtr>(s.begin(), s.end())))
+		: object(pySet(std::vector<object>(s.begin(), s.end())))
 	{
 		AddAttributes();
 	}

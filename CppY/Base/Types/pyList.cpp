@@ -4,7 +4,7 @@
 #include "pyExceptions.h"
 #include "ComparisonUtils.h"
 #include "pyLambda.h"
-//#include "Comparisons.h"
+#include "PyObj.h"
 #include <algorithm>
 
 namespace py
@@ -33,12 +33,12 @@ namespace py
 		return idx;
 	}
 
-	pyObjPtr& pyList::operator [](pyObjPtr const& key)
+	object& pyList::operator [](object const& key)
 	{
 		return _impl[CorrectIdx(key->operator int())];
 	}
 
-	pyObjPtr pyList::FetchByIdx(int idx) const
+	object pyList::FetchByIdx(int idx) const
 	{
 		return _impl[CorrectIdx(idx)];
 	}
@@ -90,38 +90,44 @@ namespace py
 			_impl.push_back(elem);
 	}
 
-	pyObjPtr pyList::Clone() const
+	object pyList::Clone() const
 	{
-		shared_ptr<pyList> result(new pyList());
-		for (pyObjPtr oPtr : this->_impl)
-			result->append(oPtr);
-		return result;
+		object resultObj(new pyList());
+		pyList* resultPtr = reinterpret_cast<pyList*>(resultObj.get());
+		pyList& result = *resultPtr;
+
+		for (object oPtr : this->_impl)
+			result.append(oPtr);
+		
+		return resultObj;
 	}
 
-	void pyList::append(pyObjPtr o)
+	void pyList::append(object o)
 	{
 		_impl.push_back(o);
 	}
 
-	pyObjPtr pyList::pop(int idx)
+	object pyList::pop(int idx)
 	{
 		while (idx < 0)
 			idx += (int)_impl.size();
 		while (idx >= _impl.size())
 			idx -= (int)_impl.size();
 
-		pyObjPtr ret = (*this)._impl[idx];
+		object ret = (*this)._impl[idx];
 		this->_impl.erase(_impl.begin() + idx);
 
 		return ret;
 	}
 
 
-	pyObjPtr  pyList::operator +(pyObj const& other)  const
+	object pyList::operator +(pyObj const& other)  const
 	{
-		shared_ptr<pyList> result(new pyList(*this));
-		(*result) += other;
-		return result;
+		object resultObj(new pyList(*this));
+		pyList* resultPtr = reinterpret_cast<pyList*>(resultObj.get());
+		pyList& result = *resultPtr;
+		result += other;
+		return resultObj;
 	}
 
 	pyObj& pyList::operator += (pyObj const& other)
@@ -133,9 +139,9 @@ namespace py
 		_impl.insert(_impl.end(), otherPtr->_impl.begin(), otherPtr->_impl.end());
 		return *this;
 	}
-	int pyList::count(pyObjPtr whatToCount, pyObjPtr start, pyObjPtr end)
+	int pyList::count(object whatToCount, object start, object end)
 	{
-		int startdx = *start, enddx = *end;
+		int startdx = start, enddx = end;
 
 		int count = 0;
 		for (auto it = _impl.begin() + startdx; it < _impl.end() - (_impl.size() - enddx); it++)
@@ -144,9 +150,9 @@ namespace py
 		return count;
 	}
 
-	int pyList::index(pyObjPtr whoToSearch, pyObjPtr startIdx, pyObjPtr endIdx, bool isToThrow) const
+	int pyList::index(object whoToSearch, object startIdx, object endIdx, bool isToThrow) const
 	{
-		int startIdx_int = *startIdx, endIdx_int = *endIdx;
+		int startIdx_int = startIdx, endIdx_int = endIdx;
 		auto it = std::find(
 			_impl.begin() + startIdx_int,
 			_impl.begin() + endIdx_int, whoToSearch);
@@ -165,26 +171,26 @@ namespace py
 		while (start >= sz) start -= sz;
 		while (end < 0) end += sz;
 		while (end >= sz) end -= sz;
-		vector<pyObjPtr> subVec(_impl.begin() + start, _impl.begin() + end);
+		vector<object> subVec(_impl.begin() + start, _impl.begin() + end);
 		pyList result;
 		for (auto& v : subVec)
 			result._impl.push_back(v);
 		return result;
 	}
 
-	void pyList::remove(pyObjPtr o)
+	void pyList::remove(object o)
 	{
 		auto it = std::find_if(
 			_impl.begin(),
 			_impl.end(),
-			[&o](pyObjPtr const& a) {return (*a) == (*o); });
+			[&o](object const& a) {return a == o; });
 		THROW_IF(it == _impl.end(), "Not found element");
 		_impl.erase(it);
 	}
 
-	void pyList::insert(pyObjPtr idx, pyObjPtr o)
+	void pyList::insert(object idx, object o)
 	{
-		int index = *idx;
+		int index = idx;
 		THROW_IF(_impl.begin() + index == _impl.end(), "Index out of range");
 		_impl.insert(_impl.begin() + index, o);
 	}
@@ -203,16 +209,16 @@ namespace py
 	//////////////////////////////////////////////////////
 
 	//pySet::pySet()
-	//	:std::set<pyObjPtr>()
+	//	:std::set<object>()
 	//{}
 
-	//pySet::pySet(std::vector<pyObjPtr> const& v)
+	//pySet::pySet(std::vector<object> const& v)
 	//{
 	//	for (auto& element : v)
 	//		insert(element);
 	//}
 
-	//pySet::pySet(pyObjPtr v)
+	//pySet::pySet(object v)
 	//{
 	//	pyList dummyList;
 	//	if (v->Type() == dummyList.Type())
@@ -265,10 +271,10 @@ namespace py
 	//	return ToList() < otherPtr->ToList();
 	//}
 
-	//pyObjPtr pySet::Clone() const
+	//object pySet::Clone() const
 	//{
 	//	shared_ptr<pySet> result(new pySet());
-	//	for (pyObjPtr const& oPtr : *this)
+	//	for (object const& oPtr : *this)
 	//		result->add(oPtr);
 	//	return result;
 	//}
@@ -283,17 +289,17 @@ namespace py
 
 	//void pySet::update(pyList const& v)
 	//{
-	//	for (pyObjPtr element : v)
+	//	for (object element : v)
 	//		insert(element);
 	//}
 
 	////void pySet::update(std::vector<std::string> const& v)
 	////{
-	////	for (pyObjPtr element : v)
+	////	for (object element : v)
 	////		insert(element);
 	////}
 
-	//void pySet::add(pyObjPtr o)
+	//void pySet::add(object o)
 	//{
 	//	insert(o);
 	//}
@@ -323,7 +329,7 @@ namespace py
 	//	return result;
 	//}
 
-	//pyObjPtr sum(pyList const& l)
+	//object sum(pyList const& l)
 	//{
 	//	double sum = 0;
 	//	for (auto elem : l)

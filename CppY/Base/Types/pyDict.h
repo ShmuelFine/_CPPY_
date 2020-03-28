@@ -17,7 +17,7 @@ namespace py
 {
 	
 struct compareObjPtrs {
-	bool operator()(const pyObjPtr& a, const pyObjPtr& b) const;
+	bool operator()(const object& a, const object& b) const;
 };
 
 
@@ -25,14 +25,14 @@ class pyDict : public pyObj
 {
 
 public:
-	std::map<pyObjPtr, pyObjPtr, compareObjPtrs> _impl;
+	std::map<object, object, compareObjPtrs> _impl;
 
 public:
 	pyDict();
-	pyDict(std::map<pyObjPtr, pyObjPtr> const& v);
-	pyDict(std::initializer_list<std::pair<pyObjPtr, pyObjPtr> > const& v);
-	pyDict(std::vector<std::pair<pyObjPtr, pyObjPtr>> const& v);
-	pyDict(pyObjPtr const& other) = delete;
+	pyDict(std::map<object, object> const& v);
+	pyDict(std::initializer_list<std::pair<object, object> > const& v);
+	pyDict(std::vector<std::pair<object, object>> const& v);
+	pyDict(object const& other) = delete;
 
 public:
 	/////// pyObj: //////////////////////////////
@@ -43,7 +43,7 @@ public:
 	virtual operator int() const override { NOT_IMPL; }
 	virtual operator bool() const override { return !this->_impl.empty(); }
 
-	virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; };
+	virtual object  operator ++(int) { NOT_SUPPORTED; };
 	virtual pyObj& operator ++() { NOT_SUPPORTED; };
 	virtual pyObj& operator += (pyObj const& other) { NOT_SUPPORTED; };
 
@@ -57,11 +57,11 @@ public:
 		return pyObjIterator((pyObj*)this, (int)_impl.size());
 	}
 
-	virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; };
-	virtual pyObjPtr FetchByIdx(int idx) const;
-	virtual pyObjPtr & operator [](pyObjPtr const & key) override;
-	pyObjPtr const& at(pyObjPtr const& key) const;
-	virtual pyObjPtr Clone() const override;	
+	virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; };
+	virtual object FetchByIdx(int idx) const;
+	virtual object & operator [](object const & key) override;
+	object const& at(object const& key) const;
+	virtual object Clone() const override;	
 
 	// for using as key in sets, maps, etc:
 	virtual bool operator <(pyObj const& other) const override { NOT_IMPL; }
@@ -74,13 +74,13 @@ class pyDefaultDict : public pyDict
 {
 public:
 	pyDefaultDict();
-	pyDefaultDict(std::map<pyObjPtr, pyObjPtr> const& v);
-	pyDefaultDict(std::initializer_list<std::pair<pyObjPtr, pyObjPtr> > const& v);
-	pyDefaultDict(std::vector<std::pair<pyObjPtr, pyObjPtr>> const& v);
-	pyDefaultDict(pyObjPtr const& other) = delete;
+	pyDefaultDict(std::map<object, object> const& v);
+	pyDefaultDict(std::initializer_list<std::pair<object, object> > const& v);
+	pyDefaultDict(std::vector<std::pair<object, object>> const& v);
+	pyDefaultDict(object const& other) = delete;
 
-	virtual pyObjPtr & operator [](pyObjPtr const& key) override;
-	virtual pyObjPtr Clone() const override;
+	virtual object & operator [](object const& key) override;
+	virtual object Clone() const override;
 
 };
 

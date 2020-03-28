@@ -12,8 +12,8 @@ namespace py {
 
 	struct pyObjPtrCompare
 	{
-		bool operator()(const pyObjPtr& _Left, const pyObjPtr& _Right) const {
-			return *_Left < *_Right;
+		bool operator()(const object& _Left, const object& _Right) const {
+			return _Left < _Right;
 		}
 	};
 	class pySet;
@@ -23,12 +23,12 @@ namespace py {
 	{
 
 	public: 
-		std::set<pyObjPtr, pyObjPtrCompare> _impl;
+		std::set<object, pyObjPtrCompare> _impl;
 
 	public:
 		pySet();
-		pySet(std::vector<pyObjPtr> const& v);
-		pySet(pyObjPtr v);
+		pySet(std::vector<object> const& v);
+		pySet(object v);
 		
 		pySet(pySet const& other);
 
@@ -40,10 +40,10 @@ namespace py {
 		virtual operator int() const override;
 		virtual operator bool() const override;
 
-		virtual pyObjPtr& operator [](pyObjPtr const& key) { NOT_SUPPORTED; }
-		virtual pyObjPtr operator()(pyObj const& params) const { NOT_SUPPORTED; }
+		virtual object& operator [](object const& key) { NOT_SUPPORTED; }
+		virtual object operator()(pyObj const& params) const { NOT_SUPPORTED; }
 
-		virtual pyObjPtr FetchByIdx(int idx) const;
+		virtual object FetchByIdx(int idx) const;
 
 		virtual pyObjIterator begin() const
 		{
@@ -55,10 +55,10 @@ namespace py {
 			return pyObjIterator((pyObj*)this, (int)_impl.size());
 		}
 
-		virtual pyObjPtr Clone() const override;
+		virtual object Clone() const override;
 		virtual bool operator <(pyObj const& other) const override;
 
-		virtual pyObjPtr  operator ++(int) { NOT_SUPPORTED; };
+		virtual object  operator ++(int) { NOT_SUPPORTED; };
 		virtual pyObj& operator ++() { NOT_SUPPORTED; };
 		virtual pyObj& operator += (pyObj const& other) { NOT_SUPPORTED; };
 
@@ -69,7 +69,7 @@ namespace py {
 		void update(pyList const& l);
 		//void update(std::vector<std::string> const& v);
 
-		void add(pyObjPtr o);
+		void add(object o);
 		pySet operator -(pySet const& other) const;
 
 		pyList ToList() const;
@@ -88,16 +88,16 @@ namespace py {
 
 		bool isdisjoint(pySet const& others) const;
 
-		pySetPtr symmetric_difference(pySet const& others) const;
+		pySet symmetric_difference(pySet const& others) const;
 
 		void symmetric_difference_update(pySet const& others);
 
-		pySetPtr setUnion(pyObj const& others) const;
+		pySet setUnion(pyObj const& others) const;
 
-		void remove(pyObjPtr o);
+		void remove(object o);
 	};
 
-	//pyObjPtr sum(pyList const& l);
+	//object sum(pyList const& l);
 
 }
 

@@ -20,7 +20,7 @@ namespace py
 		return "Tuple";
 	}
 
-	pyObjPtr pyTuple::Clone() const
+	object pyTuple::Clone() const
 	{
 		return pyObjPtr(new pyTuple(_impl));
 	}

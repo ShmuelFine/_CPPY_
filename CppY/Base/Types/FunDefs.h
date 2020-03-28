@@ -6,7 +6,7 @@ namespace py
 	class ARGS
 	{
 	private:
-		pyObjPtr _;
+		object _;
 		
 	public:
 		ARGS(object const& key, object const& value);
@@ -28,8 +28,8 @@ namespace py
 #define FUN_DEF_BODY(funName)\
 public:\
 virtual std::string Type() const override { return std::string("_func_") + #funName; }\
-virtual pyObjPtr Clone() const override {return pyObjPtr(new func_ ##funName());}\
-virtual pyObjPtr operator()(pyObj const& paramsObj) const override { return CALL(paramsObj); }\
+virtual object Clone() const override {return object(new func_ ##funName());}\
+virtual object operator()(pyObj const& paramsObj) const override { return CALL(paramsObj); }\
 \
 virtual object CALL(pyObj const & paramsObj) const \
 { \

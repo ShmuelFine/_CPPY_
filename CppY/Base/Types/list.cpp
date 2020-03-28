@@ -24,7 +24,7 @@ namespace py
 		FUN_DEF(extend);
 		PARAM(self, );
 		PARAM(iterable, );
-		std::vector<pyObjPtr> toAdd;
+		std::vector<object> toAdd;
 		for (auto elem : iterable) {
 			toAdd.push_back(elem);
 		}
@@ -49,7 +49,7 @@ namespace py
 		PARAM(self, );
 		auto meAsList = dynamic_cast<pyList*>(self.get());
 		std::sort(meAsList->_impl.begin(), meAsList->_impl.end(),
-			[](pyObjPtr const& a, pyObjPtr const& b) { return (*a) < (*b); });
+			[](object const& a, object const& b) { return (*a) < (*b); });
 
 		END_FUN(sort);
 

@@ -47,6 +47,7 @@ namespace py
 		object();
 		object(pyObjPtr const& other);
 		object(pyObj const& other);
+		object(pyObj * other);
 		object(int i);
 		object(float i);
 		object(double i);
@@ -54,10 +55,9 @@ namespace py
 		object(const char* i);
 		object(size_t sz);
 		object(uint8_t i);
-		object(object const& other);
+		//object(object const& other);
 		object(std::initializer_list<object> const& v);
 
-		///////////// virtuals forwarding: /////////////////////////////////////////
 		operator std::string() const;
 		operator double() const;
 		operator float() const;
@@ -65,6 +65,8 @@ namespace py
 		operator bool() const;
 		operator unsigned char() const;
 
+		pyObj& operator *();
+		pyObj const & operator *() const;
 	public:
 
 		class ObjectIterator
@@ -137,7 +139,7 @@ namespace py
 		pyObjIterator& operator ++();
 		bool operator != (pyObjIterator const& other);
 		bool operator == (pyObjIterator const& other);
-		pyObjPtr operator *();
+		object operator *();
 	};
 
 	class pyObj
@@ -153,32 +155,32 @@ namespace py
 		virtual operator bool() const = 0;
 		virtual operator uint8_t() const;
 
-		virtual pyObjPtr& operator [](pyObjPtr const& key) = 0;
+		virtual object& operator [](object const& key) = 0;
 
-		virtual pyObjPtr FetchByIdx(int idx) const = 0;
+		virtual object FetchByIdx(int idx) const = 0;
 		virtual pyObjIterator begin() const = 0;
 		virtual pyObjIterator end() const = 0;
 
-		virtual pyObjPtr operator()(pyObj const & params) const = 0;
+		virtual object operator()(pyObj const & params) const = 0;
 
 		virtual std::string Type() const = 0;
 
-		virtual pyObjPtr Clone() const = 0;
+		virtual object Clone() const = 0;
 
 		// for using as key in sets, maps, etc:
 		virtual bool operator <(pyObj const& other) const = 0;
 		virtual bool operator == (pyObj const& other) const { return !(*this < other || other < *this); }
 		virtual bool operator != (pyObj const& other) const { return (*this < other || other < *this); }
 
-		virtual pyObjPtr  operator ++(int) = 0;
+		virtual object  operator ++(int) = 0;
 		virtual pyObj& operator ++() = 0;
 		virtual pyObj& operator += (pyObj const& other) = 0;
 
 
-		virtual pyObjPtr  operator +(pyObj const& other)  const;
-		virtual pyObjPtr  operator -(pyObj const& other)  const;
-		virtual pyObjPtr  operator *(pyObj const& other)  const;
-		virtual pyObjPtr  operator /(pyObj const& other) const;
+		virtual object  operator +(pyObj const& other)  const;
+		virtual object  operator -(pyObj const& other)  const;
+		virtual object  operator *(pyObj const& other)  const;
+		virtual object  operator /(pyObj const& other) const;
 	};
 
 }

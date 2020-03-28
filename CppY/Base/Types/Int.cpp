@@ -40,7 +40,7 @@ namespace py
 		//// TODO: Only a very partial solution
 		//int param = self;
 		//param = abs(param);
-		//std::vector<pyObjPtr> outArray(outputSize + 1);
+		//std::vector<object> outArray(outputSize + 1);
 		//for (size_t i = 0; i < (size_t)outputSize; i++)
 		//	outArray[outputSize - i].reset(new pyInt(param >> (i * 8)));
 

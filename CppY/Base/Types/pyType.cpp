@@ -4,10 +4,11 @@
 namespace py
 {
 
-	pyObjPtr pyType::Clone() const
+	object pyType::Clone() const
 	{
-		auto result = std::make_shared<pyType>(*Template);
-		result->attributes = attributes;
-		return result;
+		object resultObj(new pyType(*Template));
+		pyType* resultPtr = reinterpret_cast<pyType*>(resultObj.get());
+		resultPtr->attributes = attributes;
+		return resultObj;
 	}
 }

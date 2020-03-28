@@ -7,8 +7,7 @@ using namespace py;
 TEST(dictTest, InitializationAndIteration_Sanity)
 {
 	// Arrange
-	std::map<object, object> initVec_objs = { {"hello","2"}, {"World","4"} };
-	std::map<pyObjPtr, pyObjPtr> expected(initVec_objs.begin(), initVec_objs.end());
+	std::map<object, object> expected = { {"hello","2"}, {"World","4"} };
     pyDict d(expected);
 
 	// Act, Assert
